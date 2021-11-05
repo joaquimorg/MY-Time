@@ -378,12 +378,12 @@ add_custom_target(FLASH_ERASE
         )
 
 add_custom_target(FLASH_SOFTDEVICE
-        COMMAND ${OPENOCD_BIN_PATH} -c "tcl_port disabled" -c "gdb_port 3333" -c "telnet_port 4444" -f interface/stlink.cfg -c 'transport select hla_swd' -f target/nrf52.cfg -c "program"../../src/libs/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex\"" -c reset -c shutdown
+        COMMAND ${OPENOCD_BIN_PATH} -c "tcl_port disabled" -c "gdb_port 3333" -c "telnet_port 4444" -f interface/stlink.cfg -c 'transport select hla_swd' -f target/nrf52.cfg -c "program \"../../src/libs/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex\"" -c reset -c shutdown
         COMMENT "flashing SoftDevice s112_nrf52_6.1.1_softdevice.hex"
         )
 
 add_custom_target(FLASH
         DEPENDS ${EXECUTABLE_APP_NAME}
-        COMMAND ${OPENOCD_BIN_PATH} -c "tcl_port disabled" -c "gdb_port 3333" -c "telnet_port 4444" -f interface/stlink.cfg -c 'transport select hla_swd' -f target/nrf52.cfg -c "program"${EXECUTABLE_APP_NAME}.hex\"" -c reset -c shutdown
+        COMMAND ${OPENOCD_BIN_PATH} -c "tcl_port disabled" -c "gdb_port 3333" -c "telnet_port 4444" -f interface/stlink.cfg -c 'transport select hla_swd' -f target/nrf52.cfg -c "program \"${EXECUTABLE_APP_NAME}.hex\"" -c reset -c shutdown        
         COMMENT "flashing ${EXECUTABLE_APP_NAME}.hex"
         )
