@@ -1,4 +1,5 @@
 #include "base.h"
+#include "display.h"
 
 BLEUart bleuart; // uart over ble
 
@@ -44,7 +45,11 @@ void startAdv(void) {
 }
 
 void setup(void) {
+  dwt_enable();
   pinMode(LCD_LIGHT_3, OUTPUT);
+
+  // Modules init
+  display.init();
 
   Bluefruit.begin(1, 0);
   Bluefruit.Periph.setConnectCallback(connect_callback);
