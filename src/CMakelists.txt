@@ -1,0 +1,246 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(my-time C CXX ASM)
+
+set(NRF_PROJECT_NAME my-time)
+set(NRF_BOARD pca10040)
+
+if (DEFINED ARM_NONE_EABI_TOOLCHAIN_PATH)
+    set(ARM_NONE_EABI_TOOLCHAIN_BIN_PATH ${ARM_NONE_EABI_TOOLCHAIN_PATH}/bin)
+endif ()
+
+set(OPENOCD_BIN_PATH "openocd.exe")
+
+# Setup toolchain
+include(${CMAKE_SOURCE_DIR}/cmake-nRF5x/arm-gcc-toolchain.cmake)
+
+if (NOT DEFINED ARM_GCC_TOOLCHAIN)
+    message(FATAL_ERROR "The toolchain must be set up before calling this macro")
+endif ()
+
+set(NRFX_SOURCE_FILES
+    libs/nRF52/cores/nRF5/nordic/nrfx/mdk/system_nrf52.c
+    libs/nRF52/cores/nRF5/linker/gcc_startup_nrf52.S
+
+    libs/nRF52/libraries/Adafruit_LittleFS/src/Adafruit_LittleFS.cpp
+    libs/nRF52/libraries/Adafruit_LittleFS/src/Adafruit_LittleFS_File.cpp
+    libs/nRF52/libraries/Adafruit_LittleFS/src/littlefs/lfs.c
+    libs/nRF52/libraries/Adafruit_LittleFS/src/littlefs/lfs_util.c
+    libs/nRF52/libraries/Bluefruit52Lib/src/BLEAdvertising.cpp
+    libs/nRF52/libraries/Bluefruit52Lib/src/BLECharacteristic.cpp
+    libs/nRF52/libraries/Bluefruit52Lib/src/BLEClientCharacteristic.cpp
+    libs/nRF52/libraries/Bluefruit52Lib/src/BLEClientService.cpp
+    libs/nRF52/libraries/Bluefruit52Lib/src/BLEConnection.cpp
+    libs/nRF52/libraries/Bluefruit52Lib/src/BLEDiscovery.cpp
+    libs/nRF52/libraries/Bluefruit52Lib/src/BLEGatt.cpp
+    libs/nRF52/libraries/Bluefruit52Lib/src/BLEPeriph.cpp
+    libs/nRF52/libraries/Bluefruit52Lib/src/BLESecurity.cpp
+    libs/nRF52/libraries/Bluefruit52Lib/src/BLEService.cpp
+    libs/nRF52/libraries/Bluefruit52Lib/src/BLEUuid.cpp
+    libs/nRF52/libraries/Bluefruit52Lib/src/bluefruit.cpp
+    libs/nRF52/libraries/Bluefruit52Lib/src/utility/AdaMsg.cpp
+    libs/nRF52/libraries/Bluefruit52Lib/src/utility/bonding.cpp
+    libs/nRF52/libraries/Bluefruit52Lib/src/utility/bootloader_util.c
+    libs/nRF52/libraries/Bluefruit52Lib/src/services/BLEUart.cpp
+    libs/nRF52/libraries/InternalFileSytem/src/flash/flash_cache.c
+    libs/nRF52/libraries/InternalFileSytem/src/flash/flash_nrf5x.c
+    libs/nRF52/libraries/InternalFileSytem/src/InternalFileSystem.cpp
+    libs/nRF52/libraries/SPI/SPI.cpp
+    libs/nRF52/libraries/SPI/SPI_nrf52832.cpp
+    libs/nRF52/libraries/Wire/Wire_nRF52.cpp
+    libs/nRF52/cores/nRF5/freertos/portable/CMSIS/nrf52/port_cmsis.c
+    libs/nRF52/cores/nRF5/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c
+    libs/nRF52/cores/nRF5/freertos/portable/GCC/nrf52/port.c
+    libs/nRF52/cores/nRF5/freertos/Source/croutine.c
+    libs/nRF52/cores/nRF5/freertos/Source/event_groups.c
+    libs/nRF52/cores/nRF5/freertos/Source/list.c
+    libs/nRF52/cores/nRF5/freertos/Source/portable/MemMang/heap_3.c
+    libs/nRF52/cores/nRF5/freertos/Source/queue.c
+    libs/nRF52/cores/nRF5/freertos/Source/stream_buffer.c
+    libs/nRF52/cores/nRF5/freertos/Source/tasks.c
+    libs/nRF52/cores/nRF5/freertos/Source/timers.c
+    libs/nRF52/cores/nRF5/nordic/nrfx/drivers/src/nrfx_gpiote.c
+    libs/nRF52/cores/nRF5/nordic/nrfx/drivers/src/nrfx_power.c
+    libs/nRF52/cores/nRF5/nordic/nrfx/drivers/src/nrfx_pwm.c
+    libs/nRF52/cores/nRF5/nordic/nrfx/drivers/src/nrfx_qspi.c
+    libs/nRF52/cores/nRF5/nordic/nrfx/drivers/src/nrfx_spim.c
+    libs/nRF52/cores/nRF5/nordic/nrfx/drivers/src/nrfx_timer.c
+    libs/nRF52/cores/nRF5/sysview/Config/SEGGER_SYSVIEW_Config_FreeRTOS.c
+    libs/nRF52/cores/nRF5/sysview/SEGGER/SEGGER_RTT.c
+    libs/nRF52/cores/nRF5/sysview/SEGGER/SEGGER_RTT_printf.c
+    libs/nRF52/cores/nRF5/sysview/SEGGER/SEGGER_SYSVIEW.c
+    libs/nRF52/cores/nRF5/sysview/SEGGER_SYSVIEW_FreeRTOS.c
+    libs/nRF52/cores/nRF5/utility/AdaCallback.c
+    libs/nRF52/cores/nRF5/utility/adafruit_fifo.cpp
+    libs/nRF52/cores/nRF5/utility/debug.cpp
+    libs/nRF52/cores/nRF5/utility/SoftwareTimer.cpp
+    libs/nRF52/cores/nRF5/utility/utilities.c
+    libs/nRF52/cores/nRF5/abi.cpp
+    libs/nRF52/cores/nRF5/delay.c
+    libs/nRF52/cores/nRF5/variant.cpp
+    libs/nRF52/cores/nRF5/HardwarePWM.cpp
+    libs/nRF52/cores/nRF5/hooks.c
+    libs/nRF52/cores/nRF5/IPAddress.cpp
+    libs/nRF52/cores/nRF5/itoa.c
+    libs/nRF52/cores/nRF5/new.cpp
+    libs/nRF52/cores/nRF5/Print.cpp
+    libs/nRF52/cores/nRF5/pulse.c
+    libs/nRF52/cores/nRF5/RingBuffer.cpp
+    libs/nRF52/cores/nRF5/rtos.cpp
+    libs/nRF52/cores/nRF5/Stream.cpp
+    libs/nRF52/cores/nRF5/WInterrupts.c
+    libs/nRF52/cores/nRF5/wiring.c
+    libs/nRF52/cores/nRF5/wiring_analog.cpp
+    libs/nRF52/cores/nRF5/wiring_analog_nRF52.c
+    libs/nRF52/cores/nRF5/wiring_digital.c
+    libs/nRF52/cores/nRF5/wiring_private.c
+    libs/nRF52/cores/nRF5/wiring_shift.c
+    libs/nRF52/cores/nRF5/WMath.cpp
+    libs/nRF52/cores/nRF5/WString.cpp
+)
+
+set(LVGL_SRC
+)
+
+include_directories(
+    .
+    ../
+    libs/
+    libs/nRF52/cores/nRF5
+    libs/nRF52/cores/nRF5/freertos
+    libs/nRF52/cores/nRF5/freertos/config
+    libs/nRF52/cores/nRF5/freertos/License
+    libs/nRF52/cores/nRF5/freertos/portable
+    libs/nRF52/cores/nRF5/freertos/portable/CMSIS
+    libs/nRF52/cores/nRF5/freertos/portable/CMSIS/nrf52
+    libs/nRF52/cores/nRF5/freertos/portable/GCC
+    libs/nRF52/cores/nRF5/freertos/portable/GCC/nrf52
+    libs/nRF52/cores/nRF5/freertos/Source
+    libs/nRF52/cores/nRF5/freertos/Source/include
+    libs/nRF52/cores/nRF5/freertos/Source/portable
+    libs/nRF52/cores/nRF5/freertos/Source/portable/MemMang
+    libs/nRF52/cores/nRF5/linker
+    libs/nRF52/cores/nRF5/nordic
+    libs/nRF52/cores/nRF5/nordic/nrfx
+    libs/nRF52/cores/nRF5/nordic/nrfx/drivers
+    libs/nRF52/cores/nRF5/nordic/nrfx/drivers/include
+    libs/nRF52/cores/nRF5/nordic/nrfx/drivers/src
+    libs/nRF52/cores/nRF5/nordic/nrfx/drivers/src/prs
+    libs/nRF52/cores/nRF5/nordic/nrfx/hal
+    libs/nRF52/cores/nRF5/nordic/nrfx/helpers
+    libs/nRF52/cores/nRF5/nordic/nrfx/mdk
+    libs/nRF52/cores/nRF5/nordic/nrfx/soc
+    libs/nRF52/cores/nRF5/nordic/softdevice
+    libs/nRF52/cores/nRF5/nordic/softdevice/s112_nrf52_6.1.1_API
+    libs/nRF52/cores/nRF5/nordic/softdevice/s112_nrf52_6.1.1_API/include
+    libs/nRF52/cores/nRF5/nordic/softdevice/s112_nrf52_6.1.1_API/include/nrf52
+    libs/nRF52/cores/nRF5/sysview
+    libs/nRF52/cores/nRF5/sysview/Config
+    libs/nRF52/cores/nRF5/sysview/SEGGER
+    libs/nRF52/cores/nRF5/utility
+    libs/nRF52/libraries
+    libs/nRF52/libraries/Adafruit_LittleFS
+    libs/nRF52/libraries/Adafruit_LittleFS/src
+    libs/nRF52/libraries/Adafruit_LittleFS/src/littlefs
+    libs/nRF52/libraries/Adafruit_nRFCrypto
+    libs/nRF52/libraries/Adafruit_nRFCrypto/src
+    libs/nRF52/libraries/Adafruit_nRFCrypto/src/cortex-m4
+    libs/nRF52/libraries/Adafruit_nRFCrypto/src/cortex-m4/fpv4-sp-d16-hard
+    libs/nRF52/libraries/Adafruit_nRFCrypto/src/ecc
+    libs/nRF52/libraries/Adafruit_nRFCrypto/src/nrf_cc310
+    libs/nRF52/libraries/Adafruit_nRFCrypto/src/nrf_cc310/include
+    libs/nRF52/libraries/Bluefruit52Lib
+    libs/nRF52/libraries/Bluefruit52Lib/src    
+    libs/nRF52/libraries/Bluefruit52Lib/src/utility
+    libs/nRF52/libraries/Bluefruit52Lib/src/services
+    libs/nRF52/libraries/InternalFileSytem
+    libs/nRF52/libraries/InternalFileSytem/src
+    libs/nRF52/libraries/InternalFileSytem/src/flash
+    libs/nRF52/libraries/SPI
+    libs/nRF52/libraries/Wire
+    libs/nRF52/cmsis/include
+    smartwatch
+)
+
+list(APPEND SOURCE_FILES
+    main.c
+    smartwatch/base.cpp
+)
+
+
+link_directories(
+    ../
+)
+
+set(COMMON_FLAGS -MP -MD -mthumb -mabi=aapcs -Wall -Wno-unknown-pragmas -ffunction-sections -fdata-sections -fno-strict-aliasing -fno-builtin --short-enums -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Wreturn-type -Werror=return-type)
+add_definitions(-DNRF52 -DNRF52832 -DNRF52832_XXAA -DNRF52_PAN_74 -DNRF52_PAN_64 -DNRF52_PAN_12 -DNRF52_PAN_58 -DNRF52_PAN_54 -DNRF52_PAN_31 -DNRF52_PAN_51 -DNRF52_PAN_36 -DNRF52_PAN_15 -DNRF52_PAN_20 -DNRF52_PAN_55 -DBOARD_PCA10040)
+add_definitions(-DFREERTOS)
+add_definitions(-D__STACK_SIZE=0x2000)
+add_definitions(-D__HEAP_SIZE=0x2000)
+add_definitions(-DS112)
+add_definitions(-DSOFTDEVICE_PRESENT)
+add_definitions(-DF_CPU=64000000)
+
+# Release
+set(COMMON_FLAGS_OPT -Os -fno-exceptions -fno-non-call-exceptions)
+
+add_definitions(-DCFG_DEBUG=0)
+
+# NRF SDK
+add_library(nrf-sdk STATIC ${NRFX_SOURCE_FILES})
+target_include_directories(nrf-sdk SYSTEM PUBLIC . ../)
+target_include_directories(nrf-sdk SYSTEM PUBLIC ${INCLUDES_FROM_LIBS})
+target_compile_options(nrf-sdk PRIVATE
+            $<$<AND:$<COMPILE_LANGUAGE:C>,$<CONFIG:DEBUG>>: ${COMMON_FLAGS} -O0 -g3>
+            $<$<AND:$<COMPILE_LANGUAGE:C>,$<CONFIG:RELEASE>>: ${COMMON_FLAGS} -O3 ${COMMON_FLAGS_OPT}>
+            $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:DEBUG>>: ${COMMON_FLAGS} -O0 -g3>
+            $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:RELEASE>>: ${COMMON_FLAGS} -O3 ${COMMON_FLAGS_OPT} -fno-rtti>
+            $<$<COMPILE_LANGUAGE:ASM>: -MP -MD -x assembler-with-cpp>
+        )
+
+# Build binary 
+set(EXECUTABLE_APP_NAME "my-time")
+set(EXECUTABLE_APP_FILE_NAME ${EXECUTABLE_APP_NAME})
+set(IMAGE_APP_FILE_NAME image-${EXECUTABLE_APP_NAME}.bin)
+set(DFU_FILE_NAME dfu-${EXECUTABLE_APP_NAME}.zip)
+set(NRF5_LINKER_SCRIPT_MCUBOOT "${CMAKE_SOURCE_DIR}/src/libs/nRF52/cores/nRF5/linker/gcc_nrf52.ld")
+add_executable(${EXECUTABLE_APP_NAME} ${SOURCE_FILES})
+target_link_libraries(${EXECUTABLE_APP_NAME} nrf-sdk )
+set_target_properties(${EXECUTABLE_APP_NAME} PROPERTIES OUTPUT_NAME ${EXECUTABLE_APP_FILE_NAME})
+target_compile_options(${EXECUTABLE_APP_NAME} PUBLIC
+            $<$<AND:$<COMPILE_LANGUAGE:C>,$<CONFIG:DEBUG>>: ${COMMON_FLAGS} -O0 -g3>
+            $<$<AND:$<COMPILE_LANGUAGE:C>,$<CONFIG:RELEASE>>: ${COMMON_FLAGS} -O3 ${COMMON_FLAGS_OPT}>
+            $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:DEBUG>>: ${COMMON_FLAGS} -O0 -g3>
+            $<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CONFIG:RELEASE>>: ${COMMON_FLAGS} -O3 ${COMMON_FLAGS_OPT} -fno-rtti>
+            $<$<COMPILE_LANGUAGE:ASM>: -MP -MD -x assembler-with-cpp>
+        )
+
+set_target_properties(${EXECUTABLE_APP_NAME} PROPERTIES
+        SUFFIX ".out"
+        LINK_FLAGS "-mthumb -mabi=aapcs -L ${CMAKE_SOURCE_DIR}/src/libs/nRF52/cores/nRF5/nordic/nrfx/mdk -L ${CMAKE_SOURCE_DIR}/src/libs/nRF52/cores/nRF5/linker -T ${NRF5_LINKER_SCRIPT_MCUBOOT} -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Wl,--gc-sections --specs=nano.specs -lc -lnosys -lm -Wl,--wrap=malloc -Wl,--wrap=free -Wl,-Map=${EXECUTABLE_APP_FILE_NAME}.map"
+        )
+
+add_custom_command(TARGET ${EXECUTABLE_APP_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_SIZE_UTIL} ${EXECUTABLE_APP_FILE_NAME}.out
+        COMMAND ${CMAKE_OBJCOPY} -O binary ${EXECUTABLE_APP_FILE_NAME}.out "${EXECUTABLE_APP_FILE_NAME}.bin"
+        COMMAND ${CMAKE_OBJCOPY} -O ihex ${EXECUTABLE_APP_FILE_NAME}.out "${EXECUTABLE_APP_FILE_NAME}.hex"
+        COMMENT "post build steps for ${EXECUTABLE_APP_FILE_NAME}"
+        )
+
+
+add_custom_target(FLASH_ERASE
+        COMMAND ${OPENOCD_BIN_PATH} -f interface/stlink.cfg -c 'transport select hla_swd' -f target/nrf52.cfg -c init -c halt -c 'nrf5 mass_erase' -c reset -c shutdown
+        COMMENT "erasing flashing"
+        )
+
+add_custom_target(FLASH_SOFTDEVICE
+        COMMAND ${OPENOCD_BIN_PATH} -c "tcl_port disabled" -c "gdb_port 3333" -c "telnet_port 4444" -f interface/stlink.cfg -c 'transport select hla_swd' -f target/nrf52.cfg -c "program \"../../src/libs/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex\"" -c reset -c shutdown
+        COMMENT "flashing SoftDevice s112_nrf52_6.1.1_softdevice.hex"
+        )
+
+add_custom_target(FLASH
+        DEPENDS ${EXECUTABLE_APP_NAME}
+        COMMAND ${OPENOCD_BIN_PATH} -c "tcl_port disabled" -c "gdb_port 3333" -c "telnet_port 4444" -f interface/stlink.cfg -c 'transport select hla_swd' -f target/nrf52.cfg -c "program \"${EXECUTABLE_APP_NAME}.hex\"" -c reset -c shutdown
+        COMMENT "flashing ${EXECUTABLE_APP_NAME}.hex"
+        )

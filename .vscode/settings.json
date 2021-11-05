@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.sql": "oracle",
+        "nrfx_gpiote.h": "c",
+        "nrfx_common.h": "c"
+    }
+}

@@ -1,0 +1,9 @@
+/mnt/d/Work/PineTime/OS/MyTime_dev/build/CMakeFiles/rebuild_cache.dir
+/mnt/d/Work/PineTime/OS/MyTime_dev/build/CMakeFiles/edit_cache.dir
+/mnt/d/Work/PineTime/OS/MyTime_dev/build/src/CMakeFiles/rebuild_cache.dir
+/mnt/d/Work/PineTime/OS/MyTime_dev/build/src/CMakeFiles/FLASH.dir
+/mnt/d/Work/PineTime/OS/MyTime_dev/build/src/CMakeFiles/FLASH_SOFTDEVICE.dir
+/mnt/d/Work/PineTime/OS/MyTime_dev/build/src/CMakeFiles/FLASH_ERASE.dir
+/mnt/d/Work/PineTime/OS/MyTime_dev/build/src/CMakeFiles/my-time.dir
+/mnt/d/Work/PineTime/OS/MyTime_dev/build/src/CMakeFiles/edit_cache.dir
+/mnt/d/Work/PineTime/OS/MyTime_dev/build/src/CMakeFiles/nrf-sdk.dir
