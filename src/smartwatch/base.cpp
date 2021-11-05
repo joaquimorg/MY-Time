@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <string.h>
-
-#include "nrf52.h"
-#include <bluefruit.h>
-#include "pinetime_board.h"
+#include "base.h"
 
 BLEUart bleuart; // uart over ble
 
@@ -59,6 +54,7 @@ void setup(void) {
   bleuart.begin();
 
   startAdv();
+
 }
 
 
