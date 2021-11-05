@@ -7,7 +7,7 @@ ooo        ooooo oooooo   oooo         ooooooooooooo  o8o
  8  `888'   888      `888'     8888888      888       888   888   888   888  888ooo888 
  8    Y     888       888                   888       888   888   888   888  888    .o 
 o8o        o888o     o888o                 o888o     o888o o888o o888o o888o `Y8bod8P' 
-                                                                                                                               
+                                                                                        
 </pre>
 
 # PineTime smartwatch
