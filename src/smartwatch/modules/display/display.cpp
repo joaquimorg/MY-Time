@@ -504,7 +504,7 @@ void Display::init(void) {
     cmd_enable(1);
     //verticalScrollingStartAddress = 0; 
     //display_vertical_scroll_definition(0, 320, 0, verticalScrollingStartAddress);
-    //draw_square(0, 0, 239, 239, RGB2COLOR(0x00, 0x00, 0x00));
-    draw_square(0, 0, 239, 239, RGB2COLOR(0xa0, 0x00, 0x00));
+    draw_square(0, 0, 239, 239, RGB2COLOR(0x00, 0x00, 0x00));
+    //draw_square(0, 0, 239, 239, RGB2COLOR(0xa0, 0x00, 0x00));
 }
 
