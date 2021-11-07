@@ -41,9 +41,12 @@ Build and flash MY-Time
 $ git clone --recurse-submodules https://github.com/joaquimorg/MY-Time.git
 $ cd MY-Time
 $ mkdir build
-$ cd build
-$ cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DARM_NONE_EABI_TOOLCHAIN_PATH=/usr ../
-$ ninja my-time
+$ cmake -S . -B "build" -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DARM_NONE_EABI_TOOLCHAIN_PATH=/usr/local/gcc-arm-none-eabi-9-2020-q2-update
+
+$ cmake --build build
+
+$ cmake --build build --target FLASH
+
 </pre>
 
 Docs

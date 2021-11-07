@@ -70,7 +70,7 @@
  *It removes the need to manually update the tick with `lv_tick_inc()`)*/
 #define LV_TICK_CUSTOM     0
 #if LV_TICK_CUSTOM
-#define LV_TICK_CUSTOM_INCLUDE  "Arduino.h"         /*Header for the system time function*/
+#define LV_TICK_CUSTOM_INCLUDE  "nrf52.h"         /*Header for the system time function*/
 #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())     /*Expression evaluating to current system time in ms*/
 #endif   /*LV_TICK_CUSTOM*/
 
@@ -456,7 +456,7 @@ LV_FONT_DECLARE(lv_font_clock_90) \
 
 #define LV_USE_SPINBOX      0
 
-#define LV_USE_SPINNER      0
+#define LV_USE_SPINNER      1
 
 #define LV_USE_TABVIEW      0
 
@@ -488,7 +488,7 @@ LV_FONT_DECLARE(lv_font_clock_90) \
 #endif /*LV_USE_THEME_DEFAULT*/
 
 /*An very simple them that is a good starting point for a custom theme*/
- #define LV_USE_THEME_BASIC    1
+ #define LV_USE_THEME_BASIC    0
 
 /*A theme designed for monochrome displays*/
 #define LV_USE_THEME_MONO       0

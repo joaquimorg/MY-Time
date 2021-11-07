@@ -287,13 +287,29 @@ include_directories(
 	libs/lvgl/src/widgets
 
     smartwatch
+    smartwatch/apps
+    smartwatch/modules/
+    smartwatch/modules/lvgl
+    smartwatch/modules/lvgl/theme
+    smartwatch/modules/backlight
     smartwatch/modules/display
 )
 
 list(APPEND SOURCE_FILES
     main.c
-    smartwatch/base.cpp
+
     smartwatch/modules/display/display.cpp
+    smartwatch/modules/backlight/backlight.cpp
+    smartwatch/modules/smartwatch.cpp
+
+    smartwatch/modules/lvgl/theme/lv_font_24.c
+    smartwatch/modules/lvgl/theme/lv_font_sys_48.c
+    smartwatch/modules/lvgl/theme/lv_font_clock_42.c
+    smartwatch/modules/lvgl/theme/lv_font_clock_90.c
+    smartwatch/modules/lvgl/theme/lv_theme_pinetime.c
+    smartwatch/modules/lvgl/lvglmodule.cpp
+    
+    smartwatch/base.cpp    
 
 )
 
@@ -346,7 +362,7 @@ set(EXECUTABLE_APP_NAME "my-time")
 set(EXECUTABLE_APP_FILE_NAME ${EXECUTABLE_APP_NAME})
 set(IMAGE_APP_FILE_NAME image-${EXECUTABLE_APP_NAME}.bin)
 set(DFU_FILE_NAME dfu-${EXECUTABLE_APP_NAME}.zip)
-set(NRF5_LINKER_SCRIPT_MCUBOOT "${CMAKE_SOURCE_DIR}/src/libs/nRF52/cores/nRF5/linker/gcc_nrf52.ld")
+set(NRF5_LINKER_SCRIPT_MCUBOOT "${CMAKE_SOURCE_DIR}/src/libs/nRF52/cores/nRF5/linker/nrf52832_s112_v6.ld")
 add_executable(${EXECUTABLE_APP_NAME} ${SOURCE_FILES})
 target_link_libraries(${EXECUTABLE_APP_NAME} nrf-sdk lvgl )
 set_target_properties(${EXECUTABLE_APP_NAME} PROPERTIES OUTPUT_NAME ${EXECUTABLE_APP_FILE_NAME})

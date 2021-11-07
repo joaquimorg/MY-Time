@@ -52,6 +52,7 @@ extern "C"
 {
 
 // defined in linker script
+/*
 extern unsigned char __HeapBase[];
 extern unsigned char __HeapLimit[];
 
@@ -64,7 +65,7 @@ caddr_t _sbrk( int incr )
 
   if ( sbrk_heap_top + incr > __HeapLimit )
   {
-    /* Out of dynamic memory heap space */
+    // Out of dynamic memory heap space
     errno = ENOMEM;
     return (caddr_t) -1;
   }
@@ -75,5 +76,6 @@ caddr_t _sbrk( int incr )
 
   return (caddr_t) prev_heap;
 }
+*/
 
 }

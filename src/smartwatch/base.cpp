@@ -1,5 +1,4 @@
 #include "base.h"
-#include "display.h"
 
 BLEUart bleuart; // uart over ble
 
@@ -45,12 +44,12 @@ void startAdv(void) {
 }
 
 void setup(void) {
-  dwt_enable();
-  pinMode(LCD_LIGHT_3, OUTPUT);
+  dwt_enable();  
 
-  // Modules init
-  display.init();
+  // Smartwatch module init
+  smartwatch.init();
 
+  // Bluetooth Config
   Bluefruit.begin(1, 0);
   Bluefruit.Periph.setConnectCallback(connect_callback);
   Bluefruit.Periph.setDisconnectCallback(disconnect_callback);
@@ -58,12 +57,15 @@ void setup(void) {
 
   bleuart.begin();
 
-  startAdv();
+  startAdv();  
 
 }
 
 
 void loop(void) {
+  //vTaskDelay(500);
   delay(1000);
-  digitalToggle(LCD_LIGHT_3);
+  //digitalToggle(LCD_LIGHT_3);
+  //lv_timer_handler();
+  //lv_tick_inc(15);
 }

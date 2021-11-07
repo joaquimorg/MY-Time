@@ -1,4 +1,4 @@
-/* Linker script for Nordic Semiconductor nRF52 devices
+/* Linker script for Nordic Semiconductor nRF devices
  *
  * Version: Sourcery G++ 4.5-1
  * Support: https://support.codesourcery.com/GNUToolchain/
@@ -21,7 +21,7 @@ OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
  * with other linker script that defines memory regions FLASH and RAM.
  * It references following symbols, which must be defined in code:
  *   Reset_Handler : Entry of reset handler
- * 
+ *
  * It defines following symbols, which code can use without definition:
  *   __exidx_start
  *   __exidx_end
@@ -46,18 +46,6 @@ OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
  */
 ENTRY(Reset_Handler)
 
-/* Adafruit
- * Stack is used by ISR and SoftDevice only, other code run on thread's allocated stack from heap. 
- * Maximum stack used by S132's spec is 1536 byte. Therefore 2KB should be enough
- */
-__StackSize = 1024*2;
-
-/* Set stack top to end of RAM, and stack limit move down by size of stack_dummy section */
-PROVIDE(__StackTop   = ORIGIN(RAM) + LENGTH(RAM));
-PROVIDE(__StackLimit = __StackTop - __StackSize);
-PROVIDE(__stack      = __StackTop);
-
-/* Flash region */
 __flash_arduino_start = ORIGIN(FLASH);
 __flash_arduino_end   = ORIGIN(FLASH) + LENGTH(FLASH);
 
@@ -138,7 +126,7 @@ SECTIONS
 
     } > RAM
 
-    .bss ALIGN(4):
+    .bss :
     {
         . = ALIGN(4);
         __bss_start__ = .;
@@ -147,29 +135,37 @@ SECTIONS
         . = ALIGN(4);
         __bss_end__ = .;
     } > RAM
-
-    .heap :
+    
+    .heap (COPY):
     {
         __HeapBase = .;
         __end__ = .;
         PROVIDE(end = .);
         KEEP(*(.heap*))
-        . = ALIGN(__StackLimit);
         __HeapLimit = .;
     } > RAM
-    
+
     /* .stack_dummy section doesn't contains any symbols. It is only
      * used for linker to calculate size of stack sections, and assign
      * values to stack symbols later */
-    /*
     .stack_dummy (COPY):
     {
         KEEP(*(.stack*))
     } > RAM
-    */
-    
+
+    /* Set stack top to end of RAM, and stack limit move down by
+     * size of stack_dummy section */
+    __StackTop = ORIGIN(RAM) + LENGTH(RAM);
+    __StackLimit = __StackTop - SIZEOF(.stack_dummy);
+    PROVIDE(__stack = __StackTop);
+
     /* Check if data + heap + stack exceeds RAM limit */
     ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
-    ASSERT(__StackLimit >= __bss_end__, "region RAM overflowed with stack")
+    
+    /* Check if text sections + data exceeds FLASH limit */
+    DataInitFlashUsed = __bss_start__ - __data_start__;
+    CodeFlashUsed = __etext - ORIGIN(FLASH);
+    TotalFlashUsed = CodeFlashUsed + DataInitFlashUsed;
+    ASSERT(TotalFlashUsed <= LENGTH(FLASH), "region FLASH overflowed with .data and user data")
+    
 }
-

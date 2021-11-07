@@ -2,6 +2,7 @@
     "files.associations": {
         "*.sql": "oracle",
         "nrfx_gpiote.h": "c",
-        "nrfx_common.h": "c"
+        "nrfx_common.h": "c",
+        "lv_theme_default.h": "c"
     }
 }

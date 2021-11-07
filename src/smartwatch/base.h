@@ -9,9 +9,9 @@
 #include "bluefruit.h"
 #include "pinetime_board.h"
 
-#include "display.h"
+#include "smartwatch.h"
 
+Smartwatch  smartwatch;
 
-Display display;
 
 #endif // BASE_H_
