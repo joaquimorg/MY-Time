@@ -48,14 +48,14 @@
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 #define configUSE_PREEMPTION                                     1
-#define configUSE_PORT_OPTIMISED_TASK_SELECTION                  0
+#define configUSE_PORT_OPTIMISED_TASK_SELECTION                  1
 #define configUSE_TICKLESS_IDLE                                  1
 #define configUSE_TICKLESS_IDLE_SIMPLE_DEBUG                     1 /* See into vPortSuppressTicksAndSleep source code for explanation */
 #define configCPU_CLOCK_HZ                                       ( SystemCoreClock )
 #define configTICK_RATE_HZ                                       1024
 #define configMAX_PRIORITIES                                     ( 5 )
 #define configMINIMAL_STACK_SIZE                                 ( 100 )
-#define configTOTAL_HEAP_SIZE                                    ( 4096 ) /* not used since we use malloc */
+#define configTOTAL_HEAP_SIZE                                    ( 1024*10 ) /* not used since we use malloc */
 #define configMAX_TASK_NAME_LEN                                  ( 8 )
 #define configUSE_16_BIT_TICKS                                   0
 #define configIDLE_SHOULD_YIELD                                  1

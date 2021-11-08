@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include "nrf52.h"
 
-#define LOOP_STACK_SZ       (256*3)
+#define LOOP_STACK_SZ       (256*4)
 #define CALLBACK_STACK_SZ   (256*2)
+
 
 static TaskHandle_t  _loopHandle;
 
@@ -35,4 +36,21 @@ int main(void) {
 
     return 0;
 
+}
+
+void suspendLoop(void)
+{
+  vTaskSuspend(_loopHandle);
+}
+
+void resumeLoop(void)
+{
+  if ( isInISR() ) 
+  {
+    xTaskResumeFromISR(_loopHandle);
+  } 
+  else
+  {
+    vTaskResume(_loopHandle);
+  }
 }

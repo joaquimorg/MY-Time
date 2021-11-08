@@ -53,6 +53,9 @@ void Backlight::set_level(uint8_t level) {
    
 }
 
+uint8_t Backlight::get_level(void){
+   return backlightLevel;
+}
 
 const char * Backlight::get_icon(uint8_t level) {
    switch (level) {

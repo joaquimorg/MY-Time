@@ -1,9 +1,13 @@
 #include "base.h"
 
+BLEDfu  bledfu;  // OTA DFU service
 BLEUart bleuart; // uart over ble
+
+TimerHandle_t buttonTimer;
 
 // callback invoked when central connects
 void connect_callback(uint16_t conn_handle) {
+  //smartwatch.push_message(Smartwatch::Messages::BleConnected);
 }
 
 /**
@@ -14,6 +18,7 @@ void connect_callback(uint16_t conn_handle) {
 void disconnect_callback(uint16_t conn_handle, uint8_t reason) {
   (void)conn_handle;
   (void)reason;
+  //smartwatch.push_message(Smartwatch::Messages::BleDisconnected);
 }
 
 void startAdv(void) {
@@ -43,29 +48,48 @@ void startAdv(void) {
   Bluefruit.Advertising.start(0);                // 0 = Don't stop advertising after n seconds  
 }
 
+void button_timer_callback(TimerHandle_t xTimer) {
+    xTimerStop(xTimer, 0);
+    smartwatch.push_message(Smartwatch::Messages::OnButtonEvent);
+}
+
+void button_callback(void) {
+    if ( digitalRead(KEY_ACTION) == HIGH ) {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        xTimerStartFromISR(buttonTimer, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken); 
+    }
+}
+
+//*****************************************************************************
+
 void setup(void) {
-  dwt_enable();  
+    dwt_enable();    
 
-  // Smartwatch module init
-  smartwatch.init();
+    // Smartwatch module init
+    smartwatch.init();
 
-  // Bluetooth Config
-  Bluefruit.begin(1, 0);
-  Bluefruit.Periph.setConnectCallback(connect_callback);
-  Bluefruit.Periph.setDisconnectCallback(disconnect_callback);
-  Bluefruit.setAppearance(BLE_APPEARANCE_GENERIC_WATCH);
+    // Bluetooth Config
+    Bluefruit.begin(1, 0);
+    Bluefruit.Periph.setConnectCallback(connect_callback);
+    Bluefruit.Periph.setDisconnectCallback(disconnect_callback);
+    Bluefruit.setAppearance(BLE_APPEARANCE_GENERIC_WATCH);
 
-  bleuart.begin();
+    // To be consistent OTA DFU should be added first if it exists
+    bledfu.begin();
 
-  startAdv();  
+    bleuart.begin();
+
+    buttonTimer = xTimerCreate ("buttonTimer", 300, pdFALSE, NULL, button_timer_callback);
+    pinio.init();
+    
+    startAdv();  
 
 }
 
 
 void loop(void) {
-  //vTaskDelay(500);
-  delay(1000);
-  //digitalToggle(LCD_LIGHT_3);
-  //lv_timer_handler();
-  //lv_tick_inc(15);
+    //vTaskDelay(ms2tick(1000));
+    //digitalToggle(LCD_LIGHT_3);
+    smartwatch.hardware_update();
 }

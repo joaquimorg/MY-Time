@@ -2,6 +2,7 @@
 #include "nrf52.h"
 #include "lvgl.h"
 #include "lv_theme_pinetime.h"
+#include "fast_spi.h"
 
 
 extern "C" {
@@ -68,21 +69,22 @@ void LvglModule::init(Display display) {
     indev_drv.user_data = this;
     lv_indev_drv_register(&indev_drv);
     
-    //display.draw_square(0, 0, 239, 239, RGB2COLOR(0x00, 0x00, 0x00));
 }
 
 void LvglModule::touchpad(lv_indev_data_t* data) {
 
-    data->state = LV_INDEV_STATE_REL;
+    //data->state = LV_INDEV_STATE_REL;
 
     /*Set the coordinates*/
-    data->point.x = 0;
-    data->point.y = 0;
+    data->point.x = -1;
+    data->point.y = -1;
 }
 
 void LvglModule::flush_display(const lv_area_t *area, lv_color_t *color_p) {
 
     uint16_t y1, y2, width, height = 0;
+
+    display.start_write_display();
     
     if( (this->scrollDirection == refreshDirections::Down) && (area->y2 == visibleNbLines - 1)) {
         writeOffset = ((writeOffset + totalNbLines) - visibleNbLines) % totalNbLines;
@@ -144,20 +146,22 @@ void LvglModule::flush_display(const lv_area_t *area, lv_color_t *color_p) {
         height = totalNbLines - y1;
 
         if ( height > 0 ) {
-
-            display.draw_bitmap (area->x1, y1, area->x1 + width, y1 + height, (uint8_t*)(color_p));
+            display.set_addr_display(area->x1, y1, width, height);
+            write_fast_spi(reinterpret_cast<const uint8_t *>(color_p), (width * height * 2));
         }
 
         uint16_t pixOffset = width * height;
 
         height = y2 + 1;
 
-        display.draw_bitmap (area->x1, 0, area->x1 + width, height, (uint8_t*)(color_p + pixOffset));
+        display.set_addr_display(area->x1, 0, width, height);
+        write_fast_spi(reinterpret_cast<const uint8_t *>(color_p + pixOffset), (width * height * 2));
 
     } else {
-
-        display.draw_bitmap (area->x1, y1, area->x1 + width, y1 + height, (uint8_t*)(color_p));
-
+        display.set_addr_display(area->x1, y1, width, height);
+        write_fast_spi(reinterpret_cast<const uint8_t *>(color_p), (width * height * 2));
     }
+
+    display.start_write_display();
     lv_disp_flush_ready(&disp_drv);
 }

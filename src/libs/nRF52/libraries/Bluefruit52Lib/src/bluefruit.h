@@ -57,6 +57,7 @@
 
 // Services
 #include "services/BLEUart.h"
+#include "services/BLEDfu.h"
 
 #include "utility/AdaCallback.h"
 #include "utility/bonding.h"

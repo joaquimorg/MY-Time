@@ -42,6 +42,7 @@ set(NRFX_SOURCE_FILES
     libs/nRF52/libraries/Bluefruit52Lib/src/utility/bonding.cpp
     libs/nRF52/libraries/Bluefruit52Lib/src/utility/bootloader_util.c
     libs/nRF52/libraries/Bluefruit52Lib/src/services/BLEUart.cpp
+    libs/nRF52/libraries/Bluefruit52Lib/src/services/BLEDfu.cpp
     libs/nRF52/libraries/InternalFileSytem/src/flash/flash_cache.c
     libs/nRF52/libraries/InternalFileSytem/src/flash/flash_nrf5x.c
     libs/nRF52/libraries/InternalFileSytem/src/InternalFileSystem.cpp
@@ -293,13 +294,20 @@ include_directories(
     smartwatch/modules/lvgl/theme
     smartwatch/modules/backlight
     smartwatch/modules/display
+    smartwatch/modules/battery
+    smartwatch/modules/pinio
+    smartwatch/modules/time
+    smartwatch/modules/touch
+    smartwatch/modules/watchdog
 )
 
 list(APPEND SOURCE_FILES
     main.c
 
+    smartwatch/modules/display/fast_spi.cpp
     smartwatch/modules/display/display.cpp
     smartwatch/modules/backlight/backlight.cpp
+    smartwatch/modules/pinio/pinio.cpp
     smartwatch/modules/smartwatch.cpp
 
     smartwatch/modules/lvgl/theme/lv_font_24.c
@@ -321,8 +329,8 @@ link_directories(
 set(COMMON_FLAGS -MP -MD -mthumb -mabi=aapcs -Wall -Wno-unknown-pragmas -ffunction-sections -fdata-sections -fno-strict-aliasing -fno-builtin --short-enums -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Wreturn-type -Werror=return-type)
 add_definitions(-DNRF52 -DNRF52832 -DNRF52832_XXAA -DNRF52_PAN_74 -DNRF52_PAN_64 -DNRF52_PAN_12 -DNRF52_PAN_58 -DNRF52_PAN_54 -DNRF52_PAN_31 -DNRF52_PAN_51 -DNRF52_PAN_36 -DNRF52_PAN_15 -DNRF52_PAN_20 -DNRF52_PAN_55 -DBOARD_PCA10040)
 add_definitions(-DFREERTOS)
-add_definitions(-D__STACK_SIZE=0x1100)
-add_definitions(-D__HEAP_SIZE=0x1100)
+add_definitions(-D__STACK_SIZE=0x1500)
+add_definitions(-D__HEAP_SIZE=0x1500)
 add_definitions(-DS112)
 add_definitions(-DSOFTDEVICE_PRESENT)
 add_definitions(-DF_CPU=64000000)

@@ -13,6 +13,7 @@ class Backlight
     void init(void);
 
     void set_level(uint8_t level);
+    uint8_t get_level(void);
     const char * get_icon(uint8_t level);
 
 };
