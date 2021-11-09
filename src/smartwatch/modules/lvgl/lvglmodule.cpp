@@ -20,7 +20,7 @@ extern "C" {
 /**
  * Constructor
  */
-LvglModule::LvglModule(void) {
+LvglModule::LvglModule(Display &display, Touch &touch) : display{display}, touch{touch} {
     
 }
 
@@ -28,9 +28,7 @@ void LvglModule::SetRefreshDirection(refreshDirections direction) {
     this->scrollDirection = direction;
 }
 
-void LvglModule::init(Display display) {
-
-    this->display = display;
+void LvglModule::init(void) {
 
     writeOffset = 0;
     scrollOffset = 0;
@@ -60,7 +58,7 @@ void LvglModule::init(Display display) {
     lv_disp_set_theme(lv_disp_get_default(), th);
 
 
-    lv_indev_drv_t indev_drv;
+    static lv_indev_drv_t indev_drv;
 
     // Register a touchpad input device
     lv_indev_drv_init(&indev_drv);
@@ -73,11 +71,18 @@ void LvglModule::init(Display display) {
 
 void LvglModule::touchpad(lv_indev_data_t* data) {
 
-    //data->state = LV_INDEV_STATE_REL;
+    // Get the touchpad's position
+    touch.read();
+    
+    if (touch.getEvent() == 2) {
+        data->state = LV_INDEV_STATE_PR;
+    } else {
+        data->state = LV_INDEV_STATE_REL;
+    }
 
-    /*Set the coordinates*/
-    data->point.x = -1;
-    data->point.y = -1;
+    data->point.x = touch.getLastX();
+    data->point.y = touch.getLastY();
+
 }
 
 void LvglModule::flush_display(const lv_area_t *area, lv_color_t *color_p) {
@@ -162,6 +167,6 @@ void LvglModule::flush_display(const lv_area_t *area, lv_color_t *color_p) {
         write_fast_spi(reinterpret_cast<const uint8_t *>(color_p), (width * height * 2));
     }
 
-    display.start_write_display();
+    display.end_write_display();
     lv_disp_flush_ready(&disp_drv);
 }

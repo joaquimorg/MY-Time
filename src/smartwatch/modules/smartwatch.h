@@ -5,6 +5,7 @@
 #include "lvgl.h"
 #include "backlight.h"
 #include "display.h"
+#include "touch.h"
 #include "lvglmodule.h"
 
 
@@ -14,11 +15,12 @@ class Smartwatch
   public:
     Backlight   backlight;
     Display     display;
-    LvglModule  lvglmodule;    
+    Touch       touch;
+    LvglModule  lvglmodule {display, touch};    
 
     enum class States {Idle, Running};
     enum class Messages {
-      WakeUp, GoToSleep, BleConnected, BleDisconnected, OnTouchEvent, OnButtonEvent, ReloadIdleTimer
+      WakeUp, GoToSleep, BleConnected, BleDisconnected, BleData, OnTouchEvent, OnButtonEvent, ReloadIdleTimer
     };
     
     States state = States::Running;
@@ -28,6 +30,7 @@ class Smartwatch
     void run(void);
     void push_message(Smartwatch::Messages msg);
     void hardware_update(void);
+    void setDebug(uint32_t debug) {this->debug = debug;}
 
   protected:
     
@@ -41,8 +44,12 @@ class Smartwatch
     TimerHandle_t idleTimer;
 
     lv_obj_t *main_scr;
+    lv_obj_t * label1;
+
+    uint32_t debug = 0;
 
     uint32_t displayTimeout;
+    Touch::Gestures gesture = Touch::Gestures::None;
 
     static void task(void *instance);    
     static void idle_callback(TimerHandle_t xTimer);
@@ -50,7 +57,6 @@ class Smartwatch
 
     void sleep();
     void wakeup();
-
 };
 
 #endif //SMARTWATCH_H

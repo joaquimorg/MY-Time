@@ -259,8 +259,9 @@ static void style_init(void)
     lv_color_filter_dsc_init(&grey_filter, grey_filter_cb);
 
     style_init_reset(&styles->pressed);
-    lv_style_set_color_filter_dsc(&styles->pressed, &dark_filter);
-    lv_style_set_color_filter_opa(&styles->pressed, 35);
+    //lv_style_set_color_filter_dsc(&styles->pressed, &dark_filter);
+    //lv_style_set_color_filter_opa(&styles->pressed, 35);
+    lv_style_set_bg_color(&styles->pressed, DARK_COLOR_SECONDARY);
 
     style_init_reset(&styles->disabled);
     lv_style_set_color_filter_dsc(&styles->disabled, &grey_filter);

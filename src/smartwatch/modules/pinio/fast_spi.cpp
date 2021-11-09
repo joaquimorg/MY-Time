@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+
 #include "fast_spi.h"
 #include "pinetime_board.h"
 
@@ -115,3 +116,4 @@ void read_fast_spi(uint8_t *ptr, uint32_t len)
   }
   while ( len );
 }
+

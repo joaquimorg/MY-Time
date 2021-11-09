@@ -304,10 +304,13 @@ include_directories(
 list(APPEND SOURCE_FILES
     main.c
 
-    smartwatch/modules/display/fast_spi.cpp
+    smartwatch/modules/pinio/pinio.cpp
+    smartwatch/modules/pinio/fast_spi.cpp
+    smartwatch/modules/pinio/i2c.cpp
     smartwatch/modules/display/display.cpp
     smartwatch/modules/backlight/backlight.cpp
-    smartwatch/modules/pinio/pinio.cpp
+    smartwatch/modules/touch/touch.cpp
+    smartwatch/modules/watchdog/watchdog.cpp
     smartwatch/modules/smartwatch.cpp
 
     smartwatch/modules/lvgl/theme/lv_font_24.c
@@ -414,8 +417,8 @@ add_custom_target(MAKE_BOOT
         )
 
 add_custom_target(MAKE_PKG
-        DEPENDS MAKE_BOOT
-        COMMAND nrfutil pkg generate --key-file /mnt/d/Work/PineTime/nordic_pem_keys/pinetime.pem --app-boot-validation VALIDATE_GENERATED_CRC --hw-version 52 --sd-req 0x0103 --application-version-string "0.1.0" --application ${EXECUTABLE_APP_NAME}.boot.hex ${EXECUTABLE_APP_NAME}.dfu.zip
+        DEPENDS ${EXECUTABLE_APP_NAME}
+        COMMAND nrfutil pkg generate --key-file /mnt/d/Work/PineTime/nordic_pem_keys/pinetime.pem --app-boot-validation VALIDATE_GENERATED_CRC --hw-version 52 --sd-req 0x0103 --application-version-string "0.1.0" --application ${EXECUTABLE_APP_NAME}.hex ${EXECUTABLE_APP_NAME}.dfu.zip
         COMMENT "## Build .zip for DFU"
         )
 

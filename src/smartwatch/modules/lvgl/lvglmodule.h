@@ -4,8 +4,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <display.h>
-#include <lvgl.h>
+#include "display.h"
+#include "touch.h"
+#include "lvgl.h"
 
 class LvglModule
 {
@@ -13,8 +14,8 @@ class LvglModule
     
     enum class refreshDirections { None, Up, Down, Left, Right };
 
-    LvglModule(void);
-    void init(Display display);
+    LvglModule(Display &display, Touch &touch);
+    void init(void);
     void SetRefreshDirection(refreshDirections direction);
     
     void flush_display(const lv_area_t *area, lv_color_t *color_p);
@@ -41,6 +42,7 @@ class LvglModule
     refreshDirections scrollDirection = refreshDirections::None;
 
     Display display;
+    Touch   touch;
 
 };
 

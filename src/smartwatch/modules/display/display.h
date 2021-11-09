@@ -11,6 +11,7 @@ class Display
 {
   protected:
     uint16_t verticalScrollingStartAddress = 0;
+    void spi_command(uint8_t d);
 
   public:
     Display(void);
@@ -19,8 +20,7 @@ class Display
     void set_addr_display(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 
     void vertical_scroll_definition(uint16_t topFixedLines, uint16_t scrollLines, uint16_t bottomFixedLines, uint16_t line);
-
-    void spi_command(uint8_t d);
+    
     void start_write_display(void);
     void end_write_display(void);
 

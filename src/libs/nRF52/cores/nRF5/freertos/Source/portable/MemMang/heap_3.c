@@ -72,7 +72,7 @@ void __wrap_free (void *ptr)
 
 void *pvPortMalloc( size_t xWantedSize )
 {
-void *pvReturn;
+	void *pvReturn;
 
 	vTaskSuspendAll();
 	{
