@@ -288,7 +288,7 @@ include_directories(
 	libs/lvgl/src/widgets
 
     smartwatch
-    smartwatch/apps
+    smartwatch/applications
     smartwatch/modules/
     smartwatch/modules/lvgl
     smartwatch/modules/lvgl/theme
@@ -304,14 +304,12 @@ include_directories(
 list(APPEND SOURCE_FILES
     main.c
 
-    smartwatch/modules/pinio/pinio.cpp
     smartwatch/modules/pinio/fast_spi.cpp
     smartwatch/modules/pinio/i2c.cpp
     smartwatch/modules/display/display.cpp
     smartwatch/modules/backlight/backlight.cpp
     smartwatch/modules/touch/touch.cpp
     smartwatch/modules/watchdog/watchdog.cpp
-    smartwatch/modules/smartwatch.cpp
 
     smartwatch/modules/lvgl/theme/lv_font_24.c
     smartwatch/modules/lvgl/theme/lv_font_sys_48.c
@@ -322,6 +320,7 @@ list(APPEND SOURCE_FILES
     
     smartwatch/utils.cpp
     smartwatch/base.cpp
+    smartwatch/smartwatch.cpp
 
 )
 

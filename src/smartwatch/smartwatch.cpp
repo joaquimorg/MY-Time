@@ -4,19 +4,10 @@
 #include "utils.h"
 #include "lvgl.h"
 
+#include "Clock.h"
+
+
 #define SW_STACK_SZ       (256*8)
-
-extern "C" {
-    static void event_handler(lv_event_t * e)
-    {
-        lv_event_code_t code = lv_event_get_code(e);
-
-        if(code == LV_EVENT_CLICKED) {
-            
-        }
-        
-    }
-}
 
 /**
  * Constructor
@@ -50,7 +41,7 @@ void Smartwatch::init(void) {
     lv_obj_set_size(spinner, 220, 220);
     lv_obj_center(spinner);*/
 
-    label1 = lv_label_create(main_scr);
+    /*label1 = lv_label_create(main_scr);
     lv_label_set_text_fmt(label1, "MY-Time - Ready to rock - %s", resetReason);
     lv_obj_set_style_text_color(label1, lv_color_make(0xff, 0xff, 0xff), 0);
     lv_obj_set_width(label1, 220);
@@ -66,8 +57,10 @@ void Smartwatch::init(void) {
 
     label = lv_label_create(btn1);
     lv_label_set_text(label, "Button");
-    lv_obj_center(label);
-    
+    lv_obj_center(label);*/
+
+    currentApplication = std::make_unique<Clock>(main_scr);
+    currentApp = Applications::Clock;
 
     idleTimer = xTimerCreate ("idleTimer", ms2tick(displayTimeout), pdFALSE, this, Smartwatch::idle_callback);
     xTimerStart(idleTimer, 0);
