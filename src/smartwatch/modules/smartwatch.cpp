@@ -1,9 +1,23 @@
 #include "smartwatch.h"
 #include "nrf52.h"
 #include "pinetime_board.h"
+#include "utils.h"
 #include "lvgl.h"
 
 #define SW_STACK_SZ       (256*8)
+
+extern "C" {
+    static void event_handler(lv_event_t * e)
+    {
+        lv_event_code_t code = lv_event_get_code(e);
+
+        if(code == LV_EVENT_CLICKED) {
+            
+        }
+        
+    }
+}
+
 /**
  * Constructor
  */
@@ -16,16 +30,6 @@ void Smartwatch::idle_callback(TimerHandle_t xTimer) {
     sw->on_idle();
 }
 
-static void event_handler(lv_event_t * e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-
-    if(code == LV_EVENT_CLICKED) {
-        
-    }
-    
-}
-
 void Smartwatch::init(void) {
 
     // Initialize the modules
@@ -34,6 +38,8 @@ void Smartwatch::init(void) {
     lvglmodule.init();
     backlight.init();
     backlight.set_level(2);
+
+    resetReason = actual_reset_reason();
 
     // Main queue
     msgQueue = xQueueCreate(queueSize, itemSize);
@@ -45,7 +51,7 @@ void Smartwatch::init(void) {
     lv_obj_center(spinner);*/
 
     label1 = lv_label_create(main_scr);
-    lv_label_set_text_fmt(label1, "MY-Time - Ready to rock - %li", debug);
+    lv_label_set_text_fmt(label1, "MY-Time - Ready to rock - %s", resetReason);
     lv_obj_set_style_text_color(label1, lv_color_make(0xff, 0xff, 0xff), 0);
     lv_obj_set_width(label1, 220);
     lv_label_set_long_mode(label1, LV_LABEL_LONG_SCROLL_CIRCULAR);
@@ -84,9 +90,7 @@ void Smartwatch::hardware_update(void) {
         vTaskDelay(ms2tick(30000));
     } else {
         vTaskDelay(ms2tick(500));
-    }
-
-    lv_label_set_text_fmt(label1, "MY-Time - Ready to rock - %li", debug);
+    }    
 
 }
 

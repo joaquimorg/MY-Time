@@ -9,12 +9,6 @@
 #include "bluefruit.h"
 #include "pinetime_board.h"
 
-#include "smartwatch.h"
-#include "pinio.h"
-
-Smartwatch  smartwatch;
-PinIO       pinio;
-
 #define COMMAND_BASE                    0x00
 #define COMMAND_TIME_UPDATE            COMMAND_BASE + 0x01
 #define COMMAND_NOTIFICATION           COMMAND_BASE + 0x02

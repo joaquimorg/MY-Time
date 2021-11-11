@@ -320,7 +320,8 @@ list(APPEND SOURCE_FILES
     smartwatch/modules/lvgl/theme/lv_theme_pinetime.c
     smartwatch/modules/lvgl/lvglmodule.cpp
     
-    smartwatch/base.cpp    
+    smartwatch/utils.cpp
+    smartwatch/base.cpp
 
 )
 

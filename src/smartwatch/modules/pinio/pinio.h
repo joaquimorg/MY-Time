@@ -3,14 +3,8 @@
 
 #include "stdint.h"
 
-class PinIO
-{
-  public:
-    PinIO(void);
-    void init(void);
 
-  protected:
-    
-};
+void io_init(void);
+
 
 #endif //PINIO_H

@@ -3,15 +3,8 @@
 
 #include "stdint.h"
 
-class Watchdog
-{
-  public:
-    Watchdog(void);
-    void init(int timeout);
-    void feed(void);
 
-  protected:
-    
-};
+void watchdog_init(int timeout);
+void watchdog_feed(void);
 
 #endif //WATCHDOG_H

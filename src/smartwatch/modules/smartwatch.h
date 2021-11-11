@@ -47,6 +47,7 @@ class Smartwatch
     lv_obj_t * label1;
 
     uint32_t debug = 0;
+    const char* resetReason;
 
     uint32_t displayTimeout;
     Touch::Gestures gesture = Touch::Gestures::None;

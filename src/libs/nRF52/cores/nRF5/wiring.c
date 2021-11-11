@@ -34,10 +34,10 @@ static uint32_t _reset_reason = 0;
 
 void init( void )
 {
-  _reset_reason = NRF_POWER->RESETREAS;
+  //_reset_reason = NRF_POWER->RESETREAS;
 
   // clear reset reason: can save it for application usage if needed.
-  NRF_POWER->RESETREAS |= NRF_POWER->RESETREAS;
+  //NRF_POWER->RESETREAS |= NRF_POWER->RESETREAS;
 
   // Retrieve bootloader version
   bootloaderVersion = BOOTLOADER_VERSION_REGISTER;
