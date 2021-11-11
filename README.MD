@@ -38,10 +38,16 @@ The purpose of **MY-Time** is to build a firmware for Pinetime that is lightweig
 Build and flash MY-Time 
 ========================================
 <pre>
+$ sudo apt install build-essential
+$ wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2
+$ sudo tar xjf gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2 -C /usr/share
+$ sudo apt install ninja-build
+$ $ sudo apt install cmake
+
 $ git clone --recurse-submodules https://github.com/joaquimorg/MY-Time.git
 $ cd MY-Time
 $ mkdir build
-$ cmake -S . -B "build" -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DARM_NONE_EABI_TOOLCHAIN_PATH=/usr/local/gcc-arm-none-eabi-9-2020-q2-update
+$ cmake -S . -B "build" -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DARM_NONE_EABI_TOOLCHAIN_PATH=/usr/share/gcc-arm-none-eabi-10.3-2021.10
 
 $ cmake --build build
 
