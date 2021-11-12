@@ -45,6 +45,8 @@ class Clock : public Application
                 case Touch::Gestures::SlideDown:
                     smartwatch->load_application(Applications::Debug, Smartwatch::RefreshDirections::Down);
                     return true;
+                default:
+                    return false;
             }
             return false; 
         };

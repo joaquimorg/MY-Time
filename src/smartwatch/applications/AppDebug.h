@@ -24,6 +24,8 @@ class AppDebug : public Application
                 case Touch::Gestures::SlideUp:
                     smartwatch->load_application(Applications::Clock, Smartwatch::RefreshDirections::Up);
                     return true;
+                default:
+                    return false;
             }
             return false; 
         };

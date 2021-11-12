@@ -131,6 +131,8 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
             currentApplication = std::make_unique<AppDebug>(this);
             return_app(Applications::Clock, Touch::Gestures::SlideUp, RefreshDirections::Up);
             break;
+        default:
+            break;
     }
     stopLvgl = false;
 }
