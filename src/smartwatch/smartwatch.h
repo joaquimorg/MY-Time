@@ -35,13 +35,15 @@ class Smartwatch
         enum class RefreshDirections { None, Up, Down, Left, Right };
 
         enum class Messages : uint8_t {
-            WakeUp = 1,
+            WakeUp,
             GoToSleep,
             BleConnected,
             BleDisconnected,
             BleData,
             OnTouchEvent,
             OnButtonEvent,
+            OnChargingEvent,
+            OnPowerEvent,
             ReloadIdleTimer
         };
 
@@ -71,10 +73,12 @@ class Smartwatch
         TaskHandle_t _lvglHandle;
         TimerHandle_t idleTimer;
 
-        lv_obj_t *main_scr;
+        lv_timer_t * appUpdate;
+
+        lv_obj_t * main_scr;
 
         uint32_t debug = 0;
-        const char *resetReason;
+        const char * resetReason;
 
         uint32_t displayTimeout;
         Touch::Gestures gesture = Touch::Gestures::None;
@@ -97,6 +101,8 @@ class Smartwatch
         void wakeup();
 
         void return_app(Applications app, Touch::Gestures gesture, RefreshDirections dir);
+        static void lv_update_app(lv_timer_t * timer);
+        void update_application(void);
 };
 
 #endif //SMARTWATCH_H

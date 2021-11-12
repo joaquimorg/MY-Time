@@ -25,6 +25,11 @@ void Smartwatch::idle_callback(TimerHandle_t xTimer) {
     sw->on_idle();
 }
 
+void Smartwatch::lv_update_app(lv_timer_t * timer) {  
+    auto user_data = static_cast<Smartwatch *>(timer->user_data);
+    user_data->update_application();
+}
+
 void Smartwatch::init(void) {
 
     // Initialize the modules
@@ -51,6 +56,14 @@ void Smartwatch::init(void) {
 
     // Create a task for lvgl
     xTaskCreate(Smartwatch::lvgl_task, "lvgl", LVGL_STACK_SZ, this, TASK_PRIO_NORMAL, &_lvglHandle);
+
+    appUpdate = lv_timer_create(Smartwatch::lv_update_app, 1000, this);
+}
+
+void Smartwatch::update_application(void) {
+    if(currentApplication) {
+        currentApplication->update();
+    }
 }
 
 void Smartwatch::task(void *instance) {
@@ -117,8 +130,11 @@ void Smartwatch::return_app(Applications app, Touch::Gestures gesture, RefreshDi
 
 void Smartwatch::load_application(Applications app, RefreshDirections dir) {
     if ( currentApp == app ) return;
+    if ( app == Applications::None ) return;
+    
     stopLvgl = true;
     currentApp = app;
+    lv_timer_pause(appUpdate);
     currentApplication.reset(nullptr);
     set_refresh_direction(dir);
     switch (app) {
@@ -131,9 +147,12 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
             currentApplication = std::make_unique<AppDebug>(this);
             return_app(Applications::Clock, Touch::Gestures::SlideUp, RefreshDirections::Up);
             break;
+
         default:
             break;
     }
+    lv_timer_set_period(appUpdate, currentApplication->get_update_interval());
+    lv_timer_resume(appUpdate);
     stopLvgl = false;
 }
 
@@ -153,6 +172,12 @@ void Smartwatch::run(void) {
             case Messages::GoToSleep:
                 state = States::Idle;
                 sleep();
+                break;
+
+            case Messages::OnChargingEvent:
+                break;
+
+            case Messages::OnPowerEvent:
                 break;
 
             case Messages::BleConnected:

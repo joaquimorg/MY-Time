@@ -30,7 +30,8 @@ The purpose of **MY-Time** is to build a firmware for Pinetime that is lightweig
 
  - Code written in **C++**;
  - Build system based on **CMake and Ninja**;
- - Based on **[FreeRTOS 10.0.0](https://freertos.org)** real-time OS;
+ - Using **[FreeRTOS 10.0.0](https://freertos.org)** real-time OS;
+ - Arduino Core for **[Adafruit Bluefruit nRF52 Boards](https://github.com/adafruit/Adafruit_nRF52_Arduino)**
  - UI library **[LVGL 8](https://lvgl.io/)**;
  - Bluetooth Nordic Softdevice **[S112 nrf52 6.1.1 softdevice](https://www.nordicsemi.com/Products/Development-software/nRF5-SDK)**;
 

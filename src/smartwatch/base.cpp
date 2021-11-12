@@ -10,7 +10,8 @@ BLEDfu      bledfu;  // OTA DFU service
 BLEUart     bleuart; // uart over ble
 
 TimerHandle_t buttonTimer;
-TimerHandle_t watchdogTimer;
+TimerHandle_t chargingTimer;
+TimerHandle_t powerTimer;
 
 // callback invoked when central connects
 void connect_callback(uint16_t conn_handle) {
@@ -76,12 +77,31 @@ void tp_callback(void) {
     }
 }
 
-/*
-void feed_watchdog(TimerHandle_t xTimer) {
-    if (digitalRead(KEY_ACTION) == LOW) return;
-    watchdog_feed();
+void charging_timer_callback(TimerHandle_t xTimer) {
+    xTimerStop(xTimer, 0);
+    smartwatch->push_message(Smartwatch::Messages::OnChargingEvent);
 }
-*/
+
+void charging_callback(void) {
+    if (digitalRead(CHARGE_IRQ) == HIGH) {        
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        xTimerStartFromISR(chargingTimer, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    }
+}
+
+void power_timer_callback(TimerHandle_t xTimer) {
+    xTimerStop(xTimer, 0);
+    smartwatch->push_message(Smartwatch::Messages::OnPowerEvent);
+}
+
+void power_callback(void) {
+    if (digitalRead(CHARGE_BASE_IRQ) == HIGH) {        
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        xTimerStartFromISR(powerTimer, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    }
+}
 
 uint16_t countrx = 0;
 uint8_t inputEnd = 1;
@@ -129,6 +149,12 @@ void setup(void) {
     pinMode(TP_IRQ, INPUT_SENSE_LOW);
     attachInterrupt(TP_IRQ, tp_callback, FALLING); // ISR_DEFERRED | 
 
+    pinMode(CHARGE_IRQ, INPUT_PULLDOWN);
+    attachInterrupt(CHARGE_IRQ, charging_callback, RISING); 
+
+    pinMode(CHARGE_BASE_IRQ, INPUT_PULLDOWN);
+    attachInterrupt(CHARGE_BASE_IRQ, power_callback, RISING); 
+
     init_fast_spi();
     init_i2c();
 
@@ -137,6 +163,10 @@ void setup(void) {
     smartwatch->init();
 
     buttonTimer = xTimerCreate("buttonTimer", 300, pdFALSE, NULL, button_timer_callback);
+
+    chargingTimer = xTimerCreate("chargingTimer", 1000, pdFALSE, NULL, charging_timer_callback);
+
+    powerTimer = xTimerCreate("powerTimer", 1000, pdFALSE, NULL, power_timer_callback);
 
     // Bluetooth Config
     Bluefruit.begin(1, 0);
@@ -152,8 +182,6 @@ void setup(void) {
 
     startAdv();    
 
-    //watchdogTimer = xTimerCreate("watchdog", 1000, pdTRUE, NULL, feed_watchdog);
-    //xTimerStart(watchdogTimer, 0);
 }
 
 
