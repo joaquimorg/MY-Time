@@ -16,7 +16,7 @@ class LvglModule
 
     LvglModule(Display &display, Touch &touch);
     void init(void);
-    void SetRefreshDirection(refreshDirections direction);
+    void set_refresh_direction(refreshDirections direction);
     
     void flush_display(const lv_area_t *area, lv_color_t *color_p);
     void touchpad(lv_indev_data_t* data);

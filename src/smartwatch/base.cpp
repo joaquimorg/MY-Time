@@ -1,6 +1,5 @@
 #include <memory>
 #include "base.h"
-#include "watchdog.h"
 #include "smartwatch.h"
 #include "fast_spi.h"
 #include "i2c.h"
@@ -77,10 +76,12 @@ void tp_callback(void) {
     }
 }
 
+/*
 void feed_watchdog(TimerHandle_t xTimer) {
-    if (digitalRead(KEY_ACTION) == HIGH) return;
+    if (digitalRead(KEY_ACTION) == LOW) return;
     watchdog_feed();
 }
+*/
 
 uint16_t countrx = 0;
 uint8_t inputEnd = 1;
@@ -149,12 +150,10 @@ void setup(void) {
     bleuart.begin();
     bleuart.setRxCallback(bleuart_rx_callback, false);
 
-    startAdv();
+    startAdv();    
 
-    watchdog_init(5000);
-
-    watchdogTimer = xTimerCreate("watchdog", 1000, pdTRUE, NULL, feed_watchdog);
-    xTimerStart(watchdogTimer, 0);
+    //watchdogTimer = xTimerCreate("watchdog", 1000, pdTRUE, NULL, feed_watchdog);
+    //xTimerStart(watchdogTimer, 0);
 }
 
 

@@ -24,7 +24,7 @@ LvglModule::LvglModule(Display &display, Touch &touch) : display{display}, touch
     
 }
 
-void LvglModule::SetRefreshDirection(refreshDirections direction) {
+void LvglModule::set_refresh_direction(refreshDirections direction) {
     this->scrollDirection = direction;
 }
 
@@ -72,7 +72,7 @@ void LvglModule::init(void) {
 void LvglModule::touchpad(lv_indev_data_t* data) {
 
     // Get the touchpad's position
-    touch.read();
+    //touch.read();
     
     if (touch.getEvent() == 2) {
         data->state = LV_INDEV_STATE_PR;

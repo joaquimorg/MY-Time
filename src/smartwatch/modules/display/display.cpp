@@ -18,28 +18,6 @@ Display::Display(void) {
 
 }
 
-
-void Display::vertical_scroll_definition(uint16_t topFixedLines, uint16_t scrollLines, uint16_t bottomFixedLines, uint16_t line) {
-
-    verticalScrollingStartAddress = line;
-
-    uint8_t temp[6];
-    spi_command(ST77XX_VSCRDEF);
-    temp[0] = topFixedLines >> 8u;
-    temp[1] = topFixedLines & 0x00ffu;
-    temp[2] = scrollLines >> 8u;
-    temp[3] = scrollLines & 0x00ffu;
-    temp[4] = bottomFixedLines >> 8u;
-    temp[5] = bottomFixedLines & 0x00ffu;
-    write_fast_spi(temp, 6);
-
-    spi_command(ST77XX_VSCSAD);
-    temp[0] = line >> 8u;
-    temp[1] = line & 0x00ffu;
-    write_fast_spi(temp, 2);
-
-}
-
 void Display::spi_command(uint8_t d) {
     digitalWrite(LCD_DC , LOW);
     write_fast_spi(&d, 1);
@@ -56,6 +34,27 @@ void Display::end_write_display(void) {
     enable_spi(false);
 }
 
+
+void Display::vertical_scroll_definition(uint16_t topFixedLines, uint16_t scrollLines, uint16_t bottomFixedLines, uint16_t line) {    
+
+    uint8_t temp[6];
+    spi_command(ST77XX_VSCRDEF);
+    temp[0] = topFixedLines >> 8u;
+    temp[1] = topFixedLines & 0x00ffu;
+    temp[2] = scrollLines >> 8u;
+    temp[3] = scrollLines & 0x00ffu;
+    temp[4] = bottomFixedLines >> 8u;
+    temp[5] = bottomFixedLines & 0x00ffu;
+    write_fast_spi(temp, 6);
+
+    spi_command(ST77XX_VSCSAD);
+    temp[0] = line >> 8u;
+    temp[1] = line & 0x00ffu;
+    write_fast_spi(temp, 2);
+
+    this->verticalScrollingStartAddress = line;
+}
+
 void Display::sleep(void) {
     start_write_display();
     spi_command(ST77XX_SLPIN);
@@ -65,9 +64,10 @@ void Display::sleep(void) {
 
 void Display::wake_up(void) {
     start_write_display();
-    vertical_scroll_definition(0, 320, 0, verticalScrollingStartAddress);
     spi_command(ST77XX_DISPON);
     spi_command(ST77XX_SLPOUT);
+    //delay(10);
+    //vertical_scroll_definition(0, 320, 0, this->verticalScrollingStartAddress);
     end_write_display();
 }
 
@@ -184,7 +184,7 @@ void Display::init(void) {
     spi_command(0x11);
     spi_command(0x29);
 
-    vertical_scroll_definition(0, 320, 0, 0);
+    vertical_scroll_definition(0, 320, 0, this->verticalScrollingStartAddress);
 
     end_write_display();    
 }

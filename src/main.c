@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include "nrf52.h"
 
-#define LOOP_STACK_SZ       (256*6)
-#define CALLBACK_STACK_SZ   (256*3)
+#define LOOP_STACK_SZ       (256*4)
+#define CALLBACK_STACK_SZ   (256*1)
 
 
 static TaskHandle_t  _loopHandle;

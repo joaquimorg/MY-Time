@@ -9,9 +9,14 @@
 class Application
 {
     public:
-        Application( lv_obj_t * parent ) {
+        Application( lv_obj_t *parrent ) {
+
             this->updateInterval = 1000;
-            this->screen = lv_obj_create(parent);
+            this->screen = lv_obj_create(parrent);
+            lv_obj_clear_flag(this->screen, LV_OBJ_FLAG_CLICKABLE);
+            lv_obj_clear_flag(this->screen, LV_OBJ_FLAG_SCROLL_ELASTIC);
+            lv_obj_remove_style_all(this->screen);                            /*Make it transparent*/
+            lv_obj_set_size(this->screen, lv_pct(100), lv_pct(100));
         };
 
         ~Application() {
@@ -24,7 +29,7 @@ class Application
         virtual bool gestures(Touch::Gestures gesture) { return false; };
 
     protected:
-
+        
         uint32_t updateInterval;
         
         lv_obj_t *screen;

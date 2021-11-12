@@ -65,6 +65,7 @@ void Touch::read() {
   user_i2c_read(TP_TWI_ADDR, 0x01, data_raw, 6);
 
   if ( data_raw[0] == 0xe0 ) {
+    gesture = Touch::Gestures::None;
     return;
   }
   
