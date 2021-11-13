@@ -66,7 +66,7 @@ void Display::wake_up(void) {
     start_write_display();
     spi_command(ST77XX_DISPON);
     spi_command(ST77XX_SLPOUT);
-    //delay(10);
+    delay(10);
     //vertical_scroll_definition(0, 320, 0, this->verticalScrollingStartAddress);
     end_write_display();
 }
@@ -188,5 +188,4 @@ void Display::init(void) {
 
     end_write_display();    
 }
-
 

@@ -39,7 +39,7 @@
 #define CHARGE_IRQ      12  // CHARGE INDICATION
 #define VIBRATOR_CTRL   16  // 
 
-#define BATTERY_VOL     NRF_SAADC_INPUT_AIN7   // 31 Analog
+#define BATTERY_VOL     31 //NRF_SAADC_INPUT_AIN7   // 31 Analog
 
 
 #endif // PINETIME_BOARD_H

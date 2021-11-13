@@ -8,7 +8,6 @@
 #include "nrf52.h"
 
 
-
 #define ADC_REF_VOLTAGE_IN_MILLIVOLTS  600  //!< Reference voltage (in milli volts) used by ADC while doing conversion.
 #define ADC_RES_10BIT                  1024 //!< Maximum digital value for 10-bit ADC conversion.
 #define ADC_PRE_SCALING_COMPENSATION   6    //!< The ADC is configured to use VDD with 1/3 prescaling as input. And hence the result of conversion is to be multiplied by 3 to get the actual value of the battery voltage.
@@ -17,10 +16,6 @@
 
 #define VIN_MEAS_R26 1000 + 50  // 1000kOhm +- 5% + error correction
 #define VIN_MEAS_R35 1000       // 1000kOhm +- 5%
-
-#define BATT_BUFFER_SIZE 5
-nrf_saadc_value_t batt_buffer[BATT_BUFFER_SIZE];
-uint8_t batt_buffer_index = 0;
 
 #define VOLTAGE_DIVISIONS 21 
 static const float generic_lipo[VOLTAGE_DIVISIONS] = 
@@ -51,43 +46,44 @@ static int voltage_percentage(float battery_voltage) {
 }
 
 
+/**
+ * Constructor
+ */
+Battery::Battery(void) {
 
-void battery_init(void) {
-    
 }
 
-
-void battery_read(void) {
+void Battery::read(void) {
 
     volatile int16_t adc_result = 0;
 
-   
+    adc_result = analogRead(BATTERY_VOL);
 
     batt_buffer[batt_buffer_index++] = adc_result;
-    if (batt_buffer_index >= BATT_BUFFER_SIZE) {
+    if (batt_buffer_index >= bufferSize) {
         batt_buffer_index = 0;
     }
     adc_result = 0;
-    for(uint8_t i = 0; i < BATT_BUFFER_SIZE; i++) {
+    for(uint8_t i = 0; i < bufferSize; i++) {
         adc_result += batt_buffer[i];
     }
-    adc_result /= BATT_BUFFER_SIZE;
+    adc_result /= bufferSize;
 
     // Voltage divider ratio
     //(R26 + R35) / R35
     uint16_t value = (VIN_MEAS_R26 + VIN_MEAS_R35) * adc_result / VIN_MEAS_R35;
 
-    pinetimecos.batteryVoltage = ADC_RESULT_IN_MILLI_VOLTS(value);
+    batteryVoltage = ADC_RESULT_IN_MILLI_VOLTS(value);
 
-    pinetimecos.batteryPercentRemaining = voltage_percentage((float)pinetimecos.batteryVoltage / 1000);
+    batteryPercentRemaining = voltage_percentage((float)batteryVoltage / 1000);
 
 }
 
-char * battery_get_icon(void) {
-    if (pinetimecos.batteryPercentRemaining == -1) return "\xEE\xA4\x87";
-    if (pinetimecos.batteryPercentRemaining > 80) return "\xEE\xA4\xA0";
-    if (pinetimecos.batteryPercentRemaining > 60) return "\xEE\xA4\xA1";
-    if (pinetimecos.batteryPercentRemaining > 40) return "\xEE\xA4\xA2";
-    if (pinetimecos.batteryPercentRemaining > 20) return "\xEE\xA4\xA3";
+const char * Battery::get_icon(void) {
+    if (batteryPercentRemaining == -1) return "\xEE\xA4\x87";
+    if (batteryPercentRemaining > 80) return "\xEE\xA4\xA0";
+    if (batteryPercentRemaining > 60) return "\xEE\xA4\xA1";
+    if (batteryPercentRemaining > 40) return "\xEE\xA4\xA2";
+    if (batteryPercentRemaining > 20) return "\xEE\xA4\xA3";
     return "\xEE\xA4\xA4";
 }

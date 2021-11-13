@@ -10,7 +10,7 @@
 #include "AppDebug.h"
 
 
-#define SW_STACK_SZ       (256*8)
+#define SW_STACK_SZ       (256*6)
 #define LVGL_STACK_SZ     (256*2)
 
 /**
@@ -37,12 +37,15 @@ void Smartwatch::init(void) {
     touch.init();
     lvglmodule.init();
     backlight.init();
-    backlight.set_level(2);
+    backlight.set_level(2); 
 
     resetReason = actual_reset_reason();
 
     // Main queue
     msgQueue = xQueueCreate(queueSize, itemSize);
+
+    appUpdate = lv_timer_create(Smartwatch::lv_update_app, 1000, this);
+    lv_timer_pause(appUpdate);
 
     main_scr = lv_scr_act();
 
@@ -56,8 +59,7 @@ void Smartwatch::init(void) {
 
     // Create a task for lvgl
     xTaskCreate(Smartwatch::lvgl_task, "lvgl", LVGL_STACK_SZ, this, TASK_PRIO_NORMAL, &_lvglHandle);
-
-    appUpdate = lv_timer_create(Smartwatch::lv_update_app, 1000, this);
+    
 }
 
 void Smartwatch::update_application(void) {
@@ -103,7 +105,7 @@ void Smartwatch::hardware_update(void) {
     } else {
         vTaskDelay(ms2tick(500));
     }    
-
+    battery.read();
 }
 
 void Smartwatch::set_refresh_direction(RefreshDirections dir) {

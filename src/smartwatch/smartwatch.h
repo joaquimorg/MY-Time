@@ -8,6 +8,7 @@
 #include "backlight.h"
 #include "display.h"
 #include "touch.h"
+#include "battery.h"
 #include "lvglmodule.h"
 
 enum class Applications
@@ -21,6 +22,7 @@ class Smartwatch
 {
 
     public:
+        Battery battery;
         Backlight backlight;
         Display display;
         Touch touch;

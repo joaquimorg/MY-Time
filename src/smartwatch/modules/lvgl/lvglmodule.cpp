@@ -167,6 +167,7 @@ void LvglModule::flush_display(const lv_area_t *area, lv_color_t *color_p) {
         write_fast_spi(reinterpret_cast<const uint8_t *>(color_p), (width * height * 2));
     }
 
+
     display.end_write_display();
     lv_disp_flush_ready(&disp_drv);
 }

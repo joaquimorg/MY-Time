@@ -9,6 +9,9 @@ class Clock : public Application
     public:
         Clock( Smartwatch * smartwatch ) : Application(smartwatch->get_main_screen()), smartwatch{smartwatch} {
 
+            lv_obj_set_style_bg_color(this->screen, lv_color_hex(0xff0000), 0);
+            lv_obj_set_style_bg_opa(this->screen, LV_OPA_COVER, 0);
+
             lv_timeh = lv_label_create(this->screen);    
             lv_obj_set_style_text_font(lv_timeh, &lv_font_clock_90, 0);
             lv_label_set_text_fmt(lv_timeh, "%02i", 21);
@@ -31,7 +34,7 @@ class Clock : public Application
             lv_obj_align(lv_times, LV_ALIGN_CENTER, 0, -35);
             
             lv_info = lv_label_create( this->screen );
-            lv_label_set_text_fmt(lv_info, "MY-Time - Ready to rock - %s", smartwatch->get_reset_reason());
+            lv_label_set_text(lv_info, "MY-Time - Ready to rock");
             lv_obj_set_style_text_color(lv_info, lv_color_hex(0x00ffff), 0);
             lv_obj_set_width(lv_info, 220);
             lv_label_set_long_mode(lv_info, LV_LABEL_LONG_SCROLL_CIRCULAR);

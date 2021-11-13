@@ -17,6 +17,11 @@ class Application
             lv_obj_clear_flag(this->screen, LV_OBJ_FLAG_SCROLL_ELASTIC);
             lv_obj_remove_style_all(this->screen);                            /*Make it transparent*/
             lv_obj_set_size(this->screen, lv_pct(100), lv_pct(100));
+            
+            /*lv_obj_t * backgoundLabel = lv_label_create( this->screen );
+            lv_label_set_text_static(backgoundLabel, "");
+            lv_obj_set_size(backgoundLabel, 240, 240);
+            lv_obj_set_pos(backgoundLabel, 0, 0);*/
         };
 
         ~Application() {
