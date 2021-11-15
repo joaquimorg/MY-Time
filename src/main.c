@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "nrf52.h"
 
-#define LOOP_STACK_SZ       (256*4)
+#define LOOP_STACK_SZ       (256*2)
 #define CALLBACK_STACK_SZ   (256*1)
 
 

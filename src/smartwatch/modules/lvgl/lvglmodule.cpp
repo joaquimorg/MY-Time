@@ -6,12 +6,12 @@
 
 
 extern "C" {
-    static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p) {
+    static void disp_flush(lv_disp_drv_t* disp_drv, const lv_area_t* area, lv_color_t* color_p) {
         auto* lvgl = static_cast<LvglModule*>(disp_drv->user_data);
-        lvgl->flush_display(area, color_p);  
+        lvgl->flush_display(area, color_p);
     }
 
-    static void touchpad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data) {
+    static void touchpad_read(lv_indev_drv_t* indev_drv, lv_indev_data_t* data) {
         auto* lvgl = static_cast<LvglModule*>(indev_drv->user_data);
         lvgl->touchpad(data);
     }
@@ -20,8 +20,8 @@ extern "C" {
 /**
  * Constructor
  */
-LvglModule::LvglModule(Display &display, Touch &touch) : display{display}, touch{touch} {
-    
+LvglModule::LvglModule(Display& display, Touch& touch) : display{ display }, touch{ touch } {
+
 }
 
 void LvglModule::set_refresh_direction(refreshDirections direction) {
@@ -53,7 +53,7 @@ void LvglModule::init(void) {
     // Finally register the driver
     lv_disp_drv_register(&disp_drv);
 
-    lv_theme_t * th = lv_theme_pinetime_init();
+    lv_theme_t* th = lv_theme_pinetime_init();
 
     lv_disp_set_theme(lv_disp_get_default(), th);
 
@@ -66,17 +66,18 @@ void LvglModule::init(void) {
     indev_drv.read_cb = touchpad_read;
     indev_drv.user_data = this;
     lv_indev_drv_register(&indev_drv);
-    
+
 }
 
 void LvglModule::touchpad(lv_indev_data_t* data) {
 
     // Get the touchpad's position
     //touch.read();
-    
+
     if (touch.getEvent() == 2) {
         data->state = LV_INDEV_STATE_PR;
-    } else {
+    }
+    else {
         data->state = LV_INDEV_STATE_REL;
     }
 
@@ -85,15 +86,16 @@ void LvglModule::touchpad(lv_indev_data_t* data) {
 
 }
 
-void LvglModule::flush_display(const lv_area_t *area, lv_color_t *color_p) {
+void LvglModule::flush_display(const lv_area_t* area, lv_color_t* color_p) {
 
     uint16_t y1, y2, width, height = 0;
 
     display.start_write_display();
-    
-    if( (this->scrollDirection == refreshDirections::Down) && (area->y2 == visibleNbLines - 1)) {
+
+    if ((this->scrollDirection == refreshDirections::Down) && (area->y2 == visibleNbLines - 1)) {
         writeOffset = ((writeOffset + totalNbLines) - visibleNbLines) % totalNbLines;
-    } else if( (this->scrollDirection == refreshDirections::Up) && (area->y1 == 0) ) {
+    }
+    else if ((this->scrollDirection == refreshDirections::Up) && (area->y1 == 0)) {
         writeOffset = (writeOffset + visibleNbLines) % totalNbLines;
     }
 
@@ -103,45 +105,50 @@ void LvglModule::flush_display(const lv_area_t *area, lv_color_t *color_p) {
     width = (area->x2 - area->x1) + 1;
     height = (area->y2 - area->y1) + 1;
 
-    if ( this->scrollDirection == refreshDirections::Down ) {
-        if(area->y2 < visibleNbLines - 1) {
+    if (this->scrollDirection == refreshDirections::Down) {
+        if (area->y2 < visibleNbLines - 1) {
             uint16_t toScroll = 0;
-                if(area->y1 == 0) {
+            if (area->y1 == 0) {
                 toScroll = height * 2;
                 this->scrollDirection = refreshDirections::None;
                 lv_disp_set_direction(lv_disp_get_default(), 0);
-            } else {
+            }
+            else {
                 toScroll = height;
             }
 
-            if(scrollOffset >= toScroll)
+            if (scrollOffset >= toScroll)
                 scrollOffset -= toScroll;
             else {
                 toScroll -= scrollOffset;
-                scrollOffset = (totalNbLines) - toScroll;
+                scrollOffset = (totalNbLines)-toScroll;
             }
             display.vertical_scroll_start_address(scrollOffset);
         }
-    } else if(this->scrollDirection == refreshDirections::Up) {
+    }
+    else if (this->scrollDirection == refreshDirections::Up) {
 
-        if(area->y1 > 0) {
-            if(area->y2 == visibleNbLines - 1) {
+        if (area->y1 > 0) {
+            if (area->y2 == visibleNbLines - 1) {
                 scrollOffset += (height * 2);
                 this->scrollDirection = refreshDirections::None;
                 lv_disp_set_direction(lv_disp_get_default(), 0);
-            } else {
+            }
+            else {
                 scrollOffset += height;
             }
             scrollOffset = scrollOffset % totalNbLines;
             display.vertical_scroll_start_address(scrollOffset);
         }
-    } else if(this->scrollDirection == refreshDirections::Left) {
-        if(area->x2 == visibleNbLines - 1) {
+    }
+    else if (this->scrollDirection == refreshDirections::Left) {
+        if (area->x2 == visibleNbLines - 1) {
             this->scrollDirection = refreshDirections::None;
             lv_disp_set_direction(lv_disp_get_default(), 0);
         }
-    } else if(this->scrollDirection == refreshDirections::Right) {
-        if(area->x1 == 0) {
+    }
+    else if (this->scrollDirection == refreshDirections::Right) {
+        if (area->x1 == 0) {
             this->scrollDirection = refreshDirections::None;
             lv_disp_set_direction(lv_disp_get_default(), 0);
         }
@@ -150,20 +157,21 @@ void LvglModule::flush_display(const lv_area_t *area, lv_color_t *color_p) {
     if (y2 < y1) {
         height = totalNbLines - y1;
 
-        if ( height > 0 ) {
-            display.draw_buffer(area->x1, y1, width, height, reinterpret_cast<const uint8_t *>(color_p), width * height * 2);
+        if (height > 0) {
+            display.draw_buffer(area->x1, y1, width, height, reinterpret_cast<const uint8_t*>(color_p), width * height * 2);
         }
 
         uint16_t pixOffset = width * height;
 
         height = y2 + 1;
 
-        display.draw_buffer(area->x1, 0, width, height, reinterpret_cast<const uint8_t *>(color_p + pixOffset), width * height * 2);
+        display.draw_buffer(area->x1, 0, width, height, reinterpret_cast<const uint8_t*>(color_p + pixOffset), width * height * 2);
 
-    } else {
-        display.draw_buffer(area->x1, y1, width, height, reinterpret_cast<const uint8_t *>(color_p), width * height * 2);
     }
-    
+    else {
+        display.draw_buffer(area->x1, y1, width, height, reinterpret_cast<const uint8_t*>(color_p), width * height * 2);
+    }
+
     display.end_write_display();
 
     lv_disp_flush_ready(&disp_drv);

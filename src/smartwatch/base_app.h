@@ -18,6 +18,9 @@ class Application
             lv_obj_remove_style_all(this->screen);                            /*Make it transparent*/
             lv_obj_set_size(this->screen, lv_pct(100), lv_pct(100));
             
+            //lv_obj_set_style_bg_opa(this->screen, LV_OPA_COVER, 0);
+            //lv_obj_set_style_bg_color(this->screen, lv_color_hex(0x000000), 0);
+            
             /*lv_obj_t * backgoundLabel = lv_label_create( this->screen );
             lv_label_set_text_static(backgoundLabel, "");
             lv_obj_set_size(backgoundLabel, 240, 240);

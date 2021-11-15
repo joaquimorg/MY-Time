@@ -204,6 +204,7 @@ void Display::vertical_scroll_definition(uint16_t topFixedLines, uint16_t scroll
 }
 
 void Display::vertical_scroll_start_address(uint16_t line) {
+    if (line > 320 ) return;
     verticalScrollingStartAddress = line;
     //assert(line < 320);
     write_command(ST7789_VSCSAD);

@@ -25,3 +25,38 @@ const char* actual_reset_reason(void) {
     return "NFC";
   return "Hard reset";
 }
+
+
+
+// usage:
+//   float x, y, z;
+//   int i = 0;
+//   i += packFloat(&buffer[i], x);
+//   i += packFloat(&buffer[i], y);
+//   i += packFloat(&buffer[i], z);
+int packFloat(void *buf, float x) {
+    unsigned char *b = (unsigned char *)buf;
+    unsigned char *p = (unsigned char *) &x;
+    b[0] = p[3];
+    b[1] = p[2];
+    b[2] = p[1];
+    b[3] = p[0];
+    return 4;
+}
+
+int packInt(void *buf, int x) {
+    unsigned char *b = (unsigned char *)buf;
+    unsigned char *p = (unsigned char *) &x;
+    b[0] = p[3];
+    b[1] = p[2];
+    b[2] = p[1];
+    b[3] = p[0];
+    return 4;
+}
+
+int packByte(void *buf, uint8_t x) {
+    unsigned char *b = (unsigned char *)buf;
+    unsigned char *p = (unsigned char *) &x;
+    b[0] = p[0];
+    return 1;
+}

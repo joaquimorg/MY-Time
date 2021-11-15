@@ -7,9 +7,6 @@ class AppDebug : public Application
 {
     public:
         AppDebug( Smartwatch * smartwatch ) : Application(smartwatch->get_main_screen()), smartwatch{smartwatch} {
-            
-            lv_obj_set_style_bg_color(this->screen, lv_color_hex(0x0000ff), 0);
-            lv_obj_set_style_bg_opa(this->screen, LV_OPA_COVER, 0);
 
             lv_info = lv_label_create( this->screen );
             lv_label_set_text(lv_info, "");

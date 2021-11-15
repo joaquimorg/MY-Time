@@ -16,6 +16,8 @@ enum class Applications
 {
     None,
     Debug,
+    Passkey,
+    ShowMessage,
     Clock,
 };
 
@@ -35,6 +37,12 @@ class Smartwatch
             Idle,
             Running
         };
+
+        enum class MessageType : uint8_t 
+        {
+            Error,
+            Info
+        };
         
         enum class RefreshDirections { None, Up, Down, Left, Right };
 
@@ -48,10 +56,14 @@ class Smartwatch
             OnButtonEvent,
             OnChargingEvent,
             OnPowerEvent,
-            ReloadIdleTimer
+            ReloadIdleTimer,
+            ShowPasskey,
+            ShowMessage,
         };
 
         States state = States::Running;
+
+        uint8_t passkey[7];
 
         Smartwatch(void);
         void init(void);        
@@ -67,6 +79,19 @@ class Smartwatch
 
         void set_ble_data(uint8_t msgType, uint8_t* data, uint8_t len);
 
+        void set_notification(const char* title, const char* text, MessageType msgType) {
+            this->notificationTitle = title;
+            this->notificationText = text;
+            this->notificationType = msgType;
+        };
+
+        const char* get_notification_title(void) { return this->notificationTitle; };
+        const char* get_notification_text(void) { return this->notificationText; };
+        MessageType get_notification_type(void) { return this->notificationType; };
+
+        bool is_charging(void) { return this->isCharging; };
+        void set_charging(bool charging) { this->isCharging = charging; };
+
     protected:
         QueueHandle_t msgQueue;
         static constexpr uint8_t queueSize = 10;
@@ -74,6 +99,7 @@ class Smartwatch
 
         bool doNotGoToSleep = false;
         bool stopLvgl = false;
+        bool isCharging = false;
 
         TaskHandle_t _smartwatchHandle;
         TaskHandle_t _lvglHandle;
@@ -85,6 +111,10 @@ class Smartwatch
 
         uint32_t debug = 0;
         const char * resetReason;
+
+        const char * notificationText;
+        const char * notificationTitle;
+        MessageType notificationType = MessageType::Info;
 
         uint32_t displayTimeout;
         Touch::Gestures gesture = Touch::Gestures::None;

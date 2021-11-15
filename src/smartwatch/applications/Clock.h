@@ -12,8 +12,9 @@ class Clock : public Application
 
             smartwatch->rtc_time.get_time();
 
-            lv_obj_set_style_bg_color(this->screen, lv_color_hex(0xff0000), 0);
             lv_obj_set_style_bg_opa(this->screen, LV_OPA_COVER, 0);
+            lv_obj_set_style_bg_color(this->screen, lv_color_hex(0x550000), 0);
+            lv_obj_set_style_radius(this->screen, 15, 0);
 
             lv_timeh = lv_label_create(this->screen);    
             lv_obj_set_style_text_font(lv_timeh, &lv_font_clock_90, 0);

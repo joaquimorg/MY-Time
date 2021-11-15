@@ -8,6 +8,8 @@
 
 #include "Clock.h"
 #include "AppDebug.h"
+#include "Passkey.h"
+#include "ShowMessage.h"
 
 
 #define SW_STACK_SZ       (256*6)
@@ -32,15 +34,15 @@ void Smartwatch::lv_update_app(lv_timer_t * timer) {
 
 void Smartwatch::init(void) {
 
+    resetReason = actual_reset_reason();
+
     // Initialize the modules
     rtc_time.init();
     display.init();
     touch.init();
     lvglmodule.init();
     backlight.init();
-    backlight.set_level(2); 
-
-    resetReason = actual_reset_reason();
+    backlight.set_level(2);    
 
     // Main queue
     msgQueue = xQueueCreate(queueSize, itemSize);
@@ -89,11 +91,11 @@ void Smartwatch::run_lvgl(void) {
     if ( state == States::Running ) {
         if ( !stopLvgl ) {
             lv_timer_handler();
-            lv_tick_inc(20);
+            lv_tick_inc(10);
         }
         vTaskDelay(1);
     } else {
-        vTaskDelay(100);
+        vTaskDelay(ms2tick(1000));
     }
     if (digitalRead(KEY_ACTION) == HIGH) return;
     watchdog_feed();
@@ -102,9 +104,9 @@ void Smartwatch::run_lvgl(void) {
 
 void Smartwatch::hardware_update(void) {
     if ( state == States::Idle ) {
-        vTaskDelay(ms2tick(30000));
+        vTaskDelay(ms2tick(60000));
     } else {
-        vTaskDelay(ms2tick(500));
+        vTaskDelay(ms2tick(5000));
     }    
     battery.read();
 }
@@ -139,11 +141,18 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
     currentApp = app;
     lv_timer_pause(appUpdate);
     currentApplication.reset(nullptr);
-    set_refresh_direction(dir);
     switch (app) {
         case Applications::Clock:
             currentApplication = std::make_unique<Clock>(this);
             return_app(Applications::Clock, Touch::Gestures::None, RefreshDirections::None);
+            break;
+        case Applications::Passkey:
+            currentApplication = std::make_unique<Passkey>(this);
+            return_app(Applications::Clock, Touch::Gestures::SlideDown, RefreshDirections::Down);
+            break;
+        case Applications::ShowMessage:
+            currentApplication = std::make_unique<ShowMessage>(this);
+            return_app(Applications::Clock, Touch::Gestures::SlideDown, RefreshDirections::Down);
             break;
 
         case Applications::Debug:
@@ -154,6 +163,7 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
         default:
             break;
     }
+    set_refresh_direction(dir);
     lv_timer_set_period(appUpdate, currentApplication->get_update_interval());
     lv_timer_resume(appUpdate);
     stopLvgl = false;
@@ -178,17 +188,17 @@ void Smartwatch::run(void) {
                 break;
 
             case Messages::OnChargingEvent:
-                if (state == States::Idle) {
-                    push_message(Messages::WakeUp);
-                    break;
-                }
+                if (currentApp == Applications::ShowMessage) break;
+                set_notification("Power", "Charging...", Smartwatch::MessageType::Info);
+                push_message(Messages::WakeUp);
+                load_application(Applications::ShowMessage, RefreshDirections::Up);
                 break;
 
             case Messages::OnPowerEvent:
-                if (state == States::Idle) {
-                    push_message(Messages::WakeUp);
-                    break;
-                }
+                if (currentApp == Applications::ShowMessage) break;
+                set_notification("Power", "Connected to\ncharger.", Smartwatch::MessageType::Info);
+                push_message(Messages::WakeUp);
+                load_application(Applications::ShowMessage, RefreshDirections::Up);
                 break;
 
             case Messages::BleConnected:
@@ -222,10 +232,7 @@ void Smartwatch::run(void) {
                 break;
 
             case Messages::BleData:
-                if (state == States::Idle) {
-                    push_message(Messages::WakeUp);
-                    break;
-                }
+                push_message(Messages::WakeUp);
                 break;    
 
             case Messages::OnButtonEvent:
@@ -234,7 +241,11 @@ void Smartwatch::run(void) {
                     break;
                 }
                 if (state == States::Running) {
-                    push_message(Messages::GoToSleep);
+                    if (currentApp == Applications::Clock) {
+                        push_message(Messages::GoToSleep);
+                        break;
+                    }
+                    load_application(returnToApp, returnDirection);
                     break;
                 }
                 
@@ -246,6 +257,15 @@ void Smartwatch::run(void) {
                 xTimerReset(idleTimer, 0);
                 break;
                         
+            case Messages::ShowPasskey:
+                push_message(Messages::WakeUp);
+                load_application(Applications::Passkey, RefreshDirections::Up);
+                break;
+            
+            case Messages::ShowMessage:
+                push_message(Messages::WakeUp);
+                load_application(Applications::ShowMessage, RefreshDirections::Up);
+                break;
         }
     }
 
