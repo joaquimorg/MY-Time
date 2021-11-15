@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "lvgl.h"
 #include "base_app.h"
+#include "rtc_time.h"
 #include "backlight.h"
 #include "display.h"
 #include "touch.h"
@@ -22,6 +23,7 @@ class Smartwatch
 {
 
     public:
+        RTCTime rtc_time;
         Battery battery;
         Backlight backlight;
         Display display;
@@ -62,6 +64,8 @@ class Smartwatch
 
         void set_refresh_direction(RefreshDirections dir);
         void load_application(Applications app, RefreshDirections dir);
+
+        void set_ble_data(uint8_t msgType, uint8_t* data, uint8_t len);
 
     protected:
         QueueHandle_t msgQueue;

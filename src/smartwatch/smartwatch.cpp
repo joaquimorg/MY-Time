@@ -33,6 +33,7 @@ void Smartwatch::lv_update_app(lv_timer_t * timer) {
 void Smartwatch::init(void) {
 
     // Initialize the modules
+    rtc_time.init();
     display.init();
     touch.init();
     lvglmodule.init();
@@ -177,9 +178,17 @@ void Smartwatch::run(void) {
                 break;
 
             case Messages::OnChargingEvent:
+                if (state == States::Idle) {
+                    push_message(Messages::WakeUp);
+                    break;
+                }
                 break;
 
             case Messages::OnPowerEvent:
+                if (state == States::Idle) {
+                    push_message(Messages::WakeUp);
+                    break;
+                }
                 break;
 
             case Messages::BleConnected:
