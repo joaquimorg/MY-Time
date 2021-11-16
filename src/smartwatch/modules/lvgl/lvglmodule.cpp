@@ -123,7 +123,7 @@ void LvglModule::flush_display(const lv_area_t* area, lv_color_t* color_p) {
                 toScroll -= scrollOffset;
                 scrollOffset = (totalNbLines)-toScroll;
             }
-            display.vertical_scroll_start_address(scrollOffset);
+            display.vertical_scroll_definition(0, totalNbLines, 0, scrollOffset);
         }
     }
     else if (this->scrollDirection == refreshDirections::Up) {
@@ -138,7 +138,7 @@ void LvglModule::flush_display(const lv_area_t* area, lv_color_t* color_p) {
                 scrollOffset += height;
             }
             scrollOffset = scrollOffset % totalNbLines;
-            display.vertical_scroll_start_address(scrollOffset);
+            display.vertical_scroll_definition(0, totalNbLines, 0, scrollOffset);
         }
     }
     else if (this->scrollDirection == refreshDirections::Left) {
@@ -158,18 +158,21 @@ void LvglModule::flush_display(const lv_area_t* area, lv_color_t* color_p) {
         height = totalNbLines - y1;
 
         if (height > 0) {
-            display.draw_buffer(area->x1, y1, width, height, reinterpret_cast<const uint8_t*>(color_p), width * height * 2);
+            display.set_addr_display(area->x1, y1, width, height);
+            write_fast_spi(reinterpret_cast<const uint8_t*>(color_p), (width * height * 2));
         }
 
         uint16_t pixOffset = width * height;
 
         height = y2 + 1;
 
-        display.draw_buffer(area->x1, 0, width, height, reinterpret_cast<const uint8_t*>(color_p + pixOffset), width * height * 2);
+        display.set_addr_display(area->x1, 0, width, height);
+        write_fast_spi(reinterpret_cast<const uint8_t*>(color_p + pixOffset), (width * height * 2));
 
     }
     else {
-        display.draw_buffer(area->x1, y1, width, height, reinterpret_cast<const uint8_t*>(color_p), width * height * 2);
+        display.set_addr_display(area->x1, y1, width, height);
+        write_fast_spi(reinterpret_cast<const uint8_t*>(color_p), (width * height * 2));
     }
 
     display.end_write_display();
