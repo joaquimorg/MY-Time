@@ -36,6 +36,7 @@ class Application
         virtual void update(void) {};
         virtual bool gestures(Touch::Gestures gesture) { return false; };
         uint32_t get_update_interval(void) { return this->updateInterval; };
+        void set_update_interval(uint32_t interval) { this->updateInterval = interval; };
 
     protected:
         

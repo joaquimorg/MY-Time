@@ -5,18 +5,6 @@
 #include "fast_spi.h"
 
 
-extern "C" {
-    static void disp_flush(lv_disp_drv_t* disp_drv, const lv_area_t* area, lv_color_t* color_p) {
-        auto* lvgl = static_cast<LvglModule*>(disp_drv->user_data);
-        lvgl->flush_display(area, color_p);
-    }
-
-    static void touchpad_read(lv_indev_drv_t* indev_drv, lv_indev_data_t* data) {
-        auto* lvgl = static_cast<LvglModule*>(indev_drv->user_data);
-        lvgl->touchpad(data);
-    }
-}
-
 /**
  * Constructor
  */
@@ -26,6 +14,16 @@ LvglModule::LvglModule(Display& display, Touch& touch) : display{ display }, tou
 
 void LvglModule::set_refresh_direction(refreshDirections direction) {
     this->scrollDirection = direction;
+}
+
+void LvglModule::disp_flush(lv_disp_drv_t* disp_drv, const lv_area_t* area, lv_color_t* color_p) {
+    auto* lvgl = static_cast<LvglModule*>(disp_drv->user_data);
+    lvgl->flush_display(area, color_p);
+}
+
+void LvglModule::touchpad_read(lv_indev_drv_t* indev_drv, lv_indev_data_t* data) {
+    auto* lvgl = static_cast<LvglModule*>(indev_drv->user_data);
+    lvgl->touchpad(data);
 }
 
 void LvglModule::init(void) {
@@ -44,7 +42,7 @@ void LvglModule::init(void) {
     disp_drv.ver_res = displayVER;
 
     // Used to copy the buffer's content to the display
-    disp_drv.flush_cb = disp_flush;
+    disp_drv.flush_cb = LvglModule::disp_flush;
     disp_drv.user_data = this;
 
     // Set a display buffer
@@ -55,15 +53,12 @@ void LvglModule::init(void) {
 
     lv_theme_t* th = lv_theme_pinetime_init();
 
-    lv_disp_set_theme(lv_disp_get_default(), th);
-
-
-    static lv_indev_drv_t indev_drv;
+    lv_disp_set_theme(lv_disp_get_default(), th);    
 
     // Register a touchpad input device
     lv_indev_drv_init(&indev_drv);
     indev_drv.type = LV_INDEV_TYPE_POINTER;
-    indev_drv.read_cb = touchpad_read;
+    indev_drv.read_cb = LvglModule::touchpad_read;
     indev_drv.user_data = this;
     lv_indev_drv_register(&indev_drv);
 
@@ -72,18 +67,17 @@ void LvglModule::init(void) {
 void LvglModule::touchpad(lv_indev_data_t* data) {
 
     // Get the touchpad's position
-    //touch.read();
 
-    if (touch.getEvent() == 2) {
-        data->state = LV_INDEV_STATE_PR;
-    }
-    else {
+    if (touch_gesture == Touch::Gestures::SingleTap) {
+        data->state = LV_INDEV_STATE_PR;        
+        data->point.x = touch_xpos;
+        data->point.y = touch_ypos;
+    } else {
         data->state = LV_INDEV_STATE_REL;
+        //data->point.x = 0;
+        //data->point.y = 0;
     }
-
-    data->point.x = touch.getLastX();
-    data->point.y = touch.getLastY();
-
+    touch_gesture = Touch::Gestures::None;
 }
 
 void LvglModule::flush_display(const lv_area_t* area, lv_color_t* color_p) {

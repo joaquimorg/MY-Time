@@ -45,16 +45,17 @@ class Clock : public Application
             lv_obj_set_style_text_color(lv_date, lv_color_make(0xff, 0xff, 0xff), 0);
             lv_obj_align(lv_date, LV_ALIGN_CENTER, 0, 25);
             
-            lv_info = lv_label_create( this->screen );
+            /*lv_info = lv_label_create( this->screen );
             lv_label_set_text(lv_info, "MY-Time - Ready to rock");
             lv_obj_set_style_text_color(lv_info, lv_color_hex(0x00ffff), 0);
             lv_obj_set_width(lv_info, 240);
             lv_label_set_long_mode(lv_info, LV_LABEL_LONG_SCROLL_CIRCULAR);
             //lv_obj_set_style_text_align(lv_info, LV_TEXT_ALIGN_CENTER, 0);
-            lv_obj_align(lv_info, LV_ALIGN_BOTTOM_LEFT, 0, -25);
+            lv_obj_align(lv_info, LV_ALIGN_BOTTOM_LEFT, 0, -25);*/
 
             save_old_time();
 
+            set_update_interval(500);
         };
 
         void update(void) {
@@ -82,7 +83,7 @@ class Clock : public Application
         bool gestures(Touch::Gestures gesture) { 
             switch (gesture) {
                 case Touch::Gestures::SlideDown:
-                    smartwatch->load_application(Applications::Debug, Smartwatch::RefreshDirections::Down);
+                    smartwatch->load_application(Applications::QMenu, Smartwatch::RefreshDirections::Down);
                     return true;
                 default:
                     return false;

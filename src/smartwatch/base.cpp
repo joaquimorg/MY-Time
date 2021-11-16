@@ -113,34 +113,36 @@ void button_callback(void) {
 
 void tp_callback(void) {
     if (digitalRead(TP_IRQ) == LOW) {
+        smartwatch->touch.read();
+        //smartwatch->touch.get();
         smartwatch->push_message(Smartwatch::Messages::OnTouchEvent);
     }
 }
 
 void charging_callback(void) {
-    if (digitalRead(CHARGE_IRQ) == LOW) {
-        smartwatch->set_charging(true);
-        if (xTimerIsTimerActive(chargingTimer) == pdFALSE) {
-            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-            xTimerStartFromISR(chargingTimer, &xHigherPriorityTaskWoken);
-            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-            //smartwatch->push_message(Smartwatch::Messages::OnChargingEvent);
+    if (xTimerIsTimerActive(chargingTimer) == pdFALSE) {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        xTimerStartFromISR(chargingTimer, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        if (digitalRead(CHARGE_IRQ) == HIGH) {
+            smartwatch->set_charging(true);
+        } else {
+            smartwatch->set_charging(false);
         }
-    } else {
-        smartwatch->set_charging(false);
+        smartwatch->push_message(Smartwatch::Messages::OnChargingEvent);
     }
 }
 
 
 void power_callback(void) {
-    if (digitalRead(CHARGE_BASE_IRQ) == HIGH) {
+    //if (digitalRead(CHARGE_BASE_IRQ) == HIGH) {
         if (xTimerIsTimerActive(powerTimer) == pdFALSE) {
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
             xTimerStartFromISR(powerTimer, &xHigherPriorityTaskWoken);
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
             smartwatch->push_message(Smartwatch::Messages::OnPowerEvent);
         }
-    }
+    //}
 }
 
 static uint32_t get_int() {
@@ -229,6 +231,14 @@ void setup(void) {
     dwt_enable();
 
     // Smartwatch init
+
+    init_fast_spi();
+    init_i2c();
+
+    smartwatch = std::make_unique<Smartwatch>();
+
+    smartwatch->init();
+    
     pinMode(KEY_ENABLE, OUTPUT);
     digitalWrite(KEY_ENABLE, HIGH);
 
@@ -242,20 +252,13 @@ void setup(void) {
     attachInterrupt(CHARGE_IRQ, charging_callback, CHANGE);
 
     pinMode(CHARGE_BASE_IRQ, INPUT_SENSE_HIGH);
-    attachInterrupt(CHARGE_BASE_IRQ, power_callback, RISING);
-
-    init_fast_spi();
-    init_i2c();
-
-    smartwatch = std::make_unique<Smartwatch>();
-
-    smartwatch->init();
+    attachInterrupt(CHARGE_BASE_IRQ, power_callback, CHANGE);
 
     buttonTimer = xTimerCreate("buttonTimer", 300, pdFALSE, NULL, stop_timer_callback);
 
-    chargingTimer = xTimerCreate("chargingTimer", 5000, pdFALSE, NULL, stop_timer_callback);
+    chargingTimer = xTimerCreate("chargingTimer", 1000, pdFALSE, NULL, stop_timer_callback);
 
-    powerTimer = xTimerCreate("powerTimer", 500, pdFALSE, NULL, stop_timer_callback);
+    powerTimer = xTimerCreate("powerTimer", 1000, pdFALSE, NULL, stop_timer_callback);
 
     // Bluetooth Config
     Bluefruit.begin(1, 0);

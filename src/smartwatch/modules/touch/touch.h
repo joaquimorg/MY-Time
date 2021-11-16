@@ -2,7 +2,7 @@
 #define TOUCH_H
 
 #include "stdint.h"
-
+#include "nrf52.h"
 class Touch
 {  
 
@@ -24,6 +24,7 @@ class Touch
     void init(void);
     void sleep(bool state);
     void read();
+    void get(void);
 
     uint16_t getX(void) { return xpos; }
     uint16_t getY(void) { return ypos; }
@@ -34,6 +35,9 @@ class Touch
     uint8_t getVersion(void) { return version15; }
 
   protected:
+
+    byte data_raw[8];
+
     Gestures gesture = Gestures::None;
     uint8_t touchpoints;
     uint8_t event;

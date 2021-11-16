@@ -10,6 +10,7 @@
 #include "AppDebug.h"
 #include "Passkey.h"
 #include "ShowMessage.h"
+#include "QMenu.h"
 
 
 #define SW_STACK_SZ       (256*6)
@@ -42,7 +43,9 @@ void Smartwatch::init(void) {
     touch.init();
     lvglmodule.init();
     backlight.init();
-    backlight.set_level(2);    
+    backlight.set_level(2);
+
+    set_charging(false);
 
     // Main queue
     msgQueue = xQueueCreate(queueSize, itemSize);
@@ -95,7 +98,7 @@ void Smartwatch::run_lvgl(void) {
         }
         vTaskDelay(1);
     } else {
-        vTaskDelay(ms2tick(1000));
+        vTaskDelay(ms2tick(2000));
     }
     if (digitalRead(KEY_ACTION) == HIGH) return;
     watchdog_feed();
@@ -154,10 +157,13 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
             currentApplication = std::make_unique<ShowMessage>(this);
             return_app(Applications::Clock, Touch::Gestures::SlideDown, RefreshDirections::Down);
             break;
-
+        case Applications::QMenu:
+            currentApplication = std::make_unique<QMenu>(this);
+            return_app(Applications::Clock, Touch::Gestures::SlideUp, RefreshDirections::Up);
+            break;
         case Applications::Debug:
             currentApplication = std::make_unique<AppDebug>(this);
-            return_app(Applications::Clock, Touch::Gestures::SlideUp, RefreshDirections::Up);
+            return_app(Applications::QMenu, Touch::Gestures::SlideUp, RefreshDirections::Up);
             break;
 
         default:
@@ -179,6 +185,7 @@ void Smartwatch::run(void) {
             case Messages::WakeUp:
                 if (state == States::Running) break;
                 state = States::Running;
+                update_application();
                 wakeup();
                 break;
 
@@ -189,29 +196,35 @@ void Smartwatch::run(void) {
 
             case Messages::OnChargingEvent:
                 if (currentApp == Applications::ShowMessage) break;
-                set_notification("Power", "Charging...", Smartwatch::MessageType::Info);
-                push_message(Messages::WakeUp);
-                load_application(Applications::ShowMessage, RefreshDirections::Up);
+                if (is_charging()) {
+                    set_notification("\xEE\xA4\xA1 Power", "Charging...", Smartwatch::MessageType::Info);
+                    push_message(Messages::WakeUp);
+                    load_application(Applications::ShowMessage, RefreshDirections::Up);
+                } else {
+                    set_notification("\xEE\xA4\xA1 Power", "Discharging...", Smartwatch::MessageType::Info);
+                    push_message(Messages::WakeUp);
+                    load_application(Applications::ShowMessage, RefreshDirections::Up);
+                }
+                push_message(Messages::ReloadIdleTimer);
                 break;
 
             case Messages::OnPowerEvent:
-                if (currentApp == Applications::ShowMessage) break;
-                set_notification("Power", "Connected to\ncharger.", Smartwatch::MessageType::Info);
-                push_message(Messages::WakeUp);
-                load_application(Applications::ShowMessage, RefreshDirections::Up);
                 break;
 
             case Messages::BleConnected:
                 push_message(Messages::BleData);
+                set_bluetooth_connected(true);
                 break;
 
             case Messages::BleDisconnected:
                 push_message(Messages::BleData);
+                set_bluetooth_connected(false);
                 break;
 
             case Messages::OnTouchEvent:
-                touch.read();
+                touch.get();
                 gesture = touch.getGesture();
+                lvglmodule.set_touch_data(gesture, touch.getEvent(), touch.getX(), touch.getY());
                 if (state == States::Idle) {
                     if ( gesture == Touch::Gestures::DoubleTap ) {
                         push_message(Messages::WakeUp);
@@ -219,6 +232,11 @@ void Smartwatch::run(void) {
                     break;
                 } else {
                     push_message(Messages::ReloadIdleTimer);
+
+                    if (currentApp == Applications::Clock && gesture == Touch::Gestures::DoubleTap) {
+                        push_message(Messages::GoToSleep);
+                        break;
+                    }
                 }
 
                 if ( gesture == Touch::Gestures::None ) break;
@@ -226,6 +244,8 @@ void Smartwatch::run(void) {
                 if ( !currentApplication->gestures(gesture) ) {
                     if ( gesture == returnGesture ) {
                         load_application(returnToApp, returnDirection);
+                    } else {
+                        //lvglmodule.set_touch_data(gesture, touch.getEvent(), touch.getX(), touch.getY());
                     }
                 }
 
@@ -233,6 +253,7 @@ void Smartwatch::run(void) {
 
             case Messages::BleData:
                 push_message(Messages::WakeUp);
+                push_message(Messages::ReloadIdleTimer);
                 break;    
 
             case Messages::OnButtonEvent:
@@ -301,11 +322,15 @@ void Smartwatch::push_message(Messages msg) {
 void Smartwatch::sleep() {
     backlight.set_level(0);
     display.sleep();
+    touch.sleep(true);
     xTimerStop(idleTimer, 0);
+    lv_timer_pause(appUpdate);
 }
 
 void Smartwatch::wakeup() {
-    backlight.set_level(backlight.get_level());
+    lv_timer_resume(appUpdate);
     display.wake_up();
+    touch.sleep(false);
     xTimerStart(idleTimer, 0);
+    backlight.set_level(backlight.get_level());
 }

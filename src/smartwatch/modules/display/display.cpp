@@ -22,7 +22,7 @@ Display::Display(void) {
 void Display::vertical_scroll_definition(uint16_t topFixedLines, uint16_t scrollLines, uint16_t bottomFixedLines, uint16_t line) {
 
     verticalScrollingStartAddress = line;
-    start_write_display();
+    //start_write_display();
 
     uint8_t temp[6];
     spi_command(ST77XX_VSCRDEF);
@@ -39,7 +39,7 @@ void Display::vertical_scroll_definition(uint16_t topFixedLines, uint16_t scroll
     temp[1] = line & 0x00ffu;
     write_fast_spi(temp, 2);
 
-    end_write_display();
+    //end_write_display();
 }
 
 void Display::spi_command(uint8_t d) {
@@ -63,12 +63,15 @@ void Display::sleep(void) {
     spi_command(ST77XX_SLPIN);
     spi_command(ST77XX_DISPOFF);
     end_write_display();
+    digitalWrite(LCD_CSN, LOW);
+    digitalWrite(LCD_DC, LOW);
 }
 
 void Display::wake_up(void) {
     start_write_display();
     spi_command(ST77XX_DISPON);
     spi_command(ST77XX_SLPOUT);
+    //vertical_scroll_definition(0, 320, 0, verticalScrollingStartAddress);
     end_write_display();
 }
 
@@ -186,5 +189,7 @@ void Display::init(void) {
     spi_command(41);
     spi_command(0x11);
     spi_command(0x29);
+    set_addr_display(0, 0, 320, 240);
+    vertical_scroll_definition(0, 320, 0, 0);
     end_write_display();
 }

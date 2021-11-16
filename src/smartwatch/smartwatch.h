@@ -18,6 +18,7 @@ enum class Applications
     Debug,
     Passkey,
     ShowMessage,
+    QMenu,
     Clock,
 };
 
@@ -92,6 +93,12 @@ class Smartwatch
         bool is_charging(void) { return this->isCharging; };
         void set_charging(bool charging) { this->isCharging = charging; };
 
+        bool is_blutooth_connected(void) { return this->isBluetoothConnected; };
+        void set_bluetooth_connected(bool connected) { this->isBluetoothConnected = connected; };
+
+        bool get_disturb_mode(void) { return this->dontDisturbMode; };
+        void set_disturb_mode(bool disturb) { this->dontDisturbMode = disturb; };
+
     protected:
         QueueHandle_t msgQueue;
         static constexpr uint8_t queueSize = 10;
@@ -100,6 +107,8 @@ class Smartwatch
         bool doNotGoToSleep = false;
         bool stopLvgl = false;
         bool isCharging = false;
+        bool isBluetoothConnected = false;
+        bool dontDisturbMode = false;
 
         TaskHandle_t _smartwatchHandle;
         TaskHandle_t _lvglHandle;

@@ -14,6 +14,8 @@ class AppDebug : public Application
             lv_obj_set_style_text_align(lv_info, LV_TEXT_ALIGN_CENTER, 0);
             lv_obj_align(lv_info, LV_ALIGN_CENTER, 0, 0);
 
+            set_update_interval(5000);
+            update();
         };
 
         void update(void) {
@@ -28,7 +30,7 @@ class AppDebug : public Application
         bool gestures(Touch::Gestures gesture) { 
             switch (gesture) {
                 case Touch::Gestures::SlideUp:
-                    smartwatch->load_application(Applications::Clock, Smartwatch::RefreshDirections::Up);
+                    smartwatch->load_application(Applications::QMenu, Smartwatch::RefreshDirections::Up);
                     return true;
                 default:
                     return false;
