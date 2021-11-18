@@ -7,7 +7,6 @@
 
 const char* actual_reset_reason(void);
 
-
 // usage:
 //   float x, y, z;
 //   int i = 0;

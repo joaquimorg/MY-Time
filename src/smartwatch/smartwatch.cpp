@@ -57,7 +57,7 @@ void Smartwatch::init(void) {
 
     load_application(Applications::Clock, RefreshDirections::None);
 
-    idleTimer = xTimerCreate ("idleTimer", ms2tick(displayTimeout), pdFALSE, this, Smartwatch::idle_callback);
+    idleTimer = xTimerCreate ("idleTimer", ms2tick(displayTimeout / 2), pdFALSE, this, Smartwatch::idle_callback);
     xTimerStart(idleTimer, 0);
     
     // Create a task for smartwatch
@@ -185,7 +185,6 @@ void Smartwatch::run(void) {
             case Messages::WakeUp:
                 if (state == States::Running) break;
                 state = States::Running;
-                update_application();
                 wakeup();
                 break;
 
@@ -276,6 +275,9 @@ void Smartwatch::run(void) {
 
             case Messages::ReloadIdleTimer:
                 xTimerReset(idleTimer, 0);
+                if (backlight.is_dimmed()) {
+                    backlight.set_level(backlight.get_saved_level());
+                }
                 break;
                         
             case Messages::ShowPasskey:
@@ -294,7 +296,13 @@ void Smartwatch::run(void) {
 
 void Smartwatch::on_idle() {
     if(doNotGoToSleep) return;
-    push_message(Messages::GoToSleep);
+    if (backlight.is_dimmed()) {
+        backlight.restore_dim();
+        push_message(Messages::GoToSleep);
+    } else {
+        backlight.dim();
+        xTimerReset(idleTimer, 0);
+    }
 }
 
 
@@ -320,7 +328,11 @@ void Smartwatch::push_message(Messages msg) {
 }
 
 void Smartwatch::sleep() {
+    backlight.save_level();
     backlight.set_level(0);
+    while (backlight.get_level() > 0) {
+        vTaskDelay(500);
+    }
     display.sleep();
     touch.sleep(true);
     xTimerStop(idleTimer, 0);
@@ -328,9 +340,15 @@ void Smartwatch::sleep() {
 }
 
 void Smartwatch::wakeup() {
-    lv_timer_resume(appUpdate);
     display.wake_up();
+    update_application();
+    lv_timer_resume(appUpdate);
+    
+    lv_timer_handler();
+    lv_tick_inc(1);
+
     touch.sleep(false);
     xTimerStart(idleTimer, 0);
-    backlight.set_level(backlight.get_level());
+    
+    backlight.set_level(backlight.get_saved_level());
 }

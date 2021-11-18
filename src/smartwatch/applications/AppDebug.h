@@ -12,7 +12,7 @@ class AppDebug : public Application
             lv_label_set_text(lv_info, "");
             lv_obj_set_style_text_color(lv_info, lv_color_hex(0x00ffff), 0);
             lv_obj_set_style_text_align(lv_info, LV_TEXT_ALIGN_CENTER, 0);
-            lv_obj_align(lv_info, LV_ALIGN_CENTER, 0, 0);
+            lv_obj_align(lv_info, LV_ALIGN_CENTER, 0, -40);
 
             set_update_interval(5000);
             update();

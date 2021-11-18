@@ -22,9 +22,11 @@ class ShowMessage : public Application
             } else {
                 lv_obj_set_style_text_color(lv_msg, lv_color_hex(0x00ff00), 0);
             }            
-            lv_obj_align(lv_msg, LV_ALIGN_CENTER, 0, 0);
+            lv_obj_align(lv_msg, LV_ALIGN_CENTER, 0, -30);
+            lv_obj_set_width(lv_msg, 230);
+            lv_label_set_long_mode(lv_msg, LV_LABEL_LONG_WRAP);
 
-            closeMessage = lv_timer_create(ShowMessage::close_msg, 25000, this);
+            closeMessage = lv_timer_create(ShowMessage::close_msg, 40000, this);
 
         };
 
@@ -39,12 +41,12 @@ class ShowMessage : public Application
         };
 
         bool gestures(Touch::Gestures gesture) { 
-            switch (gesture) {
+            /*switch (gesture) {
                 
                 default:
                     return false;
-            }
-            return false; 
+            }*/
+            return true; 
         };
 
     protected:

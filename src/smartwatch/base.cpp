@@ -126,39 +126,141 @@ void charging_callback(void) {
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
         if (digitalRead(CHARGE_IRQ) == HIGH) {
             smartwatch->set_charging(true);
+            //smartwatch->push_message(Smartwatch::Messages::OnChargingEvent);
         } else {
             smartwatch->set_charging(false);
         }
-        smartwatch->push_message(Smartwatch::Messages::OnChargingEvent);
     }
 }
 
 
 void power_callback(void) {
-    //if (digitalRead(CHARGE_BASE_IRQ) == HIGH) {
+    if (digitalRead(CHARGE_BASE_IRQ) == HIGH) {
         if (xTimerIsTimerActive(powerTimer) == pdFALSE) {
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
             xTimerStartFromISR(powerTimer, &xHigherPriorityTaskWoken);
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-            smartwatch->push_message(Smartwatch::Messages::OnPowerEvent);
+            //smartwatch->push_message(Smartwatch::Messages::OnPowerEvent);
         }
-    //}
+    }
 }
 
 static uint32_t get_int() {
     return bleuart.read8() << 24 | bleuart.read8() << 16 | bleuart.read8() << 8 | bleuart.read8();
 }
 
+static uint8_t get_byte() {
+    return bleuart.read8();
+}
+
+typedef struct _notification {
+    uint32_t    id;
+    char *      subject;
+    char *      body;
+    uint8_t     type;
+    const char *      typeName;
+} notification_t;
+
+const char * notification_names_def[11] = {
+    "Notification", 
+    "Missed Call", 
+    "SMS", 
+    "Social", 
+    "e-Mail", 
+    "Calendar", 
+    "WhatsApp", 
+    "Messenger", 
+    "Instagram", 
+    "Twitter", 
+    "Skype"
+};
+
+void get_notification(void) {
+    uint8_t size;
+
+    notification_t notification;
+    char text[100] = {};
+
+    notification.id = get_int();
+    notification.type = get_byte();
+
+    notification.typeName = notification_names_def[notification.type];
+
+    size = get_byte();
+    notification.subject = (char *)malloc(size + 1);
+    bleuart.read(notification.subject, size);
+    notification.subject[size + 1] = 0x00;
+
+    size = get_byte();
+    notification.body = (char *)malloc(size + 1);
+    bleuart.read(notification.body, size);
+    notification.body[size + 1] = 0x00;
+
+    sprintf(text, "%s\n%s", notification.subject, notification.body);   
+    smartwatch->set_notification(notification.typeName, text, Smartwatch::MessageType::Info);
+    smartwatch->push_message(Smartwatch::Messages::ShowMessage);
+}
+
+typedef struct _weather {
+    int8_t      currentTemp;
+    uint8_t     currentHumidity;
+    int8_t      todayMaxTemp;
+    int8_t      todayMinTemp;
+    char *      location;
+    char *      currentCondition;
+    bool        hasData;
+    bool        newData;
+} weather_t;
+
+void get_weather(void) {
+    uint8_t size;
+
+    weather_t weather;
+    char text[100] = {};
+
+    weather.currentTemp = get_byte();
+    weather.currentHumidity = get_byte();
+    weather.todayMaxTemp = get_byte();
+    weather.todayMinTemp = get_byte();
+
+    size = get_byte();
+    weather.location = (char *)malloc(size + 1);
+    bleuart.read(weather.location, size);
+    weather.location[size + 1] = 0x00;
+
+
+    size = get_byte();
+    weather.currentCondition = (char *)malloc(size + 1);
+    bleuart.read(weather.currentCondition, size);
+    weather.currentCondition[size + 1] = 0x00;
+
+    sprintf(text, "Max: %i°C Min: %i°C\n%s", weather.todayMaxTemp, weather.todayMinTemp, weather.currentCondition);
+
+    smartwatch->set_notification(weather.location, text, Smartwatch::MessageType::Info);
+    smartwatch->push_message(Smartwatch::Messages::ShowMessage);
+}
+
 void decode_message(uint8_t msgType, int16_t msgSize) {
     switch (msgType) {
-    case COMMAND_TIME_UPDATE:
-        if (msgSize == 4) {
-            smartwatch->rtc_time.set_time(get_int());
-        }
-        break;
-
-    default:
-        break;
+        case COMMAND_TIME_UPDATE:
+            if (msgSize == 4) {
+                smartwatch->rtc_time.set_time(get_int());
+            }
+            break;
+        case COMMAND_NOTIFICATION:
+            if (msgSize > 4) {
+                get_notification();
+            }
+            break;
+        case COMMAND_WEATHER:
+            if (msgSize > 4) {
+                get_weather();
+            }
+            break;
+        default:
+            smartwatch->set_notification("Notification", "New notification on your phone.", Smartwatch::MessageType::Info);
+            smartwatch->push_message(Smartwatch::Messages::ShowMessage);
+            break;
     }
 }
 
