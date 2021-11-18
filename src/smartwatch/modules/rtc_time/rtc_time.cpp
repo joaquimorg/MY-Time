@@ -111,6 +111,9 @@ void RTCTime::set_time(uint32_t timestampNow) {
     gTimestamp = timestampNow;
 }
 
+uint32_t RTCTime::get_timestamp(void) {
+    return gTimestamp;
+}
 
 void RTCTime::get_time(void) {
 

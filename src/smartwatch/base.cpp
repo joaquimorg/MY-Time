@@ -12,8 +12,61 @@ BLEDfu      bledfu;  // OTA DFU service
 BLEUart     bleuart; // uart over ble
 
 TimerHandle_t buttonTimer;
-TimerHandle_t chargingTimer;
-TimerHandle_t powerTimer;
+//TimerHandle_t chargingTimer;
+//TimerHandle_t powerTimer;
+
+void stop_timer_callback(TimerHandle_t xTimer) {
+    xTimerStop(xTimer, 0);
+}
+
+void button_callback(void) {
+    if (digitalRead(KEY_ACTION) == HIGH) {
+        if (xTimerIsTimerActive(buttonTimer) == pdFALSE) {
+            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+            xTimerStartFromISR(buttonTimer, &xHigherPriorityTaskWoken);
+            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+            smartwatch->push_message(Smartwatch::Messages::OnButtonEvent);
+        }
+    }
+}
+
+void tp_callback(void) {
+    if (digitalRead(TP_IRQ) == LOW) {
+        smartwatch->touch.read();
+        //smartwatch->touch.get();
+        smartwatch->push_message(Smartwatch::Messages::OnTouchEvent);
+    }
+}
+
+/*
+void charging_callback(void) {
+    if (xTimerIsTimerActive(chargingTimer) == pdFALSE) {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        xTimerStartFromISR(chargingTimer, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+        if (digitalRead(CHARGE_IRQ) == HIGH) {
+            smartwatch->set_charging(true);
+            //smartwatch->push_message(Smartwatch::Messages::OnChargingEvent);
+        } else {
+            smartwatch->set_charging(false);
+        }
+    }
+}
+
+
+void power_callback(void) {
+    if (digitalRead(CHARGE_BASE_IRQ) == HIGH) {
+        if (xTimerIsTimerActive(powerTimer) == pdFALSE) {
+            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+            xTimerStartFromISR(powerTimer, &xHigherPriorityTaskWoken);
+            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+            //smartwatch->push_message(Smartwatch::Messages::OnPowerEvent);
+        }
+    }
+}
+*/
+
+/* ****************************************************************************************************** */
 
 void send_data_ble(const uint8_t *content, size_t len) {
     bleuart.write(content, len);
@@ -94,55 +147,6 @@ void startAdv(void) {
     //Bluefruit.Advertising.setInterval(32, 244);   // in unit of 0.625 ms
     Bluefruit.Advertising.setFastTimeout(30);       // number of seconds in fast mode
     Bluefruit.Advertising.start(0);                 // 0 = Don't stop advertising after n seconds  
-}
-
-void stop_timer_callback(TimerHandle_t xTimer) {
-    xTimerStop(xTimer, 0);
-}
-
-void button_callback(void) {
-    if (digitalRead(KEY_ACTION) == HIGH) {
-        if (xTimerIsTimerActive(buttonTimer) == pdFALSE) {
-            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-            xTimerStartFromISR(buttonTimer, &xHigherPriorityTaskWoken);
-            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-            smartwatch->push_message(Smartwatch::Messages::OnButtonEvent);
-        }
-    }
-}
-
-void tp_callback(void) {
-    if (digitalRead(TP_IRQ) == LOW) {
-        smartwatch->touch.read();
-        //smartwatch->touch.get();
-        smartwatch->push_message(Smartwatch::Messages::OnTouchEvent);
-    }
-}
-
-void charging_callback(void) {
-    if (xTimerIsTimerActive(chargingTimer) == pdFALSE) {
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        xTimerStartFromISR(chargingTimer, &xHigherPriorityTaskWoken);
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-        if (digitalRead(CHARGE_IRQ) == HIGH) {
-            smartwatch->set_charging(true);
-            //smartwatch->push_message(Smartwatch::Messages::OnChargingEvent);
-        } else {
-            smartwatch->set_charging(false);
-        }
-    }
-}
-
-
-void power_callback(void) {
-    if (digitalRead(CHARGE_BASE_IRQ) == HIGH) {
-        if (xTimerIsTimerActive(powerTimer) == pdFALSE) {
-            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-            xTimerStartFromISR(powerTimer, &xHigherPriorityTaskWoken);
-            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-            //smartwatch->push_message(Smartwatch::Messages::OnPowerEvent);
-        }
-    }
 }
 
 static uint32_t get_int() {
@@ -327,7 +331,7 @@ void connection_secured_callback(uint16_t conn_handle) {
     //smartwatch->push_message(Smartwatch::Messages::ShowMessage);
 }
 
-//*****************************************************************************
+/* **************************************************************************** */
 
 void setup(void) {
     dwt_enable();
@@ -350,17 +354,20 @@ void setup(void) {
     pinMode(TP_IRQ, INPUT_SENSE_LOW);
     attachInterrupt(TP_IRQ, tp_callback, FALLING); // ISR_DEFERRED | 
 
-    pinMode(CHARGE_IRQ, INPUT_SENSE_HIGH);
+    /*pinMode(CHARGE_IRQ, INPUT_SENSE_HIGH);
     attachInterrupt(CHARGE_IRQ, charging_callback, CHANGE);
 
     pinMode(CHARGE_BASE_IRQ, INPUT_SENSE_HIGH);
-    attachInterrupt(CHARGE_BASE_IRQ, power_callback, CHANGE);
+    attachInterrupt(CHARGE_BASE_IRQ, power_callback, CHANGE);*/
+
+    pinMode(CHARGE_IRQ, INPUT_PULLDOWN);
+    pinMode(CHARGE_BASE_IRQ, INPUT_PULLDOWN);
 
     buttonTimer = xTimerCreate("buttonTimer", 300, pdFALSE, NULL, stop_timer_callback);
 
-    chargingTimer = xTimerCreate("chargingTimer", 1000, pdFALSE, NULL, stop_timer_callback);
+    //chargingTimer = xTimerCreate("chargingTimer", 1000, pdFALSE, NULL, stop_timer_callback);
 
-    powerTimer = xTimerCreate("powerTimer", 1000, pdFALSE, NULL, stop_timer_callback);
+    //powerTimer = xTimerCreate("powerTimer", 1000, pdFALSE, NULL, stop_timer_callback);
 
     // Bluetooth Config
     Bluefruit.begin(1, 0);

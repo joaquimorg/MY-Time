@@ -110,8 +110,22 @@ void Smartwatch::hardware_update(void) {
         vTaskDelay(ms2tick(60000));
     } else {
         vTaskDelay(ms2tick(5000));
-    }    
+    }
+    
     battery.read();
+
+    if (digitalRead(CHARGE_IRQ) == HIGH) {
+        if (!is_charging()) {
+            push_message(Messages::OnChargingEvent);
+             set_charging(true);
+        }               
+    } else {
+        set_charging(false);
+    }
+
+    if (digitalRead(CHARGE_BASE_IRQ) == HIGH) {
+        push_message(Messages::OnPowerEvent);
+    }
 }
 
 void Smartwatch::set_refresh_direction(RefreshDirections dir) {

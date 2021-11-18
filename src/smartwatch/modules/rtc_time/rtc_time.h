@@ -22,6 +22,7 @@ class RTCTime
 
     void set_time(uint32_t timestampNow);
     void get_time(void);
+    uint32_t get_timestamp(void);
 
     uint16_t year() const { return t_year; }
     uint8_t day() const { return t_day; }
