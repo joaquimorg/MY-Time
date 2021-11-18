@@ -44,6 +44,7 @@ void Smartwatch::init(void) {
     lvglmodule.init();
     backlight.init();
     backlight.set_level(2);
+    vibration.init();
 
     set_charging(false);
 
@@ -65,7 +66,7 @@ void Smartwatch::init(void) {
 
     // Create a task for lvgl
     xTaskCreate(Smartwatch::lvgl_task, "lvgl", LVGL_STACK_SZ, this, TASK_PRIO_NORMAL, &_lvglHandle);
-    
+        
 }
 
 void Smartwatch::update_application(void) {
@@ -116,15 +117,15 @@ void Smartwatch::hardware_update(void) {
 
     if (digitalRead(CHARGE_IRQ) == HIGH) {
         if (!is_charging()) {
-            push_message(Messages::OnChargingEvent);
-             set_charging(true);
+            //push_message(Messages::OnChargingEvent);
+            set_charging(true);
         }               
     } else {
         set_charging(false);
     }
 
     if (digitalRead(CHARGE_BASE_IRQ) == HIGH) {
-        push_message(Messages::OnPowerEvent);
+        //push_message(Messages::OnPowerEvent);
     }
 }
 

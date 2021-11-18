@@ -35,6 +35,7 @@ void Backlight::init(void){
    lightTimer = xTimerCreate ("lightTimer", ms2tick(2), pdTRUE, this, Backlight::timer_callback);
    
 }
+
 void Backlight::backlight_timer(void) {
    
    if ( backlightValue > backlightNewValue ) {

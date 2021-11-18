@@ -300,6 +300,7 @@ include_directories(
     smartwatch/modules/pinio
     smartwatch/modules/rtc_time
     smartwatch/modules/touch
+    smartwatch/modules/vibration
     smartwatch/modules/watchdog
 )
 
@@ -313,6 +314,7 @@ list(APPEND SOURCE_FILES
     smartwatch/modules/touch/touch.cpp
     smartwatch/modules/watchdog/watchdog.cpp
     smartwatch/modules/battery/battery.cpp
+    smartwatch/modules/vibration/vibration.cpp
     smartwatch/modules/rtc_time/rtc_time.cpp
 
     smartwatch/modules/lvgl/theme/lv_font_24.c

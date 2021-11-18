@@ -10,6 +10,7 @@
 #include "display.h"
 #include "touch.h"
 #include "battery.h"
+#include "vibration.h"
 #include "lvglmodule.h"
 
 enum class Applications
@@ -28,6 +29,7 @@ class Smartwatch
     public:
         RTCTime rtc_time;
         Battery battery;
+        Vibration vibration;
         Backlight backlight;
         Display display;
         Touch touch;
@@ -96,8 +98,8 @@ class Smartwatch
         bool is_blutooth_connected(void) { return this->isBluetoothConnected; };
         void set_bluetooth_connected(bool connected) { this->isBluetoothConnected = connected; };
 
-        bool get_disturb_mode(void) { return this->dontDisturbMode; };
-        void set_disturb_mode(bool disturb) { this->dontDisturbMode = disturb; };
+        bool get_disturb_mode(void) { return !vibration.vibration(); };
+        void set_disturb_mode(bool disturb) { vibration.can_vibrate(!disturb); };
 
     protected:
         QueueHandle_t msgQueue;

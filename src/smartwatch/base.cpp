@@ -200,7 +200,7 @@ void get_notification(void) {
     bleuart.read(notification.body, size);
     notification.body[size + 1] = 0x00;
 
-    sprintf(text, "%s\n%s", notification.subject, notification.body);   
+    sprintf(text, "%s %s", notification.subject, notification.body);   
     smartwatch->set_notification(notification.typeName, text, Smartwatch::MessageType::Info);
     smartwatch->push_message(Smartwatch::Messages::ShowMessage);
 }
@@ -254,16 +254,19 @@ void decode_message(uint8_t msgType, int16_t msgSize) {
         case COMMAND_NOTIFICATION:
             if (msgSize > 4) {
                 get_notification();
+                smartwatch->vibration.vibrate(128, 50);
             }
             break;
         case COMMAND_WEATHER:
             if (msgSize > 4) {
                 get_weather();
+                smartwatch->vibration.vibrate(64, 50);
             }
             break;
         default:
             smartwatch->set_notification("Notification", "New notification on your phone.", Smartwatch::MessageType::Info);
             smartwatch->push_message(Smartwatch::Messages::ShowMessage);
+            smartwatch->vibration.vibrate(64, 50);
             break;
     }
 }
@@ -360,8 +363,8 @@ void setup(void) {
     pinMode(CHARGE_BASE_IRQ, INPUT_SENSE_HIGH);
     attachInterrupt(CHARGE_BASE_IRQ, power_callback, CHANGE);*/
 
-    pinMode(CHARGE_IRQ, INPUT_PULLDOWN);
-    pinMode(CHARGE_BASE_IRQ, INPUT_PULLDOWN);
+    pinMode(CHARGE_IRQ, INPUT);
+    pinMode(CHARGE_BASE_IRQ, INPUT);
 
     buttonTimer = xTimerCreate("buttonTimer", 300, pdFALSE, NULL, stop_timer_callback);
 
