@@ -55,7 +55,18 @@ class Clock : public Application
 
             lv_info = lv_label_create( this->screen );
             lv_label_set_recolor(lv_info, true);
-            lv_label_set_text_static(lv_info, "");
+            if (smartwatch->weather.hasData) {
+                lv_label_set_text_fmt(lv_info, "%s - %s, #ffffff %i°C# - Today #ff9090 %i°C# / #9090ff %i°C#", 
+                    smartwatch->weather.location, 
+                    smartwatch->weather.currentCondition, 
+                    smartwatch->weather.currentTemp,
+                    smartwatch->weather.todayMaxTemp,
+                    smartwatch->weather.todayMinTemp
+                );
+                smartwatch->weather.newData = false;
+            } else {
+                lv_label_set_text_static(lv_info, "");
+            }
             lv_obj_set_style_text_color(lv_info, lv_color_hex(0x00ffff), 0);
             lv_obj_set_width(lv_info, 230);
             lv_label_set_long_mode(lv_info, LV_LABEL_LONG_SCROLL_CIRCULAR);
