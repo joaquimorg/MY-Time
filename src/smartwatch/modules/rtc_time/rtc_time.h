@@ -39,6 +39,11 @@ class RTCTime
     const char *get_months(void);
     const char *get_days(void);
 
+    uint8_t diff_minutes(uint32_t timestamp) {
+        uint32_t timestampNow = get_timestamp();
+        uint32_t diff = timestampNow - timestamp;
+        return (uint8_t)(diff / 60);
+    }
 
 };
 

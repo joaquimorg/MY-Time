@@ -5,12 +5,16 @@
 #include "lvgl.h"
 #include "watchdog.h"
 #include "touch.h"
+#include "base.h"
 
 #include "Clock.h"
 #include "AppDebug.h"
 #include "Passkey.h"
 #include "ShowMessage.h"
 #include "QMenu.h"
+#include "Notifications.h"
+#include "Steps.h"
+#include "HeartRate.h"
 
 
 #define SW_STACK_SZ       (256*6)
@@ -28,9 +32,14 @@ void Smartwatch::idle_callback(TimerHandle_t xTimer) {
     sw->on_idle();
 }
 
-void Smartwatch::lv_update_app(lv_timer_t * timer) {  
-    auto user_data = static_cast<Smartwatch *>(timer->user_data);
-    user_data->update_application();
+void Smartwatch::lv_update_app(TimerHandle_t xTimer) {  
+    auto sw = static_cast<Smartwatch *>(pvTimerGetTimerID(xTimer));
+    sw->update_application();
+}
+
+void Smartwatch::hardware_callback(TimerHandle_t xTimer) {
+    auto sw = static_cast<Smartwatch *>(pvTimerGetTimerID(xTimer));
+    sw->hardware_update();
 }
 
 void Smartwatch::init(void) {
@@ -48,11 +57,16 @@ void Smartwatch::init(void) {
 
     set_charging(false);
 
+    weather.newData = false;
+    weather.hasData = false;
+
     // Main queue
     msgQueue = xQueueCreate(queueSize, itemSize);
 
-    appUpdate = lv_timer_create(Smartwatch::lv_update_app, 1000, this);
-    lv_timer_pause(appUpdate);
+    hardwareTimer = xTimerCreate ("hardwareTimer", ms2tick(5000), pdTRUE, this, Smartwatch::hardware_callback);    
+
+    appUpdateTimer = xTimerCreate ("appUpdateTimer", ms2tick(1000), pdTRUE, this, Smartwatch::lv_update_app);
+    //xTimerStart(appUpdateTimer, 0);
 
     main_scr = lv_scr_act();
 
@@ -67,6 +81,7 @@ void Smartwatch::init(void) {
     // Create a task for lvgl
     xTaskCreate(Smartwatch::lvgl_task, "lvgl", LVGL_STACK_SZ, this, TASK_PRIO_NORMAL, &_lvglHandle);
         
+    xTimerStart(hardwareTimer, 0);
 }
 
 void Smartwatch::update_application(void) {
@@ -95,23 +110,20 @@ void Smartwatch::run_lvgl(void) {
     if ( state == States::Running ) {
         if ( !stopLvgl ) {
             lv_timer_handler();
-            lv_tick_inc(10);
+            lv_tick_inc(15);
         }
         vTaskDelay(1);
-    } else {
-        vTaskDelay(ms2tick(2000));
+    } 
+    else {
+        vTaskDelay(ms2tick(500));
     }
+
     if (digitalRead(KEY_ACTION) == HIGH) return;
     watchdog_feed();
 }
 
 
 void Smartwatch::hardware_update(void) {
-    if ( state == States::Idle ) {
-        vTaskDelay(ms2tick(60000));
-    } else {
-        vTaskDelay(ms2tick(5000));
-    }
     
     battery.read();
 
@@ -127,6 +139,8 @@ void Smartwatch::hardware_update(void) {
     if (digitalRead(CHARGE_BASE_IRQ) == HIGH) {
         //push_message(Messages::OnPowerEvent);
     }
+
+    send_ble_data();
 }
 
 void Smartwatch::set_refresh_direction(RefreshDirections dir) {
@@ -152,17 +166,30 @@ void Smartwatch::return_app(Applications app, Touch::Gestures gesture, RefreshDi
 }
 
 void Smartwatch::load_application(Applications app, RefreshDirections dir) {
-    if ( currentApp == app ) return;
+    //if ( currentApp == app ) return;
     if ( app == Applications::None ) return;
     
     stopLvgl = true;
     currentApp = app;
-    lv_timer_pause(appUpdate);
+    
+    xTimerStop(appUpdateTimer, 0);
     currentApplication.reset(nullptr);
     switch (app) {
         case Applications::Clock:
             currentApplication = std::make_unique<Clock>(this);
             return_app(Applications::Clock, Touch::Gestures::None, RefreshDirections::None);
+            break;
+        case Applications::Notifications:
+            currentApplication = std::make_unique<Notifications>(this);
+            return_app(Applications::Clock, Touch::Gestures::SlideDown, RefreshDirections::Down);
+            break;
+        case Applications::Steps:
+            currentApplication = std::make_unique<Steps>(this);
+            return_app(Applications::Clock, Touch::Gestures::SlideLeft, RefreshDirections::Left);
+            break;
+        case Applications::HeartRate:
+            currentApplication = std::make_unique<HeartRate>(this);
+            return_app(Applications::Clock, Touch::Gestures::SlideRight, RefreshDirections::Right);
             break;
         case Applications::Passkey:
             currentApplication = std::make_unique<Passkey>(this);
@@ -185,8 +212,8 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
             break;
     }
     set_refresh_direction(dir);
-    lv_timer_set_period(appUpdate, currentApplication->get_update_interval());
-    lv_timer_resume(appUpdate);
+    xTimerChangePeriod(appUpdateTimer, pdMS_TO_TICKS(currentApplication->get_update_interval()), 0);
+    xTimerStart(appUpdateTimer, 0);
     stopLvgl = false;
 }
 
@@ -194,6 +221,7 @@ void Smartwatch::run(void) {
 
     Messages msg;
     TickType_t queueTimeout = portMAX_DELAY;
+    Touch::Gestures gesture = Touch::Gestures::None;
 
     if (xQueueReceive(msgQueue, &msg, queueTimeout)) {
         switch (msg) {
@@ -205,6 +233,9 @@ void Smartwatch::run(void) {
 
             case Messages::GoToSleep:
                 state = States::Idle;
+                if (currentApp != Applications::Clock) {
+                    load_application(Applications::Clock, RefreshDirections::None);
+                }
                 sleep();
                 break;
 
@@ -236,9 +267,10 @@ void Smartwatch::run(void) {
                 break;
 
             case Messages::OnTouchEvent:
+               
                 touch.get();
                 gesture = touch.getGesture();
-                lvglmodule.set_touch_data(gesture, touch.getEvent(), touch.getX(), touch.getY());
+                
                 if (state == States::Idle) {
                     if ( gesture == Touch::Gestures::DoubleTap ) {
                         push_message(Messages::WakeUp);
@@ -252,17 +284,18 @@ void Smartwatch::run(void) {
                         break;
                     }
                 }
-
+                
                 if ( gesture == Touch::Gestures::None ) break;
+                lvglmodule.set_touch_data(gesture, touch.getEvent(), touch.getX(), touch.getY());
                 
                 if ( !currentApplication->gestures(gesture) ) {
-                    if ( gesture == returnGesture ) {
+                    /*if ( gesture == returnGesture ) {
                         load_application(returnToApp, returnDirection);
                     } else {
                         //lvglmodule.set_touch_data(gesture, touch.getEvent(), touch.getX(), touch.getY());
-                    }
+                    }*/
                 }
-
+                touch.cleanGesture();
                 break;
 
             case Messages::BleData:
@@ -276,6 +309,8 @@ void Smartwatch::run(void) {
                     break;
                 }
                 if (state == States::Running) {
+                    push_message(Messages::ReloadIdleTimer);
+
                     if (currentApp == Applications::Clock) {
                         push_message(Messages::GoToSleep);
                         break;
@@ -283,8 +318,6 @@ void Smartwatch::run(void) {
                     load_application(returnToApp, returnDirection);
                     break;
                 }
-                
-                push_message(Messages::ReloadIdleTimer);
                 
                 break;
 
@@ -303,6 +336,15 @@ void Smartwatch::run(void) {
             case Messages::ShowMessage:
                 push_message(Messages::WakeUp);
                 load_application(Applications::ShowMessage, RefreshDirections::Up);
+                break;
+
+            case Messages::NewNotification:
+                push_message(Messages::WakeUp);
+                if (currentApp == Applications::Notifications) {
+                    load_application(Applications::Notifications, RefreshDirections::None);
+                } else {
+                    load_application(Applications::Notifications, RefreshDirections::Up);
+                }
                 break;
         }
     }
@@ -351,19 +393,21 @@ void Smartwatch::sleep() {
     display.sleep();
     touch.sleep(true);
     xTimerStop(idleTimer, 0);
-    lv_timer_pause(appUpdate);
+    xTimerStop(appUpdateTimer, 0);
+    xTimerChangePeriod(hardwareTimer, pdMS_TO_TICKS(60000), 0);
 }
 
 void Smartwatch::wakeup() {
     display.wake_up();
     update_application();
-    lv_timer_resume(appUpdate);
-    
+    xTimerStart(appUpdateTimer, 0);
+
     lv_timer_handler();
     lv_tick_inc(1);
 
     touch.sleep(false);
     xTimerStart(idleTimer, 0);
+    xTimerChangePeriod(hardwareTimer, pdMS_TO_TICKS(5000), 0);
     
     backlight.set_level(backlight.get_saved_level());
 }

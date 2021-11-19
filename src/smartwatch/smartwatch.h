@@ -12,6 +12,7 @@
 #include "battery.h"
 #include "vibration.h"
 #include "lvglmodule.h"
+#include "notification.h"
 
 enum class Applications
 {
@@ -21,6 +22,9 @@ enum class Applications
     ShowMessage,
     QMenu,
     Clock,
+    Notifications,
+    Steps,
+    HeartRate,
 };
 
 class Smartwatch
@@ -34,6 +38,8 @@ class Smartwatch
         Display display;
         Touch touch;
         LvglModule lvglmodule{display, touch};
+
+        Notification notification;
 
         enum class States
         {
@@ -62,7 +68,21 @@ class Smartwatch
             ReloadIdleTimer,
             ShowPasskey,
             ShowMessage,
+            NewNotification,
         };
+
+        struct _weather {
+            int8_t  currentTemp;
+            uint8_t currentHumidity;
+            int8_t  todayMaxTemp;
+            int8_t  todayMinTemp;
+            char *  location;
+            char *  currentCondition;
+            bool    newData;
+            bool    hasData;
+        };
+
+        _weather weather;
 
         States state = States::Running;
 
@@ -115,8 +135,9 @@ class Smartwatch
         TaskHandle_t _smartwatchHandle;
         TaskHandle_t _lvglHandle;
         TimerHandle_t idleTimer;
+        TimerHandle_t hardwareTimer;
+        TimerHandle_t appUpdateTimer;
 
-        lv_timer_t * appUpdate;
 
         lv_obj_t * main_scr;
 
@@ -128,7 +149,7 @@ class Smartwatch
         MessageType notificationType = MessageType::Info;
 
         uint32_t displayTimeout;
-        Touch::Gestures gesture = Touch::Gestures::None;
+        //Touch::Gestures gesture = Touch::Gestures::None;
         Touch::Gestures returnGesture = Touch::Gestures::None;
 
         std::unique_ptr<Application> currentApplication;
@@ -144,11 +165,13 @@ class Smartwatch
         static void idle_callback(TimerHandle_t xTimer);
         void on_idle();
 
+        static void hardware_callback(TimerHandle_t xTimer);
+
         void sleep();
         void wakeup();
 
         void return_app(Applications app, Touch::Gestures gesture, RefreshDirections dir);
-        static void lv_update_app(lv_timer_t * timer);
+        static void lv_update_app(TimerHandle_t xTimer);
         void update_application(void);
 };
 

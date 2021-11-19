@@ -12,7 +12,7 @@ BLEDfu      bledfu;  // OTA DFU service
 BLEUart     bleuart; // uart over ble
 
 TimerHandle_t buttonTimer;
-//TimerHandle_t chargingTimer;
+TimerHandle_t tpTimer;
 //TimerHandle_t powerTimer;
 
 void stop_timer_callback(TimerHandle_t xTimer) {
@@ -32,9 +32,12 @@ void button_callback(void) {
 
 void tp_callback(void) {
     if (digitalRead(TP_IRQ) == LOW) {
-        smartwatch->touch.read();
-        //smartwatch->touch.get();
-        smartwatch->push_message(Smartwatch::Messages::OnTouchEvent);
+        if (xTimerIsTimerActive(tpTimer) == pdFALSE) {
+            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+            xTimerStartFromISR(tpTimer, &xHigherPriorityTaskWoken);
+            portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+            smartwatch->push_message(Smartwatch::Messages::OnTouchEvent);
+        }
     }
 }
 
@@ -157,91 +160,52 @@ static uint8_t get_byte() {
     return bleuart.read8();
 }
 
-typedef struct _notification {
-    uint32_t    id;
-    char *      subject;
-    char *      body;
-    uint8_t     type;
-    const char *      typeName;
-} notification_t;
-
-const char * notification_names_def[11] = {
-    "Notification", 
-    "Missed Call", 
-    "SMS", 
-    "Social", 
-    "e-Mail", 
-    "Calendar", 
-    "WhatsApp", 
-    "Messenger", 
-    "Instagram", 
-    "Twitter", 
-    "Skype"
-};
-
 void get_notification(void) {
     uint8_t size;
 
-    notification_t notification;
-    char text[100] = {};
+    char subject[31] = {};
+    char body[61] = {};
 
-    notification.id = get_int();
-    notification.type = get_byte();
-
-    notification.typeName = notification_names_def[notification.type];
-
-    size = get_byte();
-    notification.subject = (char *)malloc(size + 1);
-    bleuart.read(notification.subject, size);
-    notification.subject[size + 1] = 0x00;
+    uint32_t id = get_int();
+    uint8_t type = get_byte();
+    uint8_t hour = get_byte();
+    uint8_t minute = get_byte();
 
     size = get_byte();
-    notification.body = (char *)malloc(size + 1);
-    bleuart.read(notification.body, size);
-    notification.body[size + 1] = 0x00;
+    bleuart.read(subject, size);
+    //subject[size + 1] = 0x00;
 
-    sprintf(text, "%s %s", notification.subject, notification.body);   
-    smartwatch->set_notification(notification.typeName, text, Smartwatch::MessageType::Info);
-    smartwatch->push_message(Smartwatch::Messages::ShowMessage);
+    size = get_byte();
+    bleuart.read(body, size);
+    //body[size + 1] = 0x00;
+
+    smartwatch->notification.add_notification(id, type, smartwatch->rtc_time.get_timestamp(), 0, 0, 0, hour, minute, subject, body);
+    smartwatch->push_message(Smartwatch::Messages::NewNotification);
+
 }
-
-typedef struct _weather {
-    int8_t      currentTemp;
-    uint8_t     currentHumidity;
-    int8_t      todayMaxTemp;
-    int8_t      todayMinTemp;
-    char *      location;
-    char *      currentCondition;
-    bool        hasData;
-    bool        newData;
-} weather_t;
 
 void get_weather(void) {
     uint8_t size;
 
-    weather_t weather;
-    char text[100] = {};
-
-    weather.currentTemp = get_byte();
-    weather.currentHumidity = get_byte();
-    weather.todayMaxTemp = get_byte();
-    weather.todayMinTemp = get_byte();
+    smartwatch->weather.currentTemp = get_byte();
+    smartwatch->weather.currentHumidity = get_byte();
+    smartwatch->weather.todayMaxTemp = get_byte();
+    smartwatch->weather.todayMinTemp = get_byte();
 
     size = get_byte();
-    weather.location = (char *)malloc(size + 1);
-    bleuart.read(weather.location, size);
-    weather.location[size + 1] = 0x00;
+    smartwatch->weather.location = (char *)malloc(size + 1);
+    bleuart.read(smartwatch->weather.location, size);
+    smartwatch->weather.location[size + 1] = 0x00;
 
 
     size = get_byte();
-    weather.currentCondition = (char *)malloc(size + 1);
-    bleuart.read(weather.currentCondition, size);
-    weather.currentCondition[size + 1] = 0x00;
+    smartwatch->weather.currentCondition = (char *)malloc(size + 1);
+    bleuart.read(smartwatch->weather.currentCondition, size);
+    smartwatch->weather.currentCondition[size + 1] = 0x00;
 
-    sprintf(text, "Max: %i°C Min: %i°C\n%s", weather.todayMaxTemp, weather.todayMinTemp, weather.currentCondition);
+    smartwatch->weather.newData = true;
+    smartwatch->weather.hasData = true;
 
-    smartwatch->set_notification(weather.location, text, Smartwatch::MessageType::Info);
-    smartwatch->push_message(Smartwatch::Messages::ShowMessage);
 }
 
 void decode_message(uint8_t msgType, int16_t msgSize) {
@@ -257,6 +221,11 @@ void decode_message(uint8_t msgType, int16_t msgSize) {
                 smartwatch->vibration.vibrate(128, 50);
             }
             break;
+        case COMMAND_DELETE_NOTIFICATION:
+            if (msgSize == 4) {
+                smartwatch->notification.clear_notification_by_id(get_int());
+            }
+            break;
         case COMMAND_WEATHER:
             if (msgSize > 4) {
                 get_weather();
@@ -264,9 +233,9 @@ void decode_message(uint8_t msgType, int16_t msgSize) {
             }
             break;
         default:
-            smartwatch->set_notification("Notification", "New notification on your phone.", Smartwatch::MessageType::Info);
-            smartwatch->push_message(Smartwatch::Messages::ShowMessage);
-            smartwatch->vibration.vibrate(64, 50);
+            //smartwatch->set_notification("Notification", "New notification on your phone.", Smartwatch::MessageType::Info);
+            //smartwatch->push_message(Smartwatch::Messages::ShowMessage);
+            //smartwatch->vibration.vibrate(64, 50);
             break;
     }
 }
@@ -368,7 +337,7 @@ void setup(void) {
 
     buttonTimer = xTimerCreate("buttonTimer", 300, pdFALSE, NULL, stop_timer_callback);
 
-    //chargingTimer = xTimerCreate("chargingTimer", 1000, pdFALSE, NULL, stop_timer_callback);
+    tpTimer = xTimerCreate("tpTimer", 100, pdFALSE, NULL, stop_timer_callback);
 
     //powerTimer = xTimerCreate("powerTimer", 1000, pdFALSE, NULL, stop_timer_callback);
 
@@ -413,9 +382,13 @@ void setup(void) {
 }
 
 
-void loop(void) {
-    //vTaskDelay(ms2tick(1000));
-    //digitalToggle(LCD_LIGHT_3);
-    smartwatch->hardware_update();
+void send_ble_data() {
     ble_send_battery();
+}
+
+void loop(void) {
+    vTaskDelay(ms2tick(1000));
+    //digitalToggle(LCD_LIGHT_3);
+    //smartwatch->hardware_update();
+    //ble_send_battery();
 }

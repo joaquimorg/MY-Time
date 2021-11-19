@@ -302,6 +302,10 @@ include_directories(
     smartwatch/modules/touch
     smartwatch/modules/vibration
     smartwatch/modules/watchdog
+    smartwatch/services/
+    smartwatch/services/notification
+    smartwatch/services/weather
+    smartwatch/services/calls
 )
 
 list(APPEND SOURCE_FILES
@@ -324,6 +328,8 @@ list(APPEND SOURCE_FILES
     smartwatch/modules/lvgl/theme/lv_theme_pinetime.c
     smartwatch/modules/lvgl/lvglmodule.cpp
     
+    smartwatch/services/notification/notification.cpp
+
     smartwatch/utils.cpp
     smartwatch/base.cpp
     smartwatch/smartwatch.cpp

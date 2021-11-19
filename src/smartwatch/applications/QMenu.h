@@ -10,6 +10,10 @@ class QMenu : public Application
 
             smartwatch->rtc_time.get_time();
 
+            lv_obj_set_style_bg_opa(this->screen, LV_OPA_COVER, 0);
+            lv_obj_set_style_bg_color(this->screen, lv_color_hex(0x050505), 0);
+            lv_obj_set_style_radius(this->screen, 15, 0);
+
             lv_ble = lv_label_create(this->screen);
             lv_obj_align(lv_ble, LV_ALIGN_TOP_RIGHT, -5, 5);
             lv_label_set_text(lv_ble, "\xEE\xA4\x83");
@@ -64,7 +68,7 @@ class QMenu : public Application
             lv_obj_center(btn_label);
 
 
-            set_update_interval(5000);
+            set_update_interval(1000);
             update();
         };
 

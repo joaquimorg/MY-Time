@@ -34,6 +34,8 @@ class Touch
     uint8_t getEvent(void) { return event; }
     uint8_t getVersion(void) { return version15; }
 
+    void cleanGesture(void) { gesture = Gestures::None; }
+
   protected:
 
     byte data_raw[8];
