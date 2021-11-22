@@ -42,7 +42,7 @@
 #endif
 
 #ifndef CFG_BLE_TASK_STACKSIZE
-#define CFG_BLE_TASK_STACKSIZE    (256*5)
+#define CFG_BLE_TASK_STACKSIZE    (256*6)
 #endif
 
 #ifndef CFG_SOC_TASK_STACKSIZE

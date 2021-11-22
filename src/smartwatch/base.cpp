@@ -4,7 +4,7 @@
 #include "fast_spi.h"
 #include "i2c.h"
 #include "utils.h"
-
+#include "watchdog.h"
 
 std::unique_ptr<Smartwatch> smartwatch;
 
@@ -146,8 +146,8 @@ void startAdv(void) {
      * https://developer.apple.com/library/content/qa/qa1931/_index.html
      */
     Bluefruit.Advertising.restartOnDisconnect(true);
-    Bluefruit.Advertising.setInterval(400, 401);    // in unit of 0.625 ms
-    //Bluefruit.Advertising.setInterval(32, 244);   // in unit of 0.625 ms
+    //Bluefruit.Advertising.setInterval(400, 401);    // in unit of 0.625 ms
+    Bluefruit.Advertising.setInterval(32, 244);   // in unit of 0.625 ms
     Bluefruit.Advertising.setFastTimeout(30);       // number of seconds in fast mode
     Bluefruit.Advertising.start(0);                 // 0 = Don't stop advertising after n seconds  
 }
@@ -369,8 +369,8 @@ void setup(void) {
     Bluefruit.Periph.setDisconnectCallback(disconnect_callback);    
 
     // To be consistent OTA DFU should be added first if it exists
-    bledfu.setPermission(SECMODE_ENC_WITH_MITM, SECMODE_ENC_WITH_MITM);
-    bledfu.begin();
+    //bledfu.setPermission(SECMODE_ENC_WITH_MITM, SECMODE_ENC_WITH_MITM);
+    //bledfu.begin();
 
     bleuart.begin();    
     bleuart.setPermission(SECMODE_ENC_WITH_MITM, SECMODE_ENC_WITH_MITM);    
@@ -379,6 +379,7 @@ void setup(void) {
 
     startAdv();
 
+    watchdog_init(5000);
 }
 
 
@@ -391,4 +392,7 @@ void loop(void) {
     //digitalToggle(LCD_LIGHT_3);
     //smartwatch->hardware_update();
     //ble_send_battery();
+
+    if (digitalRead(KEY_ACTION) == HIGH) return;
+    watchdog_feed();
 }

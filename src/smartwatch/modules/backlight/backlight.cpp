@@ -17,13 +17,13 @@ void Backlight::timer_callback(TimerHandle_t xTimer) {
 
 void Backlight::init(void){
   
-   /*pinMode(LCD_LIGHT_1, OUTPUT);
-   pinMode(LCD_LIGHT_2, OUTPUT);
-   pinMode(LCD_LIGHT_3, OUTPUT);
+   //pinMode(LCD_LIGHT_1, OUTPUT);
+   //pinMode(LCD_LIGHT_2, OUTPUT);
+   //pinMode(LCD_LIGHT_3, OUTPUT);
 
-   digitalWrite(LCD_LIGHT_1, HIGH);
-   digitalWrite(LCD_LIGHT_2, HIGH);
-   digitalWrite(LCD_LIGHT_3, HIGH);*/
+   //digitalWrite(LCD_LIGHT_1, HIGH);
+   //digitalWrite(LCD_LIGHT_2, HIGH);
+   //digitalWrite(LCD_LIGHT_3, HIGH);
 
    HwPWM0.addPin( LCD_LIGHT_3 );
    HwPWM0.begin();
@@ -48,6 +48,10 @@ void Backlight::backlight_timer(void) {
    if ( backlightNewValue == backlightValue ) {
       xTimerStop(lightTimer, 0);
       backlightLevel = backlightNewLevel;
+      if ( backlightLevel == 0 ) {
+         HwPWM0.writePin(LCD_LIGHT_3, 0, true);
+         digitalWrite(LCD_LIGHT_3, HIGH);
+      }
    }
 }
 
@@ -59,21 +63,25 @@ void Backlight::set_level(uint8_t level) {
       case 0:
          backlightNewLevel = 0;
          backlightNewValue = 0;
+         
          xTimerStart(lightTimer, 0);
          break;
       case 1:
          backlightNewLevel = 1;
          backlightNewValue = 64;
+         
          xTimerStart(lightTimer, 0);
          break;
       case 2:       
          backlightNewLevel = 2;
          backlightNewValue = 128;
+         
          xTimerStart(lightTimer, 0);
          break;
       case 3:
          backlightNewLevel = 3;
          backlightNewValue = 256;
+         
          xTimerStart(lightTimer, 0);
          break;
 
@@ -81,6 +89,7 @@ void Backlight::set_level(uint8_t level) {
          isDimmed = true;
          backlightNewLevel = 9;
          backlightNewValue = 16;
+         
          xTimerStart(lightTimer, 0);
          break;
 

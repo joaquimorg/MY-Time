@@ -121,6 +121,8 @@ class Smartwatch
         bool get_disturb_mode(void) { return !vibration.vibration(); };
         void set_disturb_mode(bool disturb) { vibration.can_vibrate(!disturb); };
 
+        void dont_sleep(bool csleep) { this->doNotGoToSleep = csleep; };
+
     protected:
         QueueHandle_t msgQueue;
         static constexpr uint8_t queueSize = 10;
@@ -137,7 +139,6 @@ class Smartwatch
         TimerHandle_t idleTimer;
         TimerHandle_t hardwareTimer;
         TimerHandle_t appUpdateTimer;
-
 
         lv_obj_t * main_scr;
 

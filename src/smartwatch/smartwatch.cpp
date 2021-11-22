@@ -3,7 +3,6 @@
 #include "pinetime_board.h"
 #include "utils.h"
 #include "lvgl.h"
-#include "watchdog.h"
 #include "touch.h"
 #include "base.h"
 
@@ -82,6 +81,7 @@ void Smartwatch::init(void) {
     xTaskCreate(Smartwatch::lvgl_task, "lvgl", LVGL_STACK_SZ, this, TASK_PRIO_NORMAL, &_lvglHandle);
         
     xTimerStart(hardwareTimer, 0);
+
 }
 
 void Smartwatch::update_application(void) {
@@ -99,29 +99,20 @@ void Smartwatch::task(void *instance) {
 }
 
 void Smartwatch::lvgl_task(void *instance) {
-    auto *sw = static_cast<Smartwatch *>(instance);
-    watchdog_init(5000);
+    auto *sw = static_cast<Smartwatch *>(instance);    
     while (1) {
         sw->run_lvgl();
     }
 }
 
 void Smartwatch::run_lvgl(void) {
-    if ( state == States::Running ) {
-        if ( !stopLvgl ) {
-            lv_timer_handler();
-            lv_tick_inc(15);
-        }
-        vTaskDelay(1);
-    } 
-    else {
-        vTaskDelay(ms2tick(500));
+
+    if ( !stopLvgl ) {
+        lv_timer_handler();
+        lv_tick_inc(15);
     }
-
-    if (digitalRead(KEY_ACTION) == HIGH) return;
-    watchdog_feed();
+    vTaskDelay(1);
 }
-
 
 void Smartwatch::hardware_update(void) {
     
@@ -192,6 +183,7 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
             return_app(Applications::Clock, Touch::Gestures::SlideRight, RefreshDirections::Right);
             break;
         case Applications::Passkey:
+            dont_sleep(true);
             currentApplication = std::make_unique<Passkey>(this);
             return_app(Applications::Clock, Touch::Gestures::SlideDown, RefreshDirections::Down);
             break;
@@ -215,6 +207,7 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
     xTimerChangePeriod(appUpdateTimer, pdMS_TO_TICKS(currentApplication->get_update_interval()), 0);
     xTimerStart(appUpdateTimer, 0);
     stopLvgl = false;
+    dont_sleep(false);
 }
 
 void Smartwatch::run(void) {
@@ -392,6 +385,7 @@ void Smartwatch::sleep() {
     }
     display.sleep();
     touch.sleep(true);
+    vTaskSuspend( _lvglHandle );
     xTimerStop(idleTimer, 0);
     xTimerStop(appUpdateTimer, 0);
     xTimerChangePeriod(hardwareTimer, pdMS_TO_TICKS(60000), 0);
@@ -401,6 +395,7 @@ void Smartwatch::wakeup() {
     display.wake_up();
     update_application();
     xTimerStart(appUpdateTimer, 0);
+    vTaskResume( _lvglHandle );
 
     lv_timer_handler();
     lv_tick_inc(1);
