@@ -27,9 +27,9 @@ class QMenu : public Application
             lv_obj_set_style_text_color(lv_power, lv_color_hex(0x606060), 0);
             lv_obj_align(lv_power, LV_ALIGN_TOP_RIGHT, -34, 5);
             if ( smartwatch->is_charging() ) {
-                lv_label_set_text_fmt(lv_power, "%s %i%%", smartwatch->battery.get_icon(), smartwatch->battery.get_percent_remaining() == -1 ? 0 : smartwatch->battery.get_percent_remaining());
-            } else {
                 lv_label_set_text_fmt(lv_power, "\xEE\xA4\x85 %s %i%%", smartwatch->battery.get_icon(), smartwatch->battery.get_percent_remaining() == -1 ? 0 : smartwatch->battery.get_percent_remaining());
+            } else {
+                lv_label_set_text_fmt(lv_power, "%s %i%%", smartwatch->battery.get_icon(), smartwatch->battery.get_percent_remaining() == -1 ? 0 : smartwatch->battery.get_percent_remaining());
             }
             
             lv_time = lv_label_create(this->screen);
@@ -77,9 +77,9 @@ class QMenu : public Application
             lv_label_set_text_fmt(lv_time, "%02d:%02d", smartwatch->rtc_time.hours(), smartwatch->rtc_time.minutes());
 
             if ( smartwatch->is_charging() ) {
-                lv_label_set_text_fmt(lv_power, "%s %i%%", smartwatch->battery.get_icon(), smartwatch->battery.get_percent_remaining() == -1 ? 0 : smartwatch->battery.get_percent_remaining());
-            } else {
                 lv_label_set_text_fmt(lv_power, "\xEE\xA4\x85 %s %i%%", smartwatch->battery.get_icon(), smartwatch->battery.get_percent_remaining() == -1 ? 0 : smartwatch->battery.get_percent_remaining());
+            } else {
+                lv_label_set_text_fmt(lv_power, "%s %i%%", smartwatch->battery.get_icon(), smartwatch->battery.get_percent_remaining() == -1 ? 0 : smartwatch->battery.get_percent_remaining());
             }
 
             if ( smartwatch->is_blutooth_connected() ) {

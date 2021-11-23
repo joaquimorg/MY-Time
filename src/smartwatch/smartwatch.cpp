@@ -118,7 +118,7 @@ void Smartwatch::hardware_update(void) {
     
     battery.read();
 
-    if (digitalRead(CHARGE_IRQ) == HIGH) {
+    if (digitalRead(CHARGE_IRQ) == LOW) {
         if (!is_charging()) {
             //push_message(Messages::OnChargingEvent);
             set_charging(true);
@@ -127,7 +127,7 @@ void Smartwatch::hardware_update(void) {
         set_charging(false);
     }
 
-    if (digitalRead(CHARGE_BASE_IRQ) == HIGH) {
+    if (digitalRead(CHARGE_BASE_IRQ) == LOW) {
         //push_message(Messages::OnPowerEvent);
     }
 
@@ -273,6 +273,9 @@ void Smartwatch::run(void) {
                     push_message(Messages::ReloadIdleTimer);
 
                     if (currentApp == Applications::Clock && gesture == Touch::Gestures::DoubleTap) {
+                        if (backlight.is_dimmed()) {
+                            backlight.restore_dim();
+                        }
                         push_message(Messages::GoToSleep);
                         break;
                     }
@@ -377,6 +380,19 @@ void Smartwatch::push_message(Messages msg) {
     
 }
 
+
+void Smartwatch::resume_task( TaskHandle_t xTaskToResume ) {
+    BaseType_t xYieldRequired;
+
+    if( xTaskToResume == NULL ) return;
+    if (isInISR()) {
+        xYieldRequired = xTaskResumeFromISR(xTaskToResume);
+        portYIELD_FROM_ISR( xYieldRequired );
+    } else {
+        vTaskResume(xTaskToResume);
+    }
+}
+
 void Smartwatch::sleep() {
     backlight.save_level();
     backlight.set_level(0);
@@ -384,25 +400,24 @@ void Smartwatch::sleep() {
         vTaskDelay(500);
     }
     display.sleep();
-    touch.sleep(true);
+    //touch.sleep(true);
+    xTimerStop(appUpdateTimer, 0);
     vTaskSuspend( _lvglHandle );
     xTimerStop(idleTimer, 0);
-    xTimerStop(appUpdateTimer, 0);
     xTimerChangePeriod(hardwareTimer, pdMS_TO_TICKS(60000), 0);
 }
 
 void Smartwatch::wakeup() {
     display.wake_up();
-    update_application();
+    
     xTimerStart(appUpdateTimer, 0);
-    vTaskResume( _lvglHandle );
-
+    update_application();
     lv_timer_handler();
     lv_tick_inc(1);
 
-    touch.sleep(false);
+    //touch.sleep(false);
     xTimerStart(idleTimer, 0);
     xTimerChangePeriod(hardwareTimer, pdMS_TO_TICKS(5000), 0);
-    
+    resume_task( _lvglHandle );
     backlight.set_level(backlight.get_saved_level());
 }

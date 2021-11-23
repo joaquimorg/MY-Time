@@ -29,7 +29,7 @@ void enable_spi(bool state) {
   }
 }
 
-/*
+
 void enable_workaround(NRF_SPIM_Type * spim, uint32_t ppi_channel, uint32_t gpiote_channel) {
   NRF_GPIOTE->CONFIG[gpiote_channel] = (GPIOTE_CONFIG_MODE_Event << GPIOTE_CONFIG_MODE_Pos) |
                                        (spim->PSEL.SCK << GPIOTE_CONFIG_PSEL_Pos) |
@@ -46,14 +46,14 @@ void disable_workaround(NRF_SPIM_Type * spim, uint32_t ppi_channel, uint32_t gpi
   NRF_PPI->CH[ppi_channel].TEP = 0;
   NRF_PPI->CHENSET = ppi_channel;
 }
-*/
+
 
 void write_fast_spi(const uint8_t *ptr, uint32_t len) {
-  /*if (len == 1) {
+  if (len == 1) {
     enable_workaround(NRF_SPIM2, 8, 8);
   } else {
     disable_workaround(NRF_SPIM2, 8, 8);
-  }*/
+  }
 
   int v2 = 0;
   do
@@ -85,11 +85,11 @@ void write_fast_spi(const uint8_t *ptr, uint32_t len) {
 
 void read_fast_spi(uint8_t *ptr, uint32_t len)
 {
-  /*if (len == 1) {
+  if (len == 1) {
     enable_workaround(NRF_SPIM2, 8, 8);
   } else {
     disable_workaround(NRF_SPIM2, 8, 8);
-  }*/
+  }
 
   int v2 = 0;
   do

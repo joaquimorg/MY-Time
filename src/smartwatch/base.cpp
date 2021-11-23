@@ -261,7 +261,7 @@ void bleuart_rx_callback(uint16_t conn_hdl) {
         //smartwatch->setDebug(countrx++);
 
         decode_message(msgType, msgSize);
-        smartwatch->push_message(Smartwatch::Messages::BleData);
+        //smartwatch->push_message(Smartwatch::Messages::BleData);
 
         bleuart.flush();
         inputEnd = 1;
@@ -344,7 +344,7 @@ void setup(void) {
     // Bluetooth Config
     Bluefruit.begin(1, 0);
     Bluefruit.setAppearance(BLE_APPEARANCE_GENERIC_WATCH);
-    //Bluefruit.setTxPower(4);    // Check bluefruit.h for supported values
+    Bluefruit.setTxPower(8);    // Check bluefruit.h for supported values
 
     /* To use dynamic PassKey for pairing, we need to have
     * - IO capacities at least DISPPLAY

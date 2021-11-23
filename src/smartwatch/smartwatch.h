@@ -174,6 +174,8 @@ class Smartwatch
         void return_app(Applications app, Touch::Gestures gesture, RefreshDirections dir);
         static void lv_update_app(TimerHandle_t xTimer);
         void update_application(void);
+
+        void resume_task( TaskHandle_t xTaskToResume );
 };
 
 #endif //SMARTWATCH_H
