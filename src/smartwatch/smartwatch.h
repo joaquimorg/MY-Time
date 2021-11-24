@@ -137,9 +137,9 @@ class Smartwatch
         TaskHandle_t _smartwatchHandle;
         TaskHandle_t _lvglHandle;
         
-        TimerHandle_t idleTimer;
-        TimerHandle_t hardwareTimer;
-        TimerHandle_t appUpdateTimer;
+        SoftwareTimer idleTimer;
+        SoftwareTimer hardwareTimer;
+        SoftwareTimer appUpdateTimer;
 
         lv_obj_t * main_scr;
 
@@ -177,9 +177,7 @@ class Smartwatch
         void update_application(void);
 
         void resume_task( TaskHandle_t xTaskToResume );
-        void stop_timer( TimerHandle_t xTimer );
-        void stop_timer( TimerHandle_t xTimer );
-        void change_timer( TimerHandle_t xTimer, TickType_t xNewPeriod );
+
 };
 
 #endif //SMARTWATCH_H

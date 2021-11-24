@@ -62,17 +62,16 @@ void Smartwatch::init(void) {
     // Main queue
     msgQueue = xQueueCreate(queueSize, itemSize);
 
-    hardwareTimer = xTimerCreate ("hardwareTimer", ms2tick(5000), pdTRUE, this, Smartwatch::hardware_callback);    
+    hardwareTimer.begin(ms2tick(5000), Smartwatch::hardware_callback, this, pdTRUE);    
 
-    appUpdateTimer = xTimerCreate ("appUpdateTimer", ms2tick(1000), pdTRUE, this, Smartwatch::lv_update_app);
-    //xTimerStart(appUpdateTimer, 0);
+    appUpdateTimer.begin(ms2tick(1000), Smartwatch::lv_update_app, this, pdTRUE);
 
     main_scr = lv_scr_act();
 
     load_application(Applications::Clock, RefreshDirections::None);
 
-    idleTimer = xTimerCreate ("idleTimer", ms2tick(displayTimeout / 2), pdFALSE, this, Smartwatch::idle_callback);
-    xTimerStart(idleTimer, 0);
+    idleTimer.begin(ms2tick(displayTimeout / 2), Smartwatch::lv_update_app, this, pdFALSE);
+    idleTimer.start();
     
     // Create a task for smartwatch
     xTaskCreate(Smartwatch::task, "sw", SW_STACK_SZ, this, TASK_PRIO_NORMAL, &_smartwatchHandle);
@@ -80,7 +79,7 @@ void Smartwatch::init(void) {
     // Create a task for lvgl
     xTaskCreate(Smartwatch::lvgl_task, "lvgl", LVGL_STACK_SZ, this, TASK_PRIO_NORMAL, &_lvglHandle);
         
-    xTimerStart(hardwareTimer, 0);
+    hardwareTimer.start();
 
 }
 
@@ -163,7 +162,7 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
     stopLvgl = true;
     currentApp = app;
     
-    stop_timer(appUpdateTimer);
+    appUpdateTimer.stop();
     currentApplication.reset(nullptr);
     switch (app) {
         case Applications::Clock:
@@ -204,8 +203,8 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
             break;
     }
     set_refresh_direction(dir);
-    change_timer(appUpdateTimer, pdMS_TO_TICKS(currentApplication->get_update_interval()));
-    start_timer(appUpdateTimer);
+    appUpdateTimer.setPeriod(pdMS_TO_TICKS(currentApplication->get_update_interval()));
+    appUpdateTimer.start();
     stopLvgl = false;
     dont_sleep(false);
 }
@@ -318,7 +317,7 @@ void Smartwatch::run(void) {
                 break;
 
             case Messages::ReloadIdleTimer:
-                xTimerReset(idleTimer, 0);
+                idleTimer.reset();
                 if (backlight.is_dimmed()) {
                     backlight.set_level(backlight.get_saved_level());
                 }
@@ -341,6 +340,7 @@ void Smartwatch::run(void) {
                 } else {
                     load_application(Applications::Notifications, RefreshDirections::Up);
                 }
+                smartwatch->vibration.vibrate(128, 50);
                 break;
         }
     }
@@ -354,7 +354,7 @@ void Smartwatch::on_idle() {
         push_message(Messages::GoToSleep);
     } else {
         backlight.dim();
-        xTimerReset(idleTimer, 0);
+        idleTimer.reset();
     }
 }
 
@@ -393,42 +393,6 @@ void Smartwatch::resume_task( TaskHandle_t xTaskToResume ) {
     }
 }
 
-void Smartwatch::stop_timer( TimerHandle_t xTimer ) {
-   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
-    if( xTimer == NULL ) return;
-    if (isInISR()) {
-        xYieldRequired = xTimerStopFromISR( xTimer, &xHigherPriorityTaskWoken )
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-    } else {
-        xTimerStop(xTimer, 0);
-    }
-}
-
-void Smartwatch::change_timer( TimerHandle_t xTimer, TickType_t xNewPeriod ) {
-   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
-    if( xTimer == NULL ) return;
-    if (isInISR()) {
-        xYieldRequired = xTimerChangePeriodFromISR( xTimer, xNewPeriod, &xHigherPriorityTaskWoken )
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-    } else {
-        xTimerChangePeriod(xTimer, xNewPeriod, 0);
-    }
-}
-
-void Smartwatch::start_timer( TimerHandle_t xTimer ) {
-   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
-    if( xTimer == NULL ) return;
-    if (isInISR()) {
-        xYieldRequired = xTimerStartFromISR( xTimer, &xHigherPriorityTaskWoken )
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-    } else {
-        xTimerStart(xTimer, 0);
-    }
-}
-
 void Smartwatch::sleep() {
     backlight.save_level();
     backlight.set_level(0);
@@ -437,23 +401,22 @@ void Smartwatch::sleep() {
     }
     display.sleep();
     //touch.sleep(true);
-    stop_timer(appUpdateTimer);
+    appUpdateTimer.stop();
     vTaskSuspend( _lvglHandle );
-    stop_timer(idleTimer);
-    change_timer(hardwareTimer, pdMS_TO_TICKS(60000));
+    idleTimer.stop();
+    hardwareTimer.setPeriod(pdMS_TO_TICKS(60000));
 }
 
 void Smartwatch::wakeup() {
-    display.wake_up();
-    
-    start_timer(appUpdateTimer);
+    display.wake_up();    
     update_application();
     lv_timer_handler();
     lv_tick_inc(1);
 
     //touch.sleep(false);
-    start_timer(idleTimer);
-    change_timer(hardwareTimer, pdMS_TO_TICKS(5000));
+    idleTimer.start();
+    hardwareTimer.setPeriod(pdMS_TO_TICKS(5000));
     resume_task( _lvglHandle );
+    appUpdateTimer.start();
     backlight.set_level(backlight.get_saved_level());
 }

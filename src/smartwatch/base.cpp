@@ -218,7 +218,6 @@ void decode_message(uint8_t msgType, int16_t msgSize) {
         case COMMAND_NOTIFICATION:
             if (msgSize > 4) {
                 get_notification();
-                smartwatch->vibration.vibrate(128, 50);
             }
             break;
         case COMMAND_DELETE_NOTIFICATION:
@@ -261,7 +260,7 @@ void bleuart_rx_callback(uint16_t conn_hdl) {
         //smartwatch->setDebug(countrx++);
 
         decode_message(msgType, msgSize);
-        //smartwatch->push_message(Smartwatch::Messages::BleData);
+        smartwatch->push_message(Smartwatch::Messages::BleData);
 
         bleuart.flush();
         inputEnd = 1;
