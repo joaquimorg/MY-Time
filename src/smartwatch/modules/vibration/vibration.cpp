@@ -28,7 +28,7 @@ void Vibration::init(void) {
 
     HwPWM1.writePin(VIBRATOR_CTRL, 0, true);
 
-    vibrationTimer = xTimerCreate ("vibrationTimer", ms2tick(10), pdFALSE, this, Vibration::timer_callback);
+    vibrationTimer.begin(ms2tick(10), Vibration::timer_callback, this, pdFALSE);
 }
 
 
@@ -42,6 +42,7 @@ void Vibration::vibrate(uint8_t value, uint8_t time) {
     if (!canVibrate) return;
     
     HwPWM1.writePin(VIBRATOR_CTRL, value, true);
-    xTimerChangePeriod(vibrationTimer, ms2tick(time), 0);
-    xTimerStart(vibrationTimer, 0);
+
+    vibrationTimer.setPeriod(ms2tick(time));
+    vibrationTimer.start();
 }

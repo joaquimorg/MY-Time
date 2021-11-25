@@ -24,6 +24,8 @@ class LvglModule
             this->touch_ypos = y;
         };
 
+        refreshDirections get_direction(void) { return this->scrollDirection; };
+
     protected:
 
         static constexpr uint16_t totalNbLines = 320;

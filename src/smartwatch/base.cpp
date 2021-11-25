@@ -228,7 +228,7 @@ void decode_message(uint8_t msgType, int16_t msgSize) {
         case COMMAND_WEATHER:
             if (msgSize > 4) {
                 get_weather();
-                smartwatch->vibration.vibrate(64, 50);
+                //smartwatch->vibration.vibrate(64, 50);
             }
             break;
         default:

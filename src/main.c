@@ -4,7 +4,6 @@
 #define LOOP_STACK_SZ       (256*2)
 #define CALLBACK_STACK_SZ   (256*1)
 
-
 static TaskHandle_t  _loopHandle;
 
 static void loop_task(void* arg) {

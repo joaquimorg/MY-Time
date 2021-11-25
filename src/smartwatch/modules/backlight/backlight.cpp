@@ -32,7 +32,7 @@ void Backlight::init(void){
 
    HwPWM0.writePin(LCD_LIGHT_3, backlightValue, true);
 
-   lightTimer = xTimerCreate ("lightTimer", ms2tick(2), pdTRUE, this, Backlight::timer_callback);
+   lightTimer.begin(ms2tick(2), Backlight::timer_callback, this, pdTRUE);
    
 }
 
@@ -46,7 +46,7 @@ void Backlight::backlight_timer(void) {
    HwPWM0.writePin(LCD_LIGHT_3, backlightValue, true);
 
    if ( backlightNewValue == backlightValue ) {
-      xTimerStop(lightTimer, 0);
+      lightTimer.stop();
       backlightLevel = backlightNewLevel;
       if ( backlightLevel == 0 ) {
          HwPWM0.writePin(LCD_LIGHT_3, 0, true);
@@ -64,25 +64,25 @@ void Backlight::set_level(uint8_t level) {
          backlightNewLevel = 0;
          backlightNewValue = 0;
          
-         xTimerStart(lightTimer, 0);
+         lightTimer.start();
          break;
       case 1:
          backlightNewLevel = 1;
          backlightNewValue = 64;
          
-         xTimerStart(lightTimer, 0);
+         lightTimer.start();
          break;
       case 2:       
          backlightNewLevel = 2;
          backlightNewValue = 128;
          
-         xTimerStart(lightTimer, 0);
+         lightTimer.start();
          break;
       case 3:
          backlightNewLevel = 3;
          backlightNewValue = 256;
          
-         xTimerStart(lightTimer, 0);
+         lightTimer.start();
          break;
 
       case 9:
@@ -90,7 +90,7 @@ void Backlight::set_level(uint8_t level) {
          backlightNewLevel = 9;
          backlightNewValue = 16;
          
-         xTimerStart(lightTimer, 0);
+         lightTimer.start();
          break;
 
       default:

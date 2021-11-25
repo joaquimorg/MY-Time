@@ -82,7 +82,7 @@ void LvglModule::touchpad(lv_indev_data_t* data) {
 
 void LvglModule::flush_display(const lv_area_t* area, lv_color_t* color_p) {
 
-    uint16_t y1, y2, width, height = 0;
+    uint16_t y1, y2, width, height = 0;    
 
     display.start_write_display();
 

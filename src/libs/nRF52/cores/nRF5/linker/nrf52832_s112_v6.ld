@@ -19,6 +19,16 @@ MEMORY
 
 SECTIONS
 {
+  .noinit(NOLOAD):
+  {
+    PROVIDE(__start_noinit_data = .);
+    *(.noinit)
+    PROVIDE(__stop_noinit_data = .);
+  } > RAM
+} INSERT AFTER .bss
+
+SECTIONS
+{
   . = ALIGN(4);
   .svc_data :
   {

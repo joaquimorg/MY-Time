@@ -8,7 +8,7 @@
 class Vibration
 {
   protected:
-    TimerHandle_t vibrationTimer;
+    SoftwareTimer vibrationTimer;
     bool canVibrate = true;
 
     static void timer_callback(TimerHandle_t xTimer);

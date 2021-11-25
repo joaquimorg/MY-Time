@@ -10,7 +10,7 @@ class Backlight
     uint8_t backlightLevel = 0;
     uint8_t backlightSaveLevel = 0;
     uint8_t backlightNewLevel = 0;
-    TimerHandle_t lightTimer;
+    SoftwareTimer lightTimer;
     uint16_t backlightNewValue = 0;
     uint16_t backlightValue = 0;
     bool isDimmed = false;
