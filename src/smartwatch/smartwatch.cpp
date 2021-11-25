@@ -19,15 +19,6 @@
 #define SW_STACK_SZ       (256*6)
 #define LVGL_STACK_SZ     (256*2)
 
-/* Variable Declarations for variables in noinit SRAM 
-   Increment NoInit_MagicValue upon adding variables to this area
-*/
-extern uint32_t __start_noinit_data;
-extern uint32_t __stop_noinit_data;
-static constexpr uint32_t NoInit_MagicValue = 0xDEAD0000;
-uint32_t NoInit_MagicWord __attribute__((section(".noinit")));
-uint32_t NoInit_BackUpTime __attribute__((section(".noinit")));
-
 /**
  * Constructor
  */
@@ -55,15 +46,7 @@ void Smartwatch::init(void) {
     resetReason = actual_reset_reason();
 
     // Initialize the modules
-    rtc_time.init();
-
-    /*if (NoInit_MagicWord == NoInit_MagicValue) {
-        rtc_time.set_time(NoInit_BackUpTime);
-    } else {
-        //Clear Memory to known state
-        memset(&__start_noinit_data,0,(uintptr_t)&__stop_noinit_data-(uintptr_t)&__start_noinit_data);
-        NoInit_MagicWord = NoInit_MagicValue;
-    }*/
+    rtc_time.init();    
     
     display.init();
     touch.init();
@@ -132,7 +115,6 @@ void Smartwatch::run_lvgl(void) {
         vTaskDelay(pdMS_TO_TICKS(50));
     }
 
-    //NoInit_BackUpTime = rtc_time.get_timestamp();
 }
 
 void Smartwatch::hardware_update(void) {

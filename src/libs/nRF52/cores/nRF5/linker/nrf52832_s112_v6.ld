@@ -19,6 +19,7 @@ MEMORY
 
 SECTIONS
 {
+  . = ALIGN(4);
   .noinit(NOLOAD):
   {
     PROVIDE(__start_noinit_data = .);

@@ -20,6 +20,9 @@ static void loop_task(void* arg) {
 
 int main(void) {
 
+    NRF_POWER->RAMON |= (POWER_RAMON_OFFRAM0_RAM0On << POWER_RAMON_OFFRAM0_Pos) |
+                        (POWER_RAMON_OFFRAM1_RAM1On << POWER_RAMON_OFFRAM1_Pos);
+
     init();
 
     // Create a task for loop()
