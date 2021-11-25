@@ -71,8 +71,8 @@ void Smartwatch::init(void) {
 
     load_application(Applications::Clock, RefreshDirections::None);
 
-    idleTimer.begin(ms2tick(displayTimeout / 2), Smartwatch::idle_callback, this, pdFALSE);
-    idleTimer.start();
+    //idleTimer.begin(ms2tick(displayTimeout / 2), Smartwatch::idle_callback, this, pdFALSE);
+    //idleTimer.start();
     
     // Create a task for smartwatch
     xTaskCreate(Smartwatch::task, "sw", SW_STACK_SZ, this, TASK_PRIO_NORMAL, &_smartwatchHandle);
@@ -321,10 +321,10 @@ void Smartwatch::run(void) {
                 break;
 
             case Messages::ReloadIdleTimer:
-                idleTimer.reset();
-                if (backlight.is_dimmed()) {
-                    backlight.set_level(backlight.get_saved_level());
-                }
+                //idleTimer.reset();
+                //if (backlight.is_dimmed()) {
+                //    backlight.set_level(backlight.get_saved_level());
+                //}
                 break;
                         
             case Messages::ShowPasskey:
@@ -355,13 +355,13 @@ void Smartwatch::run(void) {
 
 void Smartwatch::on_idle() {
     if(doNotGoToSleep) return;
-    if (backlight.is_dimmed()) {
+    /*if (backlight.is_dimmed()) {
         backlight.restore_dim();
         push_message(Messages::GoToSleep);
     } else {
         backlight.dim();
         idleTimer.reset();
-    }
+    }*/
 }
 
 
@@ -410,7 +410,7 @@ void Smartwatch::sleep() {
 
     //touch.sleep(true);
     //appUpdateTimer.stop();    
-    idleTimer.stop();
+    //idleTimer.stop();
     hardwareTimer.setPeriod(pdMS_TO_TICKS(60000));
     //vTaskSuspend( _lvglHandle );
 }
@@ -423,7 +423,7 @@ void Smartwatch::wakeup() {
     //lv_tick_inc(1);
 
     //touch.sleep(false);
-    idleTimer.start();
+    //idleTimer.start();
     hardwareTimer.setPeriod(pdMS_TO_TICKS(5000));
     stopLvgl = false;
     //appUpdateTimer.start();
