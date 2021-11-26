@@ -14,7 +14,8 @@ MEMORY
    * - Concurrent connection peripheral + secure links
    * - Event Len, HVN queue, Write CMD queue
    */ 
-  RAM (rwx) :  ORIGIN = 0x20002300, LENGTH = 0x20010000 - 0x20002300
+  RAM (rwx) :  ORIGIN = 0x20002300, LENGTH = (0x20010000 - 0x08) - 0x20002300
+  NOINIT (rwx) :  ORIGIN = 0x20010000 - 0x08, LENGTH = 0x8
 }
 
 SECTIONS
@@ -24,8 +25,9 @@ SECTIONS
   {
     PROVIDE(__start_noinit_data = .);
     *(.noinit)
+    . = ALIGN(4);
     PROVIDE(__stop_noinit_data = .);
-  } > RAM
+  } > NOINIT
 } INSERT AFTER .bss
 
 SECTIONS
@@ -43,7 +45,8 @@ SECTIONS
     PROVIDE(__start_fs_data = .);
     KEEP(*(.fs_data))
     PROVIDE(__stop_fs_data = .);
-  } > RAM
+  } > RAM 
+
 } INSERT AFTER .data;
 
 INCLUDE "nrf52_common.ld"

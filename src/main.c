@@ -18,10 +18,27 @@ static void loop_task(void* arg) {
 }
 
 
+#define NRF52_ONRAM1_OFFRAM0    POWER_RAM_POWER_S0POWER_On      << POWER_RAM_POWER_S0POWER_Pos      \
+												      | POWER_RAM_POWER_S1POWER_On      << POWER_RAM_POWER_S1POWER_Pos      \
+												      | POWER_RAM_POWER_S0RETENTION_Off << POWER_RAM_POWER_S0RETENTION_Pos  \
+	                            | POWER_RAM_POWER_S1RETENTION_Off << POWER_RAM_POWER_S1RETENTION_Pos;
+												
+void configure_ram_retention(void) {
+
+		// Configure nRF52 RAM retention parameters. Set for System On 64kB RAM retention
+		/*NRF_POWER->RAM[0].POWER = NRF52_ONRAM1_OFFRAM0;
+		NRF_POWER->RAM[1].POWER = NRF52_ONRAM1_OFFRAM0;
+		NRF_POWER->RAM[2].POWER = NRF52_ONRAM1_OFFRAM0;
+		NRF_POWER->RAM[3].POWER = NRF52_ONRAM1_OFFRAM0;
+		NRF_POWER->RAM[4].POWER = NRF52_ONRAM1_OFFRAM0;
+		NRF_POWER->RAM[5].POWER = NRF52_ONRAM1_OFFRAM0;
+		NRF_POWER->RAM[6].POWER = NRF52_ONRAM1_OFFRAM0;*/
+		NRF_POWER->RAM[7].POWER = NRF52_ONRAM1_OFFRAM0;	
+}
+
 int main(void) {
 
-    NRF_POWER->RAMON |= (POWER_RAMON_OFFRAM0_RAM0On << POWER_RAMON_OFFRAM0_Pos) |
-                        (POWER_RAMON_OFFRAM1_RAM1On << POWER_RAMON_OFFRAM1_Pos);
+    configure_ram_retention();
 
     init();
 

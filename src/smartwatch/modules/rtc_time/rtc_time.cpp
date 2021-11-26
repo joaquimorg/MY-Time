@@ -6,11 +6,11 @@
 /* Variable Declarations for variables in noinit SRAM 
    Increment NoInit_MagicValue upon adding variables to this area
 */
-extern uint32_t __start_noinit_data;
-extern uint32_t __stop_noinit_data;
-static constexpr uint32_t NoInit_MagicValue = 0xDEAD0000;
-uint32_t NoInit_MagicWord __attribute__((section(".noinit")));
-uint32_t NoInit_BackUpTime __attribute__((section(".noinit")));
+//extern uint32_t __start_noinit_data;
+//extern uint32_t __stop_noinit_data;
+//static constexpr uint32_t NoInit_MagicValue = 0xDEAD0000;
+//uint32_t NoInit_MagicWord __attribute__((section(".noinit")));
+volatile uint32_t NoInit_BackUpTime __attribute__((section(".noinit"))) __attribute__((aligned(4)));
 
 
 /*
@@ -82,12 +82,18 @@ uint8_t get_week(uint16_t year, uint8_t month, uint8_t day) {
  */
 RTCTime::RTCTime(void) {
 
-    if (NoInit_MagicWord == NoInit_MagicValue) {
+    /*if (NoInit_MagicWord == NoInit_MagicValue) {
         set_time(NoInit_BackUpTime);
     } else {
         //Clear Memory to known state
         memset(&__start_noinit_data,0,(uintptr_t)&__stop_noinit_data-(uintptr_t)&__start_noinit_data);
         NoInit_MagicWord = NoInit_MagicValue;
+    }*/
+
+    if(NRF_POWER->GPREGRET == 0xBB) {
+        if ( NoInit_BackUpTime > 0 ) {
+            set_time(NoInit_BackUpTime);
+        }
     }
 
 }

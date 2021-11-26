@@ -230,6 +230,7 @@ Reset_Handler:
  *
  * All addresses must be aligned to 4 bytes boundary.
  */
+ 
     ldr r1, =__etext
     ldr r2, =__data_start__
     ldr r3, =__bss_start__
@@ -268,7 +269,9 @@ Reset_Handler:
  *
  * All addresses must be aligned to 4 bytes boundary.
  */
+ 
 #ifdef __STARTUP_CLEAR_BSS
+
     ldr r1, =__bss_start__
     ldr r2, =__bss_end__
 
