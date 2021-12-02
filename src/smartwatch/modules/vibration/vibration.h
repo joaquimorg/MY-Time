@@ -18,7 +18,7 @@ class Vibration
     Vibration(void);
 
     void init(void);
-    void vibrate(uint8_t value, uint8_t time);
+    void vibrate(uint8_t value, uint16_t time);
     void can_vibrate(bool value) { canVibrate = value; }
     bool vibration(void) { return canVibrate; }
 };

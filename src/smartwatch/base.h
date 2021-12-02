@@ -26,5 +26,6 @@
 #define COMMAND_PT_BATTERY             COMMAND_BASE + 0x02
 
 void send_ble_data();
+void ble_send_version(void);
 
 #endif // BASE_H_

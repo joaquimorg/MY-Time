@@ -15,17 +15,16 @@ void Touch::init(void) {
     pinMode(TP_RST, OUTPUT);
 
     digitalWrite(TP_RST, HIGH);
-    delay(50);
+    delay_ns(50);
     digitalWrite(TP_RST, LOW);
-    delay(5);
+    delay_ns(150);
     digitalWrite(TP_RST, HIGH);
-    delay(50);
+    delay_ns(50);
 
     user_i2c_read(TP_TWI_ADDR, 0x15, &version15, 1);
-    delay(5);
+    delay_ns(5);
     user_i2c_read(TP_TWI_ADDR, 0xA7, versionInfo, 3);
-
-    delay(15);
+    delay_ns(15);
 
     /*
     [2] EnConLR - Continuous operation can slide around
@@ -34,7 +33,7 @@ void Touch::init(void) {
     */
     const uint8_t motionMask = 0b00000001;
     user_i2c_write(TP_TWI_ADDR, 0xEC, &motionMask, 1);
-
+    delay_ns(15);
     /*
     [7] EnTest interrupt pin test, and automatically send out low pulse periodically after being enabled.
     [6] When EnTouch detects a touch, it periodically sends out low pulses.
@@ -42,17 +41,17 @@ void Touch::init(void) {
     [4] When EnMotion detects a gesture, it sends out a low pulse.
     [0] OnceWLP Long press gesture only sends out a low pulse signal.
     */
-    const uint8_t irqCtl = 0b00000000;
+    const uint8_t irqCtl = 0b01000000;
     user_i2c_write(TP_TWI_ADDR, 0xFA, &irqCtl, 1);
-
+    delay_ns(15);
 }
 
 
 void Touch::sleep(bool state) {
     digitalWrite(TP_RST, LOW);
-    delay(5);
+    delay_ns(5);
     digitalWrite(TP_RST, HIGH);
-    delay(50);
+    delay_ns(50);
     if (state) {
         byte standby_value = 0x03;
         user_i2c_write(TP_TWI_ADDR, 0xA5, &standby_value, 1);
@@ -66,7 +65,7 @@ void Touch::read(void) {
 
 void Touch::get(void) {
 
-    user_i2c_read(TP_TWI_ADDR, 0x01, data_raw, 6);
+    user_i2c_read(TP_TWI_ADDR, 0x01, data_raw, 8);
 
     if (data_raw[0] == 0xe0) {
         gesture = Touch::Gestures::None;

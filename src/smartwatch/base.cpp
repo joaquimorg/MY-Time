@@ -15,6 +15,8 @@ TimerHandle_t buttonTimer;
 TimerHandle_t tpTimer;
 //TimerHandle_t powerTimer;
 
+bool send_info = true;
+
 void stop_timer_callback(TimerHandle_t xTimer) {
     xTimerStop(xTimer, 0);
 }
@@ -108,8 +110,7 @@ void ble_send_battery(void) {
 // callback invoked when central connects
 void connect_callback(uint16_t conn_handle) {
     smartwatch->push_message(Smartwatch::Messages::BleConnected);
-    ble_send_version();
-    ble_send_battery();
+    send_info = true;
 }
 
 /**
@@ -122,34 +123,6 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason) {
     (void)reason;
     smartwatch->push_message(Smartwatch::Messages::BleDisconnected);
     bleuart.flush();
-}
-
-void startAdv(void) {
-    // Advertising packet
-    Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
-    Bluefruit.Advertising.addTxPower();
-
-    // Include bleuart 128-bit uuid
-    Bluefruit.Advertising.addService(bleuart);
-
-    // Secondary Scan Response packet (optional)
-    // Since there is no room for 'Name' in Advertising packet
-    Bluefruit.ScanResponse.addName();
-
-    /* Start Advertising
-     * - Enable auto advertising if disconnected
-     * - Interval:  fast mode = 20 ms, slow mode = 152.5 ms
-     * - Timeout for fast mode is 30 seconds
-     * - Start(timeout) with timeout = 0 will advertise forever (until connected)
-     *
-     * For recommended advertising interval
-     * https://developer.apple.com/library/content/qa/qa1931/_index.html
-     */
-    Bluefruit.Advertising.restartOnDisconnect(true);
-    //Bluefruit.Advertising.setInterval(400, 401);    // in unit of 0.625 ms
-    Bluefruit.Advertising.setInterval(32, 244);   // in unit of 0.625 ms
-    Bluefruit.Advertising.setFastTimeout(30);       // number of seconds in fast mode
-    Bluefruit.Advertising.start(0);                 // 0 = Don't stop advertising after n seconds  
 }
 
 static uint32_t get_int() {
@@ -231,6 +204,23 @@ void decode_message(uint8_t msgType, int16_t msgSize) {
                 //smartwatch->vibration.vibrate(64, 50);
             }
             break;
+        case COMMAND_FIND_DEVICE:
+            //if (msgSize = 1) {
+                smartwatch->set_notification("Find Device", "\nHello\nI'm here !!!", Smartwatch::MessageType::Info);
+                smartwatch->push_message(Smartwatch::Messages::ShowMessage);
+                smartwatch->vibration.vibrate(128, 500);
+
+            //}
+            break;
+
+        case COMMAND_VIBRATION:
+            //smartwatch->set_notification("Find Device", "\nHello\nI'm here !!!", Smartwatch::MessageType::Info);
+            //smartwatch->push_message(Smartwatch::Messages::ShowMessage);
+            smartwatch->vibration.vibrate(32, 30);
+            smartwatch->dont_sleep(true);
+            smartwatch->backlight.set_level(3);
+            break;
+
         default:
             //smartwatch->set_notification("Notification", "New notification on your phone.", Smartwatch::MessageType::Info);
             //smartwatch->push_message(Smartwatch::Messages::ShowMessage);
@@ -304,13 +294,40 @@ void connection_secured_callback(uint16_t conn_handle) {
 
 /* **************************************************************************** */
 
-void setup(void) {
-    dwt_enable();
+void startAdv(void) {
+    // Advertising packet
+    Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
+    Bluefruit.Advertising.addTxPower();
+
+    // Include bleuart 128-bit uuid
+    Bluefruit.Advertising.addService(bleuart);
+
+    // Secondary Scan Response packet (optional)
+    // Since there is no room for 'Name' in Advertising packet
+    Bluefruit.ScanResponse.addName();
+
+    /* Start Advertising
+     * - Enable auto advertising if disconnected
+     * - Interval:  fast mode = 20 ms, slow mode = 152.5 ms
+     * - Timeout for fast mode is 30 seconds
+     * - Start(timeout) with timeout = 0 will advertise forever (until connected)
+     *
+     * For recommended advertising interval
+     * https://developer.apple.com/library/content/qa/qa1931/_index.html
+     */
+    Bluefruit.Advertising.restartOnDisconnect(true);
+    //Bluefruit.Advertising.setInterval(400, 401);  // in unit of 0.625 ms
+    Bluefruit.Advertising.setInterval(32, 244);     // in unit of 0.625 ms
+    Bluefruit.Advertising.setFastTimeout(30);       // number of seconds in fast mode
+    Bluefruit.Advertising.start(0);                 // 0 = Don't stop advertising after n seconds  
+}
+
+void setup(void) {    
 
     // Smartwatch init
 
-    init_fast_spi();
     init_i2c();
+    init_fast_spi();    
 
     smartwatch = std::make_unique<Smartwatch>();
 
@@ -343,7 +360,7 @@ void setup(void) {
     // Bluetooth Config
     Bluefruit.begin(1, 0);
     Bluefruit.setAppearance(BLE_APPEARANCE_GENERIC_WATCH);
-    Bluefruit.setTxPower(8);    // Check bluefruit.h for supported values
+    //Bluefruit.setTxPower(8);    // Check bluefruit.h for supported values
 
     /* To use dynamic PassKey for pairing, we need to have
     * - IO capacities at least DISPPLAY
@@ -382,7 +399,12 @@ void setup(void) {
 }
 
 
-void send_ble_data() {
+void send_ble_data() {    
+    if(send_info) {
+        ble_send_version();
+        send_info = false;
+    }
+
     ble_send_battery();
 }
 

@@ -38,7 +38,7 @@ void Vibration::vibration_timer(void) {
 }
 
 
-void Vibration::vibrate(uint8_t value, uint8_t time) {
+void Vibration::vibrate(uint8_t value, uint16_t time) {
     if (!canVibrate) return;
     
     HwPWM1.writePin(VIBRATOR_CTRL, value, true);

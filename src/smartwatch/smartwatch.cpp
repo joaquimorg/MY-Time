@@ -138,6 +138,9 @@ void Smartwatch::hardware_update(void) {
 }
 
 void Smartwatch::set_refresh_direction(RefreshDirections dir) {
+    if (lvglmodule.get_direction() != LvglModule::refreshDirections::None) {
+        return;
+    }
     if ( dir == RefreshDirections::Up ) {
         lv_disp_set_direction(lv_disp_get_default(), 0);
         lvglmodule.set_refresh_direction(LvglModule::refreshDirections::Up);
@@ -163,8 +166,7 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
     //if ( currentApp == app ) return;
     if ( app == Applications::None ) return;
     
-    stopLvgl = true;
-    currentApp = app;
+    stopLvgl = true;    
     
     appUpdateTimer.stop();
     currentApplication.reset(nullptr);
@@ -206,6 +208,7 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
         default:
             break;
     }
+    currentApp = app;
     set_refresh_direction(dir);
     appUpdateTimer.setPeriod(pdMS_TO_TICKS(currentApplication->get_update_interval()));
     appUpdateTimer.start();
@@ -255,11 +258,16 @@ void Smartwatch::run(void) {
             case Messages::BleConnected:
                 push_message(Messages::BleData);
                 set_bluetooth_connected(true);
+                ble_send_version();
                 break;
 
             case Messages::BleDisconnected:
                 push_message(Messages::BleData);
                 set_bluetooth_connected(false);
+
+                set_notification("Bluetooth", "Bluetooth disconnected !", Smartwatch::MessageType::Info);
+                push_message(Messages::WakeUp);
+                load_application(Applications::ShowMessage, RefreshDirections::Up);
                 break;
 
             case Messages::OnTouchEvent:
@@ -311,6 +319,9 @@ void Smartwatch::run(void) {
                     push_message(Messages::ReloadIdleTimer);
 
                     if (currentApp == Applications::Clock) {
+                        if (backlight.is_dimmed()) {
+                            backlight.restore_dim();
+                        }
                         push_message(Messages::GoToSleep);
                         break;
                     }
