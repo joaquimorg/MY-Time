@@ -16,7 +16,7 @@
 #include "HeartRate.h"
 
 
-#define SW_STACK_SZ       (256*6)
+#define SW_STACK_SZ       (256*8)
 #define LVGL_STACK_SZ     (256*2)
 
 /**
@@ -168,7 +168,10 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
     
     stopLvgl = true;    
     
+    currentApp = app;
+    set_refresh_direction(dir);
     appUpdateTimer.stop();
+    appUpdateTimer.setPeriod(pdMS_TO_TICKS(currentApplication->get_update_interval()));
     currentApplication.reset(nullptr);
     switch (app) {
         case Applications::Clock:
@@ -208,9 +211,6 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
         default:
             break;
     }
-    currentApp = app;
-    set_refresh_direction(dir);
-    appUpdateTimer.setPeriod(pdMS_TO_TICKS(currentApplication->get_update_interval()));
     appUpdateTimer.start();
     stopLvgl = false;
     dont_sleep(false);
@@ -231,11 +231,11 @@ void Smartwatch::run(void) {
                 break;
 
             case Messages::GoToSleep:
-                state = States::Idle;
                 if (currentApp != Applications::Clock) {
                     load_application(Applications::Clock, RefreshDirections::None);
                 }
                 sleep();
+                state = States::Idle;
                 break;
 
             case Messages::OnChargingEvent:
@@ -349,15 +349,16 @@ void Smartwatch::run(void) {
                 break;
 
             case Messages::NewNotification:
-                push_message(Messages::WakeUp);
                 if (currentApp == Applications::Notifications) {
-                    load_application(Applications::Notifications, RefreshDirections::None);
+                    load_application(Applications::Notifications, RefreshDirections::Left);
                 } else {
                     if (state == States::Idle) {
                         load_application(Applications::Notifications, RefreshDirections::Up);
                     }
                     vibration.vibrate(128, 50);
                 }
+                push_message(Messages::WakeUp);
+                push_message(Messages::ReloadIdleTimer);
                 break;
         }
     }

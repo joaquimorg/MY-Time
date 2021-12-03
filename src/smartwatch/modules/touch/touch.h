@@ -38,7 +38,7 @@ class Touch
 
   protected:
 
-    byte data_raw[8];
+    byte data_raw[11];
 
     Gestures gesture = Gestures::None;
     uint8_t touchpoints;

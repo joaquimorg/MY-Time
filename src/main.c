@@ -38,6 +38,9 @@ void configure_ram_retention(void) {
 }
 
 void clean_i2c(void) {
+    
+    *(volatile uint32_t *)0x40000EE4 = (*(volatile uint32_t *)0x10000258 & 0x0000004F);
+
     NRF_TWIM0->ENABLE = 0;
     *(volatile uint32_t *)0x40003FFC = 0;
     *(volatile uint32_t *)0x40003FFC;

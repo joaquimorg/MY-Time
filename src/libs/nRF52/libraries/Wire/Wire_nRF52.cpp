@@ -24,12 +24,11 @@ extern "C" {
 #include <string.h>
 }
 
+#include "pinetime_board.h"
 #include <nrf52.h>
 #include <wiring_private.h>
 
 #include "Wire.h"
-
- // for Serial
 
 static volatile uint32_t* pincfg_reg(uint32_t pin)
 {
@@ -51,19 +50,19 @@ void TwoWire::begin(void) {
   //Main Mode
   master = true;
 
-  *pincfg_reg(_uc_pinSCL) = ((uint32_t)GPIO_PIN_CNF_DIR_Input        << GPIO_PIN_CNF_DIR_Pos)
+  *pincfg_reg(_uc_pinSCL) = ((uint32_t)GPIO_PIN_CNF_DIR_Input         << GPIO_PIN_CNF_DIR_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_INPUT_Connect    << GPIO_PIN_CNF_INPUT_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_PULL_Pullup      << GPIO_PIN_CNF_PULL_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_DRIVE_S0D1       << GPIO_PIN_CNF_DRIVE_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_SENSE_Disabled   << GPIO_PIN_CNF_SENSE_Pos);
 
-  *pincfg_reg(_uc_pinSDA) = ((uint32_t)GPIO_PIN_CNF_DIR_Input        << GPIO_PIN_CNF_DIR_Pos)
+  *pincfg_reg(_uc_pinSDA) = ((uint32_t)GPIO_PIN_CNF_DIR_Input         << GPIO_PIN_CNF_DIR_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_INPUT_Connect    << GPIO_PIN_CNF_INPUT_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_PULL_Pullup      << GPIO_PIN_CNF_PULL_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_DRIVE_S0D1       << GPIO_PIN_CNF_DRIVE_Pos)
                            | ((uint32_t)GPIO_PIN_CNF_SENSE_Disabled   << GPIO_PIN_CNF_SENSE_Pos);
 
-  _p_twim->FREQUENCY = TWIM_FREQUENCY_FREQUENCY_K100;
+  _p_twim->FREQUENCY = TWIM_FREQUENCY_FREQUENCY_K250;
   _p_twim->ENABLE = (TWIM_ENABLE_ENABLE_Enabled << TWIM_ENABLE_ENABLE_Pos);
   _p_twim->PSEL.SCL = _uc_pinSCL;
   _p_twim->PSEL.SDA = _uc_pinSDA;
@@ -218,6 +217,8 @@ uint8_t TwoWire::endTransmission(bool stopBit)
   // Start I2C transmission
   _p_twim->ADDRESS = txAddress;
 
+  // just in case twi is stopped by bus error such as secondary device reset/stalled without replying ACK/NACK
+  _p_twim->EVENTS_STOPPED = 0x0UL;
   _p_twim->TASKS_RESUME = 0x1UL;
 
   _p_twim->TXD.PTR = (uint32_t)txBuffer._aucBuffer;
@@ -401,7 +402,7 @@ void TwoWire::onService(void)
 }
 
 #if WIRE_INTERFACES_COUNT > 0
-TwoWire Wire(NRF_TWIM0, NRF_TWIS0, SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0_IRQn, PIN_WIRE_SDA, PIN_WIRE_SCL);
+TwoWire Wire(NRF_TWIM0, NRF_TWIS0, SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0_IRQn, TWI_SDA, TWI_SCL);
 
 extern "C"
 {
@@ -421,7 +422,7 @@ extern "C"
 #endif
 
 #if WIRE_INTERFACES_COUNT > 1
-TwoWire Wire1(NRF_TWIM1, NRF_TWIS1, SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQn, PIN_WIRE1_SDA, PIN_WIRE1_SCL);
+TwoWire Wire1(NRF_TWIM1, NRF_TWIS1, SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQn, TWI_SDA, TWI_SCL);
 
 extern "C"
 {

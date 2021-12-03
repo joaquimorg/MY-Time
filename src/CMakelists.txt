@@ -50,7 +50,7 @@ set(NRFX_SOURCE_FILES
     libs/nRF52/libraries/InternalFileSytem/src/InternalFileSystem.cpp
     libs/nRF52/libraries/SPI/SPI.cpp
     libs/nRF52/libraries/SPI/SPI_nrf52832.cpp
-#    libs/nRF52/libraries/Wire/Wire_nRF52.cpp
+    libs/nRF52/libraries/Wire/Wire_nRF52.cpp
     libs/nRF52/cores/nRF5/freertos/portable/CMSIS/nrf52/port_cmsis.c
     libs/nRF52/cores/nRF5/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c
     libs/nRF52/cores/nRF5/freertos/portable/GCC/nrf52/port.c
@@ -253,7 +253,7 @@ include_directories(
     libs/nRF52/libraries/InternalFileSytem/src
     libs/nRF52/libraries/InternalFileSytem/src/flash
     libs/nRF52/libraries/SPI
-#    libs/nRF52/libraries/Wire
+    libs/nRF52/libraries/Wire
     libs/nRF52/cmsis/include
 
     libs/lvgl/src

@@ -8,6 +8,9 @@
 #include "pinetime_board.h"
 #include "i2c.h"
 
+#include <Wire.h>
+
+/*
 uint8_t _uc_pinSDA = g_ADigitalPinMap[TWI_SDA];
 uint8_t _uc_pinSCL = g_ADigitalPinMap[TWI_SCL];
 bool receiving;
@@ -76,15 +79,15 @@ uint8_t wire_request_from(uint8_t address, size_t quantity, bool stopBit) {
 
     while (!NRF_TWIM0->EVENTS_LASTRX && !NRF_TWIM0->EVENTS_ERROR);
 
-    /*uint32_t txStartedCycleCount = DWT->CYCCNT;
-    uint32_t currentCycleCount;
-    while (!NRF_TWIM0->EVENTS_LASTRX && !NRF_TWIM0->EVENTS_ERROR) {
-        currentCycleCount = DWT->CYCCNT;
-        if ((currentCycleCount - txStartedCycleCount) > hw_freezed_delay) {
-            fix_hw_freezed();
-            return 0;
-        }
-    }*/
+    //uint32_t txStartedCycleCount = DWT->CYCCNT;
+    //uint32_t currentCycleCount;
+    //while (!NRF_TWIM0->EVENTS_LASTRX && !NRF_TWIM0->EVENTS_ERROR) {
+    //    currentCycleCount = DWT->CYCCNT;
+    //    if ((currentCycleCount - txStartedCycleCount) > hw_freezed_delay) {
+    //        fix_hw_freezed();
+    //        return 0;
+    //    }
+    //}
 
     NRF_TWIM0->EVENTS_LASTRX = 0x0UL;
 
@@ -132,15 +135,15 @@ uint8_t wire_end_transmission(bool stopBit) {
 
     if (txBuffer.available()) {
         while (!NRF_TWIM0->EVENTS_LASTTX && !NRF_TWIM0->EVENTS_ERROR);
-        /*uint32_t txStartedCycleCount = DWT->CYCCNT;
-        uint32_t currentCycleCount;
-        while (!NRF_TWIM0->EVENTS_LASTTX && !NRF_TWIM0->EVENTS_ERROR) {
-            currentCycleCount = DWT->CYCCNT;
-            if ((currentCycleCount - txStartedCycleCount) > hw_freezed_delay) {
-                fix_hw_freezed();
-                return 0;
-            }
-        }*/
+        //uint32_t txStartedCycleCount = DWT->CYCCNT;
+        //uint32_t currentCycleCount;
+        //while (!NRF_TWIM0->EVENTS_LASTTX && !NRF_TWIM0->EVENTS_ERROR) {
+        //    currentCycleCount = DWT->CYCCNT;
+        //    if ((currentCycleCount - txStartedCycleCount) > hw_freezed_delay) {
+        //        fix_hw_freezed();
+        //        return 0;
+        //    }
+        //}
     }
     NRF_TWIM0->EVENTS_LASTTX = 0x0UL;
 
@@ -239,13 +242,15 @@ extern "C"
         }
     }
 }
+*/
 
 void init_i2c() {
-    wire_begin();
+    //wire_begin();
+    Wire.begin();
 }
 
 uint8_t user_i2c_read(uint8_t addr, uint8_t reg_addr, uint8_t* reg_data, uint32_t length) {
-    i2c_wakeup();
+    /*i2c_wakeup();
     wire_begin_transmission(addr);
     wire_write(reg_addr);
     if (wire_end_transmission(true))return -1;
@@ -253,19 +258,35 @@ uint8_t user_i2c_read(uint8_t addr, uint8_t reg_addr, uint8_t* reg_data, uint32_
     for (uint32_t i = 0; i < length; i++) {
         *reg_data++ = wire_read();
     }
-    i2c_sleep();
+    i2c_sleep();*/
+
+    Wire.beginTransmission(addr);
+    Wire.write(reg_addr);
+    Wire.endTransmission(true);
+    Wire.requestFrom(addr, length, true);
+    for (uint32_t i = 0; i < length; i++) {
+        *reg_data++ = Wire.read();
+    }
+
+
     return 0;
 }
 
 uint8_t user_i2c_write(uint8_t addr, uint8_t reg_addr, const uint8_t* reg_data, uint32_t length) {
-    i2c_wakeup();
+    /*i2c_wakeup();
     wire_begin_transmission(addr);
     wire_write(reg_addr);
     for (uint32_t i = 0; i < length; i++) {
         wire_write(*reg_data++);
     }
     if (wire_end_transmission(true))return -1;
-    i2c_sleep();
+    i2c_sleep();*/
+    Wire.beginTransmission(addr);
+    Wire.write(reg_addr);
+    for (uint32_t i = 0; i < length; i++) {
+        Wire.write(*reg_data++);
+    }
+    Wire.endTransmission(true);
     return 0;
 }
 

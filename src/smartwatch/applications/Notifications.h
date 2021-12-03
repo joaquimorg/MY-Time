@@ -40,7 +40,7 @@ class Notifications : public Application
 
             lv_obj_t * lv_count = lv_label_create(this->screen);
             lv_label_set_recolor(lv_count, true);
-            lv_label_set_text_fmt(lv_count, "#909090 %i# / #909090 %i#", notification_count, smartwatch->notification.get_notification_count());
+            lv_label_set_text_fmt(lv_count, "#909090 %i# / #909090 %i#", smartwatch->notification.get_notification_count() - notification_count, smartwatch->notification.get_notification_count());
             lv_obj_set_style_text_align(lv_count, LV_TEXT_ALIGN_CENTER, 0);
             lv_obj_set_style_text_color(lv_count, lv_color_hex(0x009090), 0);
             lv_obj_align(lv_count, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
@@ -87,16 +87,16 @@ class Notifications : public Application
         bool gestures(Touch::Gestures gesture) {
             switch (gesture) {
                 case Touch::Gestures::SlideDown:
-                    if ( smartwatch->notification.get_notification_index() < smartwatch->notification.get_notification_count() ) {
-                        smartwatch->notification.set_notification_index(smartwatch->notification.get_notification_index() + 1);
+                    if ( smartwatch->notification.get_notification_index() > 0) {
+                        smartwatch->notification.set_notification_index(smartwatch->notification.get_notification_index() - 1);
                         smartwatch->load_application(Applications::Notifications, Smartwatch::RefreshDirections::Down);
                     } else {
                         smartwatch->load_application(Applications::Clock, Smartwatch::RefreshDirections::Down);
                     }
                     return true;
                 case Touch::Gestures::SlideUp:
-                    if ( smartwatch->notification.get_notification_index() > 1 ) {
-                        smartwatch->notification.set_notification_index(smartwatch->notification.get_notification_index() - 1);
+                    if ( smartwatch->notification.get_notification_index() < smartwatch->notification.get_notification_count() - 1) {
+                        smartwatch->notification.set_notification_index(smartwatch->notification.get_notification_index() + 1);
                         smartwatch->load_application(Applications::Notifications, Smartwatch::RefreshDirections::Up);
                     }
                     return true;

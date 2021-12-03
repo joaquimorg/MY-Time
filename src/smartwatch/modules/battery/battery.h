@@ -11,7 +11,7 @@ class Battery
     int batteryPercentRemaining;
 
     static constexpr uint8_t bufferSize = 5;
-    int16_t batt_buffer[bufferSize];
+    int16_t batt_buffer[bufferSize] = {0};
     uint8_t batt_buffer_index = 0;
 
   public:

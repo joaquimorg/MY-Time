@@ -17,21 +17,22 @@ void Touch::init(void) {
     digitalWrite(TP_RST, HIGH);
     delay_ns(50);
     digitalWrite(TP_RST, LOW);
-    delay_ns(150);
+    delay_ns(5);
     digitalWrite(TP_RST, HIGH);
     delay_ns(50);
 
-    user_i2c_read(TP_TWI_ADDR, 0x15, &version15, 1);
+    uint8_t dummy;
+    user_i2c_read(TP_TWI_ADDR, 0x15, &dummy, 1);
     delay_ns(5);
-    user_i2c_read(TP_TWI_ADDR, 0xA7, versionInfo, 3);
-    delay_ns(15);
+    user_i2c_read(TP_TWI_ADDR, 0xA7, &dummy, 1);
+    delay_ns(5);
 
     /*
     [2] EnConLR - Continuous operation can slide around
     [1] EnConUD - Slide up and down to enable continuous operation
     [0] EnDClick - Enable Double-click action
     */
-    const uint8_t motionMask = 0b00000001;
+    const uint8_t motionMask = 0b00000101;
     user_i2c_write(TP_TWI_ADDR, 0xEC, &motionMask, 1);
     delay_ns(15);
     /*
@@ -41,7 +42,7 @@ void Touch::init(void) {
     [4] When EnMotion detects a gesture, it sends out a low pulse.
     [0] OnceWLP Long press gesture only sends out a low pulse signal.
     */
-    const uint8_t irqCtl = 0b01000000;
+    const uint8_t irqCtl = 0b00111001;
     user_i2c_write(TP_TWI_ADDR, 0xFA, &irqCtl, 1);
     delay_ns(15);
 }
@@ -65,7 +66,7 @@ void Touch::read(void) {
 
 void Touch::get(void) {
 
-    user_i2c_read(TP_TWI_ADDR, 0x01, data_raw, 8);
+    user_i2c_read(TP_TWI_ADDR, 0x01, data_raw, 10);
 
     if (data_raw[0] == 0xe0) {
         gesture = Touch::Gestures::None;
