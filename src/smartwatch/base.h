@@ -24,6 +24,8 @@
 
 #define COMMAND_PT_VERSION             COMMAND_BASE + 0x01
 #define COMMAND_PT_BATTERY             COMMAND_BASE + 0x02
+#define COMMAND_PT_STEPS               COMMAND_BASE + 0x03
+#define COMMAND_PT_HEARTRATE           COMMAND_BASE + 0x04
 
 void send_ble_data();
 void ble_send_version(void);

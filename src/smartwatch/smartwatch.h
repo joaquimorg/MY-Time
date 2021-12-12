@@ -11,6 +11,7 @@
 #include "touch.h"
 #include "battery.h"
 #include "vibration.h"
+#include "step_count.h"
 #include "lvglmodule.h"
 #include "notification.h"
 
@@ -37,6 +38,7 @@ class Smartwatch
         Backlight backlight;
         Display display;
         Touch touch;
+        StepCount stepCount;
         LvglModule lvglmodule{display, touch};
 
         Notification notification;

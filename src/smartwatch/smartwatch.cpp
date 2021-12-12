@@ -54,6 +54,7 @@ void Smartwatch::init(void) {
     backlight.init();
     backlight.set_level(2);
     vibration.init();
+    stepCount.initialize();
 
     set_charging(false);
 
@@ -171,7 +172,6 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
     currentApp = app;
     set_refresh_direction(dir);
     appUpdateTimer.stop();
-    appUpdateTimer.setPeriod(pdMS_TO_TICKS(currentApplication->get_update_interval()));
     currentApplication.reset(nullptr);
     switch (app) {
         case Applications::Clock:
@@ -211,6 +211,7 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
         default:
             break;
     }
+    appUpdateTimer.setPeriod(pdMS_TO_TICKS(currentApplication->get_update_interval()));
     appUpdateTimer.start();
     stopLvgl = false;
     dont_sleep(false);

@@ -111,6 +111,19 @@ void ble_send_battery(void) {
     send_data_ble(data, i);
 }
 
+void ble_send_steps(void) {
+
+    uint8_t data[6] = {};
+
+    uint8_t i = 0;
+    data[i++] = 0x00;
+    data[i++] = COMMAND_PT_STEPS;
+
+    i += packInt(& data[i], smartwatch->stepCount.getStepCounterOutput());
+    
+    send_data_ble(data, i);
+}
+
 // callback invoked when central connects
 void connect_callback(uint16_t conn_handle) {
     smartwatch->push_message(Smartwatch::Messages::BleConnected);
@@ -449,6 +462,7 @@ void send_ble_data() {
     }
 
     ble_send_battery();
+    ble_send_steps();
 }
 
 void loop(void) {

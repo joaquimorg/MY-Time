@@ -302,6 +302,7 @@ include_directories(
     smartwatch/modules/touch
     smartwatch/modules/vibration
     smartwatch/modules/watchdog
+    smartwatch/modules/step_count
     smartwatch/services/
     smartwatch/services/notification
     smartwatch/services/weather
@@ -320,6 +321,9 @@ list(APPEND SOURCE_FILES
     smartwatch/modules/battery/battery.cpp
     smartwatch/modules/vibration/vibration.cpp
     smartwatch/modules/rtc_time/rtc_time.cpp
+    smartwatch/modules/step_count/bma4.c
+    smartwatch/modules/step_count/bma421.c
+    smartwatch/modules/step_count/step_count.cpp
 
     smartwatch/modules/lvgl/theme/lv_font_24.c
     smartwatch/modules/lvgl/theme/lv_font_sys_48.c

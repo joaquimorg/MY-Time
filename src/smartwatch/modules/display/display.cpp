@@ -232,7 +232,6 @@ void Display::init(void) {
 
     spi_command(ST77XX_DISPON);
 
-   
     set_addr_display(0, 0, 320, 240);
     vertical_scroll_definition(0, 320, 0, 0);
     end_write_display();
