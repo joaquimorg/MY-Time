@@ -56,8 +56,8 @@ void StepCount::initialize() {
     int8_t rslt;
 
     /* Soft reset */
-    //bma4_soft_reset(&bma);
-    //delay_ns(50);
+    bma4_soft_reset(&bma);
+    delay_ns(50);
 
     rslt = bma421_init(&bma);
     if ( rslt != BMA4_OK ) {

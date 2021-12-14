@@ -113,7 +113,7 @@ void Smartwatch::run_lvgl(void) {
         lv_tick_inc(15);
         vTaskDelay(1);
     } else {
-        vTaskDelay(pdMS_TO_TICKS(50));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 
 }
@@ -426,6 +426,7 @@ void Smartwatch::sleep() {
     idleTimer.stop();
     hardwareTimer.setPeriod(pdMS_TO_TICKS(60000));
     //vTaskSuspend( _lvglHandle );
+
 }
 
 void Smartwatch::wakeup() {    

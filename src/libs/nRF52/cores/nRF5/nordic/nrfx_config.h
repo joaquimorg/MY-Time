@@ -7,7 +7,7 @@
 #define NRFX_CLOCK_ENABLED 0
 
 #define NRFX_SPIM_ENABLED            1
-#define NRFX_SPIM_MISO_PULL_CFG      1 // pulldown
+#define NRFX_SPIM_MISO_PULL_CFG      0 // pulldown
 #define NRFX_SPIM_EXTENDED_ENABLED   0
 
 #define NRFX_SPIM0_ENABLED           0 // used as I2C

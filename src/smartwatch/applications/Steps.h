@@ -13,17 +13,17 @@ class Steps : public Application
             lv_obj_set_style_radius(this->screen, 15, 0);
 
             lv_info = lv_label_create( this->screen );
-            lv_label_set_text(lv_info, "\xEE\xA4\x84 Today steps");
+            lv_label_set_text(lv_info, "\xEE\xA4\x84 steps today");
             lv_obj_set_style_text_color(lv_info, lv_color_hex(0xffffff), 0);
             lv_obj_set_style_text_align(lv_info, LV_TEXT_ALIGN_CENTER, 0);
-            lv_obj_align(lv_info, LV_ALIGN_TOP_MID, 0, 0);
+            lv_obj_align(lv_info, LV_ALIGN_CENTER, 0, 20);
 
             lv_steps = lv_label_create( this->screen );
             lv_label_set_text_fmt(lv_steps, "%li", smartwatch->stepCount.getStepCounterOutput());
             lv_obj_set_style_text_color(lv_steps, lv_color_hex(0xffffff), 0);
             lv_obj_set_style_text_align(lv_steps, LV_TEXT_ALIGN_CENTER, 0);
-            lv_obj_align(lv_steps, LV_ALIGN_CENTER, 0, 0);
-            lv_obj_set_style_text_font(lv_steps, &lv_font_clock_42, 0);
+            lv_obj_align(lv_steps, LV_ALIGN_CENTER, 0, -25);
+            lv_obj_set_style_text_font(lv_steps, &lv_font_clock_76, 0);
 
             smartwatch->stepCount.getAcceleration(&ax, &ay, &az);
             lv_status = lv_label_create( this->screen );

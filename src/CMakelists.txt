@@ -328,6 +328,7 @@ list(APPEND SOURCE_FILES
     smartwatch/modules/lvgl/theme/lv_font_24.c
     smartwatch/modules/lvgl/theme/lv_font_sys_48.c
     smartwatch/modules/lvgl/theme/lv_font_clock_42.c
+    smartwatch/modules/lvgl/theme/lv_font_clock_76.c
     smartwatch/modules/lvgl/theme/lv_font_clock_90.c
     smartwatch/modules/lvgl/theme/lv_theme_pinetime.c
     smartwatch/modules/lvgl/lvglmodule.cpp

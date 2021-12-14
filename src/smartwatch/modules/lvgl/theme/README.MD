@@ -14,10 +14,14 @@ lv_font_conv --font icons_sys_48.ttf -r 0xe908 -r 0xe901 -r 0xe900 -r 0xe903 -r 
 ```
 
 
+```
+lv_font_conv --font 071MKSDBoldB.TTF --symbols %-/0123456789: -r 0x20 --size 76 --format lvgl --bpp 2 --no-compress -o lv_font_clock_76.c
+```
+
 
 
 -------------------------------------------------------------------------------
-batteryFull          = "\xEE\xA4\xA0"; //e920
+        batteryFull          = "\xEE\xA4\xA0"; //e920
         batteryEmpty         = "\xEE\xA4\xA4"; //e924
         batteryThreeQuarter  = "\xEE\xA4\xA1"; //e921
         batteryHalf          = "\xEE\xA4\xA2"; //e922
@@ -27,7 +31,7 @@ batteryFull          = "\xEE\xA4\xA0"; //e920
         heartBeat            = "\xEE\xA4\x81"; //e901
         bluetooth            = "\xEE\xA4\x83"; //e903
         plug                 = "\xEE\xA4\x85"; //e905
-        shoe                 = "\xEE\xA4\x84"; //e904
+        shoe                 = "\xEE\xA4\x84"; //e904                           
         dot                  = "\xEE\xA4\x82"; //e902
         info                 = "\xEE\xA4\x80"; //e900
         phone                = "\xEE\xA4\x88"; //e908

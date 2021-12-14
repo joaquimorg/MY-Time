@@ -42,7 +42,7 @@ void Touch::init(void) {
     [4] When EnMotion detects a gesture, it sends out a low pulse.
     [0] OnceWLP Long press gesture only sends out a low pulse signal.
     */
-    const uint8_t irqCtl = 0b00111001;
+    const uint8_t irqCtl = 0b01110000;
     user_i2c_write(TP_TWI_ADDR, 0xFA, &irqCtl, 1);
     delay_ns(15);
 }

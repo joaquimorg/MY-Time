@@ -38,8 +38,13 @@ void configure_ram_retention(void) {
 }
 
 void clean_i2c(void) {
+
+    NRF_UARTE0->ENABLE = 0; //disable UART
+    NRF_TWIS0 ->ENABLE = 0; //disable TWI Slave
+    NRF_TWIS1 ->ENABLE = 0; //disable TWI Slave
+    NRF_NFCT->TASKS_DISABLE = 1; //disable NFC, confirm this is the right way
     
-    *(volatile uint32_t *)0x40000EE4 = (*(volatile uint32_t *)0x10000258 & 0x0000004F);
+    //*(volatile uint32_t *)0x40000EE4 = (*(volatile uint32_t *)0x10000258 & 0x0000004F);
 
     NRF_TWIM0->ENABLE = 0;
     *(volatile uint32_t *)0x40003FFC = 0;
@@ -51,12 +56,12 @@ void clean_i2c(void) {
     *(volatile uint32_t *)0x40004FFC;
     *(volatile uint32_t *)0x40004FFC = 1;
 
-    pinMode(TWI_SCL, OUTPUT);
+    /*pinMode(TWI_SCL, OUTPUT);
     digitalWrite(TWI_SCL, HIGH);
     for(uint8_t i = 0; i < 16; i++) {
         digitalToggle(TWI_SCL);
         delay_ns(5);
-    }
+    }*/
 
 }
 
