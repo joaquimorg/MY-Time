@@ -440,6 +440,12 @@ add_custom_target(MAKE_PKG
         COMMENT "## Build .zip for DFU"
         )
 
+add_custom_target(MAKE_PKG_OLD
+        DEPENDS ${EXECUTABLE_APP_NAME}
+        COMMAND ${NRFUTIL} pkg generate --key-file /mnt/d/Work/PineTime/nordic_pem_keys/pinetime.pem --app-boot-validation VALIDATE_GENERATED_CRC --hw-version 52 --sd-req 0x0103 --application-version-string "0.1.0" --application ${EXECUTABLE_APP_NAME}.hex ${EXECUTABLE_APP_NAME}.dfu.zip
+        COMMENT "## Build .zip for DFU"
+        )
+
 add_custom_target(MAKE_BOOT_PKG
         COMMAND ${NRFUTIL} settings generate --family NRF52 --application ${EXECUTABLE_APP_NAME}.hex --app-boot-validation VALIDATE_GENERATED_CRC --application-version 0x001000 --bootloader-version 0x01 --bl-settings-version 2 --softdevice ${CMAKE_SOURCE_DIR}/src/libs/nRF52/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex boot_settings.hex
         COMMAND hexmerge.py --overlap=replace ${CMAKE_SOURCE_DIR}/bootloader/bootloader.hex boot_settings.hex -o ${EXECUTABLE_APP_NAME}.boot.hex

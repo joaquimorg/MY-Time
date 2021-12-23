@@ -56,12 +56,12 @@ void clean_i2c(void) {
     *(volatile uint32_t *)0x40004FFC;
     *(volatile uint32_t *)0x40004FFC = 1;*/
 
-    /*pinMode(TWI_SCL, OUTPUT);
+    pinMode(TWI_SCL, OUTPUT);
     digitalWrite(TWI_SCL, HIGH);
     for(uint8_t i = 0; i < 16; i++) {
         digitalToggle(TWI_SCL);
         delay_ns(5);
-    }*/
+    }
 
 }
 
