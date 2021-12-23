@@ -1,32 +1,41 @@
-/*
- * Copyright (c) 2015 - 2020, Nordic Semiconductor ASA
+/**
+ * Copyright (c) 2015 - 2021, Nordic Semiconductor ASA
+ *
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
  *    list of conditions and the following disclaimer.
  *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
  *
- * 3. Neither the name of the copyright holder nor the names of its
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ *
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ *
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
  * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
  */
 
 #ifndef NRFX_COMP_H__
@@ -104,42 +113,31 @@ typedef struct
     .th_up   = NRFX_VOLTAGE_THRESHOLD_TO_INT(1.5, 1.8)  \
 }
 
-/**
- * @brief COMP driver default configuration.
- *
- * This configuration sets up COMP with the following options:
- * - single-ended mode
- * - reference voltage: internal 1.8 V
- * - lower threshold: 0.5 V
- * - upper threshold: 1.5 V
- * - high speed mode
- * - hysteresis disabled
- * - current source disabled
- *
- * @param[in] _input Analog input.
- */
+/** @brief COMP driver default configuration including the COMP HAL configuration. */
 #if defined (COMP_ISOURCE_ISOURCE_Msk) || defined (__NRFX_DOXYGEN__)
-#define NRFX_COMP_DEFAULT_CONFIG(_input)                         \
-{                                                                \
-    .reference          = NRF_COMP_REF_Int1V8,                   \
-    .main_mode          = NRF_COMP_MAIN_MODE_SE,                 \
-    .threshold          = NRFX_COMP_CONFIG_TH,                   \
-    .speed_mode         = NRF_COMP_SP_MODE_High,                 \
-    .hyst               = NRF_COMP_HYST_NoHyst,                  \
-    .isource            = NRF_COMP_ISOURCE_Off,                  \
-    .input              = (nrf_comp_input_t)_input,              \
-    .interrupt_priority = NRFX_COMP_DEFAULT_CONFIG_IRQ_PRIORITY  \
+#define NRFX_COMP_DEFAULT_CONFIG(_input)                                    \
+{                                                                           \
+    .reference          = (nrf_comp_ref_t)NRFX_COMP_CONFIG_REF,             \
+    .ext_ref            = NRF_COMP_EXT_REF_0,                               \
+    .main_mode          = (nrf_comp_main_mode_t)NRFX_COMP_CONFIG_MAIN_MODE, \
+    .threshold          = NRFX_COMP_CONFIG_TH,                              \
+    .speed_mode         = (nrf_comp_sp_mode_t)NRFX_COMP_CONFIG_SPEED_MODE,  \
+    .hyst               = (nrf_comp_hyst_t)NRFX_COMP_CONFIG_HYST,           \
+    .isource            = (nrf_isource_t)NRFX_COMP_CONFIG_ISOURCE,          \
+    .input              = (nrf_comp_input_t)_input,                         \
+    .interrupt_priority = NRFX_COMP_CONFIG_IRQ_PRIORITY                     \
 }
 #else
-#define NRFX_COMP_DEFAULT_CONFIG(_input)                         \
-{                                                                \
-    .reference          = NRF_COMP_REF_Int1V8,                   \
-    .main_mode          = NRF_COMP_MAIN_MODE_SE,                 \
-    .threshold          = NRFX_COMP_CONFIG_TH,                   \
-    .speed_mode         = NRF_COMP_SP_MODE_High,                 \
-    .hyst               = NRF_COMP_HYST_NoHyst,                  \
-    .input              = (nrf_comp_input_t)_input,              \
-    .interrupt_priority = NRFX_COMP_DEFAULT_CONFIG_IRQ_PRIORITY  \
+#define NRFX_COMP_DEFAULT_CONFIG(_input)                                    \
+{                                                                           \
+    .reference          = (nrf_comp_ref_t)NRFX_COMP_CONFIG_REF,             \
+    .ext_ref            = NRF_COMP_EXT_REF_0,                               \
+    .main_mode          = (nrf_comp_main_mode_t)NRFX_COMP_CONFIG_MAIN_MODE, \
+    .threshold          = NRFX_COMP_CONFIG_TH,                              \
+    .speed_mode         = (nrf_comp_sp_mode_t)NRFX_COMP_CONFIG_SPEED_MODE,  \
+    .hyst               = (nrf_comp_hyst_t)NRFX_COMP_CONFIG_HYST,           \
+    .input              = (nrf_comp_input_t)_input,                         \
+    .interrupt_priority = NRFX_COMP_CONFIG_IRQ_PRIORITY                     \
 }
 #endif
 
@@ -220,7 +218,10 @@ uint32_t nrfx_comp_sample(void);
  *
  * @return Address of the given COMP task.
  */
-NRFX_STATIC_INLINE uint32_t nrfx_comp_task_address_get(nrf_comp_task_t task);
+__STATIC_INLINE uint32_t nrfx_comp_task_address_get(nrf_comp_task_t task)
+{
+    return (uint32_t)nrf_comp_task_address_get(task);
+}
 
 /**
  * @brief Function for getting the address of a COMP event.
@@ -229,19 +230,10 @@ NRFX_STATIC_INLINE uint32_t nrfx_comp_task_address_get(nrf_comp_task_t task);
  *
  * @return Address of the given COMP event.
  */
-NRFX_STATIC_INLINE uint32_t nrfx_comp_event_address_get(nrf_comp_event_t event);
-
-#ifndef NRFX_DECLARE_ONLY
-NRFX_STATIC_INLINE uint32_t nrfx_comp_task_address_get(nrf_comp_task_t task)
+__STATIC_INLINE uint32_t nrfx_comp_event_address_get(nrf_comp_event_t event)
 {
-    return nrf_comp_task_address_get(NRF_COMP, task);
+    return (uint32_t)nrf_comp_event_address_get(event);
 }
-
-NRFX_STATIC_INLINE uint32_t nrfx_comp_event_address_get(nrf_comp_event_t event)
-{
-    return nrf_comp_event_address_get(NRF_COMP, event);
-}
-#endif // NRFX_DECLARE_ONLY
 
 /** @} */
 

@@ -1,32 +1,41 @@
-/*
- * Copyright (c) 2016 - 2020, Nordic Semiconductor ASA
+/**
+ * Copyright (c) 2016 - 2021, Nordic Semiconductor ASA
+ *
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
  *    list of conditions and the following disclaimer.
  *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
  *
- * 3. Neither the name of the copyright holder nor the names of its
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ *
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ *
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
  * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
  */
 
 #ifndef NRF_SYSTICK_H__
@@ -85,28 +94,28 @@ typedef enum {
  * @note The @ref NRF_SYSTICK_CSR_COUNTFLAG_MASK value is cleared when CSR register is read.
  * @return Values composed by @ref nrf_systick_csr_flags_t.
  */
-NRF_STATIC_INLINE uint32_t nrf_systick_csr_get(void);
+__STATIC_INLINE uint32_t nrf_systick_csr_get(void);
 
 /**
  * @brief Function for setting Configuration and Status Register.
  *
  * @param[in] val The value composed from @ref nrf_systick_csr_flags_t.
  */
-NRF_STATIC_INLINE void nrf_systick_csr_set(uint32_t val);
+__STATIC_INLINE void nrf_systick_csr_set(uint32_t val);
 
 /**
  * @brief Function for getting the current reload value.
  *
  * @return The reload register value.
  */
-NRF_STATIC_INLINE uint32_t nrf_systick_load_get(void);
+__STATIC_INLINE uint32_t nrf_systick_load_get(void);
 
 /**
  * @brief Function for configuring the reload value.
  *
  * @param[in] val The value to be set in the reload register.
  */
-NRF_STATIC_INLINE void nrf_systick_load_set(uint32_t val);
+__STATIC_INLINE void nrf_systick_load_set(uint32_t val);
 
 /**
  * @brief Function for reading the SysTick current value.
@@ -114,7 +123,7 @@ NRF_STATIC_INLINE void nrf_systick_load_set(uint32_t val);
  * @return The current SysTick value
  * @sa NRF_SYSTICK_VAL_MASK
  */
-NRF_STATIC_INLINE uint32_t nrf_systick_val_get(void);
+__STATIC_INLINE uint32_t nrf_systick_val_get(void);
 
 /**
  * @brief Function for clearing the SysTick current value.
@@ -122,54 +131,54 @@ NRF_STATIC_INLINE uint32_t nrf_systick_val_get(void);
  * @note The SysTick does not allow setting current value.
  *       Any write to VAL register would clear the timer.
  */
-NRF_STATIC_INLINE void nrf_systick_val_clear(void);
+__STATIC_INLINE void nrf_systick_val_clear(void);
 
 /**
  * @brief Function for reading the calibration register.
  *
  * @return The calibration register value.
  */
-NRF_STATIC_INLINE uint32_t nrf_systick_calib_get(void);
+__STATIC_INLINE uint32_t nrf_systick_calib_get(void);
 
 
-#ifndef NRF_DECLARE_ONLY
+#ifndef SUPPRESS_INLINE_IMPLEMENTATION
 
-NRF_STATIC_INLINE uint32_t nrf_systick_csr_get(void)
+__STATIC_INLINE uint32_t nrf_systick_csr_get(void)
 {
     return SysTick->CTRL;
 }
 
-NRF_STATIC_INLINE void nrf_systick_csr_set(uint32_t val)
+__STATIC_INLINE void nrf_systick_csr_set(uint32_t val)
 {
     SysTick->CTRL = val;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_systick_load_get(void)
+__STATIC_INLINE uint32_t nrf_systick_load_get(void)
 {
     return SysTick->LOAD;
 }
 
-NRF_STATIC_INLINE void nrf_systick_load_set(uint32_t val)
+__STATIC_INLINE void nrf_systick_load_set(uint32_t val)
 {
     SysTick->LOAD = val;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_systick_val_get(void)
+__STATIC_INLINE uint32_t nrf_systick_val_get(void)
 {
     return SysTick->VAL;
 }
 
-NRF_STATIC_INLINE void nrf_systick_val_clear(void)
+__STATIC_INLINE void nrf_systick_val_clear(void)
 {
     SysTick->VAL = 0;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_systick_calib_get(void)
+__STATIC_INLINE uint32_t nrf_systick_calib_get(void)
 {
     return SysTick->CALIB;
 }
 
-#endif /* NRF_DECLARE_ONLY */
+#endif /* SUPPRESS_INLINE_IMPLEMENTATION */
 
 /** @} */
 

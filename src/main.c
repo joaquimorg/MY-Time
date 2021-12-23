@@ -46,15 +46,15 @@ void clean_i2c(void) {
     
     //*(volatile uint32_t *)0x40000EE4 = (*(volatile uint32_t *)0x10000258 & 0x0000004F);
 
-    NRF_TWIM0->ENABLE = 0;
-    *(volatile uint32_t *)0x40003FFC = 0;
+    //NRF_TWIM0->ENABLE = 0;
+    /**(volatile uint32_t *)0x40003FFC = 0;
     *(volatile uint32_t *)0x40003FFC;
-    *(volatile uint32_t *)0x40003FFC = 1;
+    *(volatile uint32_t *)0x40003FFC = 1;*/
 
-    NRF_TWIM1->ENABLE = 0;
-    *(volatile uint32_t *)0x40004FFC = 0;
+    //NRF_TWIM1->ENABLE = 0;
+    /**(volatile uint32_t *)0x40004FFC = 0;
     *(volatile uint32_t *)0x40004FFC;
-    *(volatile uint32_t *)0x40004FFC = 1;
+    *(volatile uint32_t *)0x40004FFC = 1;*/
 
     /*pinMode(TWI_SCL, OUTPUT);
     digitalWrite(TWI_SCL, HIGH);

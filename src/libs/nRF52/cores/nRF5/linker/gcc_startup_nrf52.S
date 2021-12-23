@@ -1,6 +1,6 @@
 /*
  
-Copyright (c) 2009-2018 ARM Limited. All rights reserved.
+Copyright (c) 2009-2020 ARM Limited. All rights reserved.
 
     SPDX-License-Identifier: Apache-2.0
 
@@ -20,13 +20,9 @@ NOTICE: This file has been modified by Nordic Semiconductor ASA.
 
 */
 
-#ifdef NRF52832_XXAA
-
     .syntax unified
     .arch armv7e-m
 
-/* Adafruit define stack & heap inside linker script */
-//--
 #ifdef __STARTUP_CONFIG
 #include "startup_config.h"
 #ifndef __STARTUP_CONFIG_STACK_ALIGNEMENT
@@ -43,7 +39,7 @@ NOTICE: This file has been modified by Nordic Semiconductor ASA.
     .equ    Stack_Size, __STACK_SIZE
 #else
     .align 3
-    .equ    Stack_Size, 8192
+    .equ    Stack_Size, 4096
 #endif
     .globl __StackTop
     .globl __StackLimit
@@ -60,7 +56,7 @@ __StackTop:
 #elif defined(__HEAP_SIZE)
     .equ Heap_Size, __HEAP_SIZE
 #else
-    .equ Heap_Size, 8192
+    .equ Heap_Size, 4096
 #endif
     .globl __HeapBase
     .globl __HeapLimit
@@ -71,8 +67,8 @@ __HeapBase:
     .size __HeapBase, . - __HeapBase
 __HeapLimit:
     .size __HeapLimit, . - __HeapLimit
-//--
-    .section .isr_vector
+
+    .section .isr_vector, "ax"
     .align 2
     .globl __isr_vector
 __isr_vector:
@@ -226,11 +222,11 @@ Reset_Handler:
  *      __etext: LMA of start of the section to copy from. Usually end of text
  *      __data_start__: VMA of start of the section to copy to.
  *      __bss_start__: VMA of end of the section to copy to. Normally __data_end__ is used, but by using __bss_start__
- *                    the user can add their own initialized data section before BSS section with the INTERT AFTER command.
+ *                    the user can add their own initialized data section before BSS section with the INSERT AFTER command.
  *
  * All addresses must be aligned to 4 bytes boundary.
  */
- 
+#ifndef __STARTUP_SKIP_ETEXT
     ldr r1, =__etext
     ldr r2, =__data_start__
     ldr r3, =__bss_start__
@@ -245,19 +241,7 @@ Reset_Handler:
     bgt .L_loop1
 
 .L_loop1_done:
-
-
-/* Adafruit fill stack region with pattern 0xADADADAD */
-/*
-    ldr     r0, =__StackLimit
-    ldr     r1, =__StackSize
-    ldr     r2, =0xADADADAD
-.L_fill:
-    str     r2, [r0]
-    adds    r0, 4
-    subs    r1, 4
-    bne     .L_fill
-*/
+#endif
 
 /* This part of work usually is done in C library startup code. Otherwise,
  * define __STARTUP_CLEAR_BSS to enable it in this startup. This section
@@ -269,9 +253,7 @@ Reset_Handler:
  *
  * All addresses must be aligned to 4 bytes boundary.
  */
- 
 #ifdef __STARTUP_CLEAR_BSS
-
     ldr r1, =__bss_start__
     ldr r2, =__bss_end__
 
@@ -422,5 +404,3 @@ Default_Handler:
     IRQ  FPU_IRQHandler
 
   .end
-
-#endif

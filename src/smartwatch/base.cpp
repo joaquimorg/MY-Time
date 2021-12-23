@@ -126,6 +126,23 @@ void ble_send_steps(void) {
 
 // callback invoked when central connects
 void connect_callback(uint16_t conn_handle) {
+
+    BLEConnection* conn = Bluefruit.Connection(conn_handle);
+
+    // request PHY changed to 2MB
+    //Serial.println("Request to change PHY");
+    conn->requestPHY();
+        
+    // request mtu exchange
+    //Serial.println("Request to change MTU");
+    conn->requestMtuExchange(128);
+
+    // request connection interval of 7.5 ms
+    //conn->requestConnectionParameter(6); // in unit of 1.25
+
+    // delay a bit for all the request to complete
+    delay(1000);
+    
     smartwatch->push_message(Smartwatch::Messages::BleConnected);
     send_info = true;
 }
@@ -443,12 +460,12 @@ void setup(void) {
 
     // To be consistent OTA DFU should be added first if it exists
     // bledfu.setPermission(SECMODE_ENC_WITH_MITM, SECMODE_ENC_WITH_MITM);
-    // bledfu.begin();
-
-    bleuart.begin();
-    bleuart.setPermission(SECMODE_ENC_WITH_MITM, SECMODE_ENC_WITH_MITM);
-    bleuart.setRxCallback(bleuart_rx_callback, false);
+    bledfu.begin();
+    
+    //bleuart.setPermission(SECMODE_ENC_WITH_MITM, SECMODE_ENC_WITH_MITM);    
+    bleuart.setRxCallback(bleuart_rx_callback, true);
     bleuart.bufferTXD(false);
+    bleuart.begin();
 
     startAdv();
 

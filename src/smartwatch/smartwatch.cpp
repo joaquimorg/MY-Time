@@ -266,7 +266,7 @@ void Smartwatch::run(void) {
                 push_message(Messages::BleData);
                 set_bluetooth_connected(false);
 
-                set_notification("Bluetooth", "Bluetooth disconnected !", Smartwatch::MessageType::Info);
+                set_notification("\xEE\xA4\x83 Bluetooth", "\nBluetooth disconnected !", Smartwatch::MessageType::Info);
                 push_message(Messages::WakeUp);
                 load_application(Applications::ShowMessage, RefreshDirections::Up);
                 break;

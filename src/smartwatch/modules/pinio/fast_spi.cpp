@@ -49,11 +49,11 @@ void disable_workaround(NRF_SPIM_Type * spim, uint32_t ppi_channel, uint32_t gpi
 
 
 void write_fast_spi(const uint8_t *ptr, uint32_t len) {
-  if (len == 1) {
-    enable_workaround(NRF_SPIM2, 8, 8);
+  /*if (len == 1) {
+    enable_workaround(NRF_SPIM2, 7, 7);
   } else {
-    disable_workaround(NRF_SPIM2, 8, 8);
-  }
+    disable_workaround(NRF_SPIM2, 7, 7);
+  }*/
 
   int v2 = 0;
   do
@@ -85,11 +85,11 @@ void write_fast_spi(const uint8_t *ptr, uint32_t len) {
 
 void read_fast_spi(uint8_t *ptr, uint32_t len)
 {
-  if (len == 1) {
-    enable_workaround(NRF_SPIM2, 8, 8);
+  /*if (len == 1) {
+    enable_workaround(NRF_SPIM2, 7, 7);
   } else {
-    disable_workaround(NRF_SPIM2, 8, 8);
-  }
+    disable_workaround(NRF_SPIM2, 7, 7);
+  }*/
 
   int v2 = 0;
   do

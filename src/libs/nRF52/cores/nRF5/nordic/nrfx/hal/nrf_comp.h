@@ -1,32 +1,41 @@
-/*
- * Copyright (c) 2015 - 2020, Nordic Semiconductor ASA
+/**
+ * Copyright (c) 2015 - 2021, Nordic Semiconductor ASA
+ *
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
  *    list of conditions and the following disclaimer.
  *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
  *
- * 3. Neither the name of the copyright holder nor the names of its
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ *
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ *
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
  * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
  */
 
 #ifndef NRF_COMP_H_
@@ -48,18 +57,27 @@ extern "C" {
 /** @brief COMP analog pin selection. */
 typedef enum
 {
-    NRF_COMP_INPUT_0 = COMP_PSEL_PSEL_AnalogInput0, /*!< AIN0 selected as analog input. */
-    NRF_COMP_INPUT_1 = COMP_PSEL_PSEL_AnalogInput1, /*!< AIN1 selected as analog input. */
-    NRF_COMP_INPUT_2 = COMP_PSEL_PSEL_AnalogInput2, /*!< AIN2 selected as analog input. */
-    NRF_COMP_INPUT_3 = COMP_PSEL_PSEL_AnalogInput3, /*!< AIN3 selected as analog input. */
-    NRF_COMP_INPUT_4 = COMP_PSEL_PSEL_AnalogInput4, /*!< AIN4 selected as analog input. */
-    NRF_COMP_INPUT_5 = COMP_PSEL_PSEL_AnalogInput5, /*!< AIN5 selected as analog input. */
-    NRF_COMP_INPUT_6 = COMP_PSEL_PSEL_AnalogInput6, /*!< AIN6 selected as analog input. */
+    NRF_COMP_INPUT_0   = COMP_PSEL_PSEL_AnalogInput0, /*!< AIN0 selected as analog input. */
+    NRF_COMP_INPUT_1   = COMP_PSEL_PSEL_AnalogInput1, /*!< AIN1 selected as analog input. */
+    NRF_COMP_INPUT_2   = COMP_PSEL_PSEL_AnalogInput2, /*!< AIN2 selected as analog input. */
+    NRF_COMP_INPUT_3   = COMP_PSEL_PSEL_AnalogInput3, /*!< AIN3 selected as analog input. */
+#if defined (COMP_PSEL_PSEL_AnalogInput4) || defined (__NRFX_DOXYGEN__)
+    NRF_COMP_INPUT_4   = COMP_PSEL_PSEL_AnalogInput4, /*!< AIN4 selected as analog input. */
+#endif
+#if defined (COMP_PSEL_PSEL_AnalogInput5) || defined (__NRFX_DOXYGEN__)
+    NRF_COMP_INPUT_5   = COMP_PSEL_PSEL_AnalogInput5, /*!< AIN5 selected as analog input. */
+#endif
+#if defined (COMP_PSEL_PSEL_AnalogInput6) || defined (__NRFX_DOXYGEN__)
+    NRF_COMP_INPUT_6   = COMP_PSEL_PSEL_AnalogInput6, /*!< AIN6 selected as analog input. */
+#endif
 #if defined (COMP_PSEL_PSEL_AnalogInput7) || defined (__NRFX_DOXYGEN__)
-    NRF_COMP_INPUT_7 = COMP_PSEL_PSEL_AnalogInput7, /*!< AIN7 selected as analog input. */
+    NRF_COMP_INPUT_7   = COMP_PSEL_PSEL_AnalogInput7, /*!< AIN7 selected as analog input. */
 #endif
 #if defined (COMP_PSEL_PSEL_VddDiv2) || defined (__NRFX_DOXYGEN__)
-    NRF_COMP_VDD_DIV2 = COMP_PSEL_PSEL_VddDiv2,     /*!< VDD/2 selected as analog input. */
+    NRF_COMP_VDD_DIV2  = COMP_PSEL_PSEL_VddDiv2,      /*!< VDD/2 selected as analog input. */
+#endif
+#if defined (COMP_PSEL_PSEL_VddhDiv5) || defined (__NRFX_DOXYGEN__)
+    NRF_COMP_VDDH_DIV5 = COMP_PSEL_PSEL_VddhDiv5,     /*!< VDDH/5 selected as analog input. */
 #endif
 } nrf_comp_input_t;
 
@@ -80,10 +98,18 @@ typedef enum
     NRF_COMP_EXT_REF_1 = COMP_EXTREFSEL_EXTREFSEL_AnalogReference1, /*!< Use AIN1 as external analog reference. */
     NRF_COMP_EXT_REF_2 = COMP_EXTREFSEL_EXTREFSEL_AnalogReference2, /*!< Use AIN2 as external analog reference. */
     NRF_COMP_EXT_REF_3 = COMP_EXTREFSEL_EXTREFSEL_AnalogReference3, /*!< Use AIN3 as external analog reference. */
+#if defined (COMP_EXTREFSEL_EXTREFSEL_AnalogReference4) || defined (__NRFX_DOXYGEN__)
     NRF_COMP_EXT_REF_4 = COMP_EXTREFSEL_EXTREFSEL_AnalogReference4, /*!< Use AIN4 as external analog reference. */
+#endif
+#if defined (COMP_EXTREFSEL_EXTREFSEL_AnalogReference5) || defined (__NRFX_DOXYGEN__)
     NRF_COMP_EXT_REF_5 = COMP_EXTREFSEL_EXTREFSEL_AnalogReference5, /*!< Use AIN5 as external analog reference. */
+#endif
+#if defined (COMP_EXTREFSEL_EXTREFSEL_AnalogReference6) || defined (__NRFX_DOXYGEN__)
     NRF_COMP_EXT_REF_6 = COMP_EXTREFSEL_EXTREFSEL_AnalogReference6, /*!< Use AIN6 as external analog reference. */
+#endif
+#if defined (COMP_EXTREFSEL_EXTREFSEL_AnalogReference7) || defined (__NRFX_DOXYGEN__)
     NRF_COMP_EXT_REF_7 = COMP_EXTREFSEL_EXTREFSEL_AnalogReference7  /*!< Use AIN7 as external analog reference. */
+#endif
 } nrf_comp_ext_ref_t;
 
 /** @brief COMP THDOWN and THUP values that are used to calculate the threshold voltages VDOWN and VUP. */
@@ -151,330 +177,293 @@ typedef struct
 } nrf_comp_ref_conf_t;
 
 
-/**
- * @brief Function for enabling the COMP peripheral.
- *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- */
-NRF_STATIC_INLINE void nrf_comp_enable(NRF_COMP_Type * p_reg);
+/** @brief Function for enabling the COMP peripheral. */
+__STATIC_INLINE void nrf_comp_enable(void);
 
-/**
- * @brief Function for disabling the COMP peripheral.
- *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- */
-NRF_STATIC_INLINE void nrf_comp_disable(NRF_COMP_Type * p_reg);
+/** @brief Function for disabling the COMP peripheral. */
+__STATIC_INLINE void nrf_comp_disable(void);
 
 /**
  * @brief Function for checking if the COMP peripheral is enabled.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @retval true  The COMP peripheral is enabled.
  * @retval false The COMP peripheral is not enabled.
  */
-NRF_STATIC_INLINE bool nrf_comp_enable_check(NRF_COMP_Type const * p_reg);
+__STATIC_INLINE bool nrf_comp_enable_check(void);
 
 /**
  * @brief Function for setting the reference source.
  *
- * @param[in] p_reg     Pointer to the structure of registers of the peripheral.
  * @param[in] reference COMP reference selection.
  */
-NRF_STATIC_INLINE void nrf_comp_ref_set(NRF_COMP_Type * p_reg, nrf_comp_ref_t reference);
+__STATIC_INLINE void nrf_comp_ref_set(nrf_comp_ref_t reference);
 
 /**
  * @brief Function for setting the external analog reference source.
  *
- * @param[in] p_reg   Pointer to the structure of registers of the peripheral.
  * @param[in] ext_ref COMP external analog reference selection.
  */
-NRF_STATIC_INLINE void nrf_comp_ext_ref_set(NRF_COMP_Type * p_reg, nrf_comp_ext_ref_t ext_ref);
+__STATIC_INLINE void nrf_comp_ext_ref_set(nrf_comp_ext_ref_t ext_ref);
 
 /**
  * @brief Function for setting threshold voltages.
  *
- * @param[in] p_reg     Pointer to the structure of registers of the peripheral.
  * @param[in] threshold COMP VDOWN and VUP thresholds.
  */
-NRF_STATIC_INLINE void nrf_comp_th_set(NRF_COMP_Type * p_reg, nrf_comp_th_t threshold);
+__STATIC_INLINE void nrf_comp_th_set(nrf_comp_th_t threshold);
 
 /**
  * @brief Function for setting the main mode.
  *
- * @param[in] p_reg     Pointer to the structure of registers of the peripheral.
  * @param[in] main_mode COMP main operation mode.
  */
-NRF_STATIC_INLINE void nrf_comp_main_mode_set(NRF_COMP_Type *      p_reg,
-                                              nrf_comp_main_mode_t main_mode);
+__STATIC_INLINE void nrf_comp_main_mode_set(nrf_comp_main_mode_t main_mode);
 
 /**
  * @brief Function for setting the speed mode.
  *
- * @param[in] p_reg      Pointer to the structure of registers of the peripheral.
  * @param[in] speed_mode COMP speed and power mode.
  */
-NRF_STATIC_INLINE void nrf_comp_speed_mode_set(NRF_COMP_Type *    p_reg,
-                                               nrf_comp_sp_mode_t speed_mode);
+__STATIC_INLINE void nrf_comp_speed_mode_set(nrf_comp_sp_mode_t speed_mode);
 
 /**
  * @brief Function for setting the hysteresis.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- * @param[in] hyst  COMP comparator hysteresis.
+ * @param[in] hyst COMP comparator hysteresis.
  */
-NRF_STATIC_INLINE void nrf_comp_hysteresis_set(NRF_COMP_Type * p_reg, nrf_comp_hyst_t hyst);
+__STATIC_INLINE void nrf_comp_hysteresis_set(nrf_comp_hyst_t hyst);
 
 #if defined (COMP_ISOURCE_ISOURCE_Msk) || defined (__NRFX_DOXYGEN__)
 /**
  * @brief Function for setting the current source on the analog input.
  *
- * @param[in] p_reg   Pointer to the structure of registers of the peripheral.
  * @param[in] isource COMP current source selection on analog input.
  */
-NRF_STATIC_INLINE void nrf_comp_isource_set(NRF_COMP_Type * p_reg, nrf_isource_t isource);
+__STATIC_INLINE void nrf_comp_isource_set(nrf_isource_t isource);
 #endif
 
 /**
  * @brief Function for selecting the active input of the COMP.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
  * @param[in] input Input to be selected.
  */
-NRF_STATIC_INLINE void nrf_comp_input_select(NRF_COMP_Type * p_reg, nrf_comp_input_t input);
+__STATIC_INLINE void nrf_comp_input_select(nrf_comp_input_t input);
 
 /**
  * @brief Function for getting the last COMP compare result.
  *
  * @note If VIN+ == VIN-, the return value depends on the previous result.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return The last compare result. If 0, then VIN+ < VIN-. If 1, then VIN+ > VIN-.
  */
-NRF_STATIC_INLINE uint32_t nrf_comp_result_get(NRF_COMP_Type const * p_reg);
+__STATIC_INLINE uint32_t nrf_comp_result_get(void);
 
 /**
  * @brief Function for enabling interrupts from COMP.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- * @param[in] mask  Mask of interrupts to be enabled.
+ * @param[in] mask Mask of interrupts to be enabled.
  *
  * @sa nrf_comp_int_enable_check
  */
-NRF_STATIC_INLINE void nrf_comp_int_enable(NRF_COMP_Type * p_reg, uint32_t mask);
+__STATIC_INLINE void nrf_comp_int_enable(uint32_t mask);
 
 /**
  * @brief Function for disabling interrupts from COMP.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- * @param[in] mask  Mask of interrupts to be disabled.
+ * @param[in] mask Mask of interrupts to be disabled.
  *
  * @sa nrf_comp_int_enable_check
  */
-NRF_STATIC_INLINE void nrf_comp_int_disable(NRF_COMP_Type * p_reg, uint32_t mask);
+__STATIC_INLINE void nrf_comp_int_disable(uint32_t mask);
 
 /**
- * @brief Function for checking if the specified interrupts are enabled.
+ * @brief Function for getting the enabled interrupts of COMP.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- * @param[in] mask  Mask of interrupts to be checked.
+ * @param[in] mask Mask of interrupts to be checked.
  *
- * @return Mask of enabled interrupts.
+ * @retval true  At least one interrupt from the specified mask is enabled.
+ * @retval false No interrupt provided by the specified mask are enabled.
  */
-NRF_STATIC_INLINE uint32_t nrf_comp_int_enable_check(NRF_COMP_Type const * p_reg, uint32_t mask);
+__STATIC_INLINE bool nrf_comp_int_enable_check(uint32_t mask);
 
 /**
  * @brief Function for getting the address of the specified COMP task register.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- * @param[in] task  COMP task.
+ * @param[in] task COMP task.
  *
  * @return Address of the specified COMP task.
  */
-NRF_STATIC_INLINE uint32_t nrf_comp_task_address_get(NRF_COMP_Type const * p_reg,
-                                                     nrf_comp_task_t       task);
+__STATIC_INLINE uint32_t * nrf_comp_task_address_get(nrf_comp_task_t task);
 
 /**
  * @brief Function for getting the address of the specified COMP event register.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
  * @param[in] event COMP event.
  *
  * @return Address of the specified COMP event.
  */
-NRF_STATIC_INLINE uint32_t nrf_comp_event_address_get(NRF_COMP_Type const * p_reg,
-                                                      nrf_comp_event_t      event);
+__STATIC_INLINE uint32_t * nrf_comp_event_address_get(nrf_comp_event_t event);
 
 /**
  * @brief  Function for setting COMP shortcuts.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- * @param[in] mask  Mask of shortcuts.
+ * @param[in] mask Mask of shortcuts.
  */
-NRF_STATIC_INLINE void nrf_comp_shorts_enable(NRF_COMP_Type * p_reg, uint32_t mask);
+__STATIC_INLINE void nrf_comp_shorts_enable(uint32_t mask);
 
 /**
  * @brief Function for clearing COMP shortcuts by mask.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- * @param[in] mask  Mask of shortcuts.
+ * @param[in] mask Mask of shortcuts.
  */
-NRF_STATIC_INLINE void nrf_comp_shorts_disable(NRF_COMP_Type * p_reg, uint32_t mask);
+__STATIC_INLINE void nrf_comp_shorts_disable(uint32_t mask);
 
 /**
  * @brief Function for setting the specified COMP task.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- * @param[in] task  Task to be activated.
+ * @param[in] task Task to be activated.
  */
-NRF_STATIC_INLINE void nrf_comp_task_trigger(NRF_COMP_Type * p_reg, nrf_comp_task_t task);
+__STATIC_INLINE void nrf_comp_task_trigger(nrf_comp_task_t task);
 
 /**
  * @brief Function for clearing the specified COMP event.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
  * @param[in] event COMP event to be cleared.
  */
-NRF_STATIC_INLINE void nrf_comp_event_clear(NRF_COMP_Type * p_reg, nrf_comp_event_t event);
+__STATIC_INLINE void nrf_comp_event_clear(nrf_comp_event_t event);
 
 /**
  * @brief Function for retrieving the state of the UARTE event.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
  * @param[in] event Event to be checked.
  *
  * @retval true  The event has been generated.
  * @retval false The event has not been generated.
  */
-NRF_STATIC_INLINE bool nrf_comp_event_check(NRF_COMP_Type const * p_reg, nrf_comp_event_t event);
+__STATIC_INLINE bool nrf_comp_event_check(nrf_comp_event_t event);
 
 
-#ifndef NRF_DECLARE_ONLY
+#ifndef SUPPRESS_INLINE_IMPLEMENTATION
 
-NRF_STATIC_INLINE void nrf_comp_enable(NRF_COMP_Type * p_reg)
+__STATIC_INLINE void nrf_comp_enable(void)
 {
-    p_reg->ENABLE = (COMP_ENABLE_ENABLE_Enabled << COMP_ENABLE_ENABLE_Pos);
+    NRF_COMP->ENABLE = (COMP_ENABLE_ENABLE_Enabled << COMP_ENABLE_ENABLE_Pos);
 }
 
-NRF_STATIC_INLINE void nrf_comp_disable(NRF_COMP_Type * p_reg)
+__STATIC_INLINE void nrf_comp_disable(void)
 {
-    p_reg->ENABLE = (COMP_ENABLE_ENABLE_Disabled << COMP_ENABLE_ENABLE_Pos);
+    NRF_COMP->ENABLE = (COMP_ENABLE_ENABLE_Disabled << COMP_ENABLE_ENABLE_Pos);
 }
 
-NRF_STATIC_INLINE bool nrf_comp_enable_check(NRF_COMP_Type const * p_reg)
+__STATIC_INLINE bool nrf_comp_enable_check(void)
 {
-    return ((p_reg->ENABLE) & COMP_ENABLE_ENABLE_Enabled);
+    return ((NRF_COMP->ENABLE) & COMP_ENABLE_ENABLE_Enabled);
 }
 
-NRF_STATIC_INLINE void nrf_comp_ref_set(NRF_COMP_Type * p_reg, nrf_comp_ref_t reference)
+__STATIC_INLINE void nrf_comp_ref_set(nrf_comp_ref_t reference)
 {
-    p_reg->REFSEL = (reference << COMP_REFSEL_REFSEL_Pos);
+    NRF_COMP->REFSEL = (reference << COMP_REFSEL_REFSEL_Pos);
 }
 
-NRF_STATIC_INLINE void nrf_comp_ext_ref_set(NRF_COMP_Type * p_reg, nrf_comp_ext_ref_t ext_ref)
+__STATIC_INLINE void nrf_comp_ext_ref_set(nrf_comp_ext_ref_t ext_ref)
 {
-    p_reg->EXTREFSEL = (ext_ref << COMP_EXTREFSEL_EXTREFSEL_Pos);
+    NRF_COMP->EXTREFSEL = (ext_ref << COMP_EXTREFSEL_EXTREFSEL_Pos);
 }
 
-NRF_STATIC_INLINE void nrf_comp_th_set(NRF_COMP_Type * p_reg, nrf_comp_th_t threshold)
+__STATIC_INLINE void nrf_comp_th_set(nrf_comp_th_t threshold)
 {
-    p_reg->TH =
+    NRF_COMP->TH =
         (((uint32_t)threshold.th_down << COMP_TH_THDOWN_Pos) & COMP_TH_THDOWN_Msk) |
         (((uint32_t)threshold.th_up << COMP_TH_THUP_Pos) & COMP_TH_THUP_Msk);
 }
 
-NRF_STATIC_INLINE void nrf_comp_main_mode_set(NRF_COMP_Type *      p_reg,
-                                              nrf_comp_main_mode_t main_mode)
+__STATIC_INLINE void nrf_comp_main_mode_set(nrf_comp_main_mode_t main_mode)
 {
-    p_reg->MODE |= (main_mode << COMP_MODE_MAIN_Pos);
+    NRF_COMP->MODE |= (main_mode << COMP_MODE_MAIN_Pos);
 }
 
-NRF_STATIC_INLINE void nrf_comp_speed_mode_set(NRF_COMP_Type *    p_reg,
-                                               nrf_comp_sp_mode_t speed_mode)
+__STATIC_INLINE void nrf_comp_speed_mode_set(nrf_comp_sp_mode_t speed_mode)
 {
-    p_reg->MODE |= (speed_mode << COMP_MODE_SP_Pos);
+    NRF_COMP->MODE |= (speed_mode << COMP_MODE_SP_Pos);
 }
 
-NRF_STATIC_INLINE void nrf_comp_hysteresis_set(NRF_COMP_Type * p_reg, nrf_comp_hyst_t hyst)
+__STATIC_INLINE void nrf_comp_hysteresis_set(nrf_comp_hyst_t hyst)
 {
-    p_reg->HYST = (hyst << COMP_HYST_HYST_Pos) & COMP_HYST_HYST_Msk;
+    NRF_COMP->HYST = (hyst << COMP_HYST_HYST_Pos) & COMP_HYST_HYST_Msk;
 }
 
 #if defined (COMP_ISOURCE_ISOURCE_Msk)
-NRF_STATIC_INLINE void nrf_comp_isource_set(NRF_COMP_Type * p_reg, nrf_isource_t isource)
+__STATIC_INLINE void nrf_comp_isource_set(nrf_isource_t isource)
 {
-    p_reg->ISOURCE = (isource << COMP_ISOURCE_ISOURCE_Pos) & COMP_ISOURCE_ISOURCE_Msk;
+    NRF_COMP->ISOURCE = (isource << COMP_ISOURCE_ISOURCE_Pos) & COMP_ISOURCE_ISOURCE_Msk;
 }
 #endif
 
-NRF_STATIC_INLINE void nrf_comp_input_select(NRF_COMP_Type * p_reg, nrf_comp_input_t input)
+__STATIC_INLINE void nrf_comp_input_select(nrf_comp_input_t input)
 {
-    p_reg->PSEL   = ((uint32_t)input << COMP_PSEL_PSEL_Pos);
+    NRF_COMP->PSEL   = ((uint32_t)input << COMP_PSEL_PSEL_Pos);
 }
 
-NRF_STATIC_INLINE uint32_t nrf_comp_result_get(NRF_COMP_Type const * p_reg)
+__STATIC_INLINE uint32_t nrf_comp_result_get(void)
 {
-    return (uint32_t)p_reg->RESULT;
+    return (uint32_t)NRF_COMP->RESULT;
 }
 
-NRF_STATIC_INLINE void nrf_comp_int_enable(NRF_COMP_Type * p_reg, uint32_t mask)
+__STATIC_INLINE void nrf_comp_int_enable(uint32_t mask)
 {
-    p_reg->INTENSET = mask;
+    NRF_COMP->INTENSET = mask;
 }
 
-NRF_STATIC_INLINE void nrf_comp_int_disable(NRF_COMP_Type * p_reg, uint32_t mask)
+__STATIC_INLINE void nrf_comp_int_disable(uint32_t mask)
 {
-    p_reg->INTENCLR = mask;
+    NRF_COMP->INTENCLR = mask;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_comp_int_enable_check(NRF_COMP_Type const * p_reg, uint32_t mask)
+__STATIC_INLINE bool nrf_comp_int_enable_check(uint32_t mask)
 {
-    return p_reg->INTENSET & mask; // When read, this register returns the value of INTEN.
+    return (NRF_COMP->INTENSET & mask); // When read, this register returns the value of INTEN.
 }
 
-NRF_STATIC_INLINE uint32_t nrf_comp_task_address_get(NRF_COMP_Type const * p_reg,
-                                                     nrf_comp_task_t       task)
+__STATIC_INLINE uint32_t * nrf_comp_task_address_get(nrf_comp_task_t task)
 {
-    return (uint32_t)((uint8_t *)p_reg + (uint32_t)task);
+    return (uint32_t *)((uint8_t *)NRF_COMP + (uint32_t)task);
 }
 
-NRF_STATIC_INLINE uint32_t nrf_comp_event_address_get(NRF_COMP_Type const * p_reg,
-                                                      nrf_comp_event_t      event)
+__STATIC_INLINE uint32_t * nrf_comp_event_address_get(nrf_comp_event_t event)
 {
-    return (uint32_t)((uint8_t *)p_reg + (uint32_t)event);
+    return (uint32_t *)((uint8_t *)NRF_COMP + (uint32_t)event);
 }
 
-NRF_STATIC_INLINE void nrf_comp_shorts_enable(NRF_COMP_Type * p_reg, uint32_t mask)
+__STATIC_INLINE void nrf_comp_shorts_enable(uint32_t mask)
 {
-    p_reg->SHORTS |= mask;
+    NRF_COMP->SHORTS |= mask;
 }
 
-NRF_STATIC_INLINE void nrf_comp_shorts_disable(NRF_COMP_Type * p_reg, uint32_t mask)
+__STATIC_INLINE void nrf_comp_shorts_disable(uint32_t mask)
 {
-    p_reg->SHORTS &= ~mask;
+    NRF_COMP->SHORTS &= ~mask;
 }
 
-NRF_STATIC_INLINE void nrf_comp_task_trigger(NRF_COMP_Type * p_reg, nrf_comp_task_t task)
+__STATIC_INLINE void nrf_comp_task_trigger(nrf_comp_task_t task)
 {
-    *( (volatile uint32_t *)( (uint8_t *)p_reg + (uint32_t)task) ) = 1;
+    *( (volatile uint32_t *)( (uint8_t *)NRF_COMP + (uint32_t)task) ) = 1;
 }
 
-NRF_STATIC_INLINE void nrf_comp_event_clear(NRF_COMP_Type * p_reg, nrf_comp_event_t event)
+__STATIC_INLINE void nrf_comp_event_clear(nrf_comp_event_t event)
 {
-    *( (volatile uint32_t *)( (uint8_t *)p_reg + (uint32_t)event) ) = 0;
+    *( (volatile uint32_t *)( (uint8_t *)NRF_COMP + (uint32_t)event) ) = 0;
 #if __CORTEX_M == 0x04
-    volatile uint32_t dummy = *((volatile uint32_t *)((uint8_t *)p_reg + (uint32_t)event));
+    volatile uint32_t dummy = *((volatile uint32_t *)((uint8_t *)NRF_COMP + (uint32_t)event));
     (void)dummy;
 #endif
 }
 
-NRF_STATIC_INLINE bool nrf_comp_event_check(NRF_COMP_Type const * p_reg, nrf_comp_event_t event)
+__STATIC_INLINE bool nrf_comp_event_check(nrf_comp_event_t event)
 {
-    return (bool) (*(volatile uint32_t *)( (uint8_t *)p_reg + (uint32_t)event));
+    return (bool) (*(volatile uint32_t *)( (uint8_t *)NRF_COMP + (uint32_t)event));
 }
 
-#endif // NRF_DECLARE_ONLY
+#endif // SUPPRESS_INLINE_IMPLEMENTATION
 
 /** @} */
 

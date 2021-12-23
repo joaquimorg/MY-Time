@@ -1,32 +1,41 @@
-/*
- * Copyright (c) 2018 - 2020, Nordic Semiconductor ASA
+/**
+ * Copyright (c) 2018 - 2021, Nordic Semiconductor ASA
+ *
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
  *    list of conditions and the following disclaimer.
  *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
  *
- * 3. Neither the name of the copyright holder nor the names of its
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ *
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ *
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
  * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
  */
 
 #ifndef NRF_RADIO_H__
@@ -124,11 +133,6 @@ typedef enum
                                                                                    and BleIeee802154_250Kbit modes when last
                                                                                    bit is sent on the air. */
 #endif
-#if defined(RADIO_INTENSET_SYNC_Msk) || defined(__NRFX_DOXYGEN__)
-    NRF_RADIO_EVENT_SYNC       = offsetof(NRF_RADIO_Type, EVENTS_SYNC),       /**< Generated in Ble_LR125Kbit, Ble_LR500Kbit
-                                                                                   and BleIeee802154_250Kbit modes when possible
-                                                                                   preamble has been received. */
-#endif
 } nrf_radio_event_t;
 
 /** @brief RADIO interrupts. */
@@ -181,9 +185,6 @@ typedef enum
 #endif
 #if defined(RADIO_INTENSET_PHYEND_Msk) || defined(__NRFX_DOXYGEN__)
     NRF_RADIO_INT_PHYEND_MASK     = RADIO_INTENSET_PHYEND_Msk,     /**< Interrupt on PHYEND event. */
-#endif
-#if defined(RADIO_INTENSET_SYNC_Msk) || defined(__NRFX_DOXYGEN__)
-    NRF_RADIO_INT_SYNC_MASK       = RADIO_INTENSET_SYNC_Msk,       /**< Interrupt on SYNC event. */
 #endif
 } nrf_radio_int_mask_t;
 
@@ -274,9 +275,7 @@ typedef enum
 #if defined(RADIO_TXPOWER_TXPOWER_Pos5dBm) || defined(__NRFX_DOXYGEN__)
     NRF_RADIO_TXPOWER_POS5DBM  = RADIO_TXPOWER_TXPOWER_Pos5dBm,  /**< 5 dBm. */
 #endif
-#if defined(RADIO_TXPOWER_TXPOWER_Pos4dBm) || defined(__NRFX_DOXYGEN__)
     NRF_RADIO_TXPOWER_POS4DBM  = RADIO_TXPOWER_TXPOWER_Pos4dBm,  /**< 4 dBm. */
-#endif
 #if defined(RADIO_TXPOWER_TXPOWER_Pos3dBm) || defined(__NRFX_DOXYGEN__)
     NRF_RADIO_TXPOWER_POS3DBM  = RADIO_TXPOWER_TXPOWER_Pos3dBm,  /**< 3 dBm. */
 #endif
@@ -374,405 +373,337 @@ typedef struct
 /**
  * @brief Function for activating a specific RADIO task.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- * @param[in] task  Task to be activated.
+ * @param[in] task Task to be activated.
  */
-NRF_STATIC_INLINE void nrf_radio_task_trigger(NRF_RADIO_Type * p_reg, nrf_radio_task_t task);
+__STATIC_INLINE void nrf_radio_task_trigger(nrf_radio_task_t task);
 
 /**
  * @brief Function for getting the address of a specific RADIO task register.
  *
  * This function can be used by the PPI module.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- * @param[in] task  Requested task.
+ * @param[in] task Requested task.
  *
  * @return Address of the specified task register.
  */
-NRF_STATIC_INLINE uint32_t nrf_radio_task_address_get(NRF_RADIO_Type const * p_reg,
-                                                      nrf_radio_task_t       task);
+__STATIC_INLINE uint32_t nrf_radio_task_address_get(nrf_radio_task_t task);
 
 /**
  * @brief Function for clearing a specific RADIO event.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
  * @param[in] event Event to clean.
  */
-NRF_STATIC_INLINE void nrf_radio_event_clear(NRF_RADIO_Type * p_reg, nrf_radio_event_t event);
+__STATIC_INLINE void nrf_radio_event_clear(nrf_radio_event_t event);
 
 /**
  * @brief Function for retrieving the state of the RADIO event.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
  * @param[in] event Event to be checked.
  *
  * @retval true  The event has been generated.
  * @retval false The event has not been generated.
  */
-NRF_STATIC_INLINE bool nrf_radio_event_check(NRF_RADIO_Type const * p_reg, nrf_radio_event_t event);
+__STATIC_INLINE bool nrf_radio_event_check(nrf_radio_event_t event);
 
 /**
  * @brief Function for getting the address of a specific RADIO event register.
  *
  * This function can be used by the PPI module.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
  * @param[in] event Requested Event.
  *
  * @return Address of the specified event register.
  */
-NRF_STATIC_INLINE uint32_t nrf_radio_event_address_get(NRF_RADIO_Type const * p_reg,
-                                                       nrf_radio_event_t      event);
+__STATIC_INLINE uint32_t nrf_radio_event_address_get(nrf_radio_event_t event);
 
 /**
  * @brief Function for enabling specified RADIO shortcuts.
  *
- * @param[in] p_reg       Pointer to the structure of registers of the peripheral.
  * @param[in] shorts_mask Mask of shortcuts.
  */
-NRF_STATIC_INLINE void nrf_radio_shorts_enable(NRF_RADIO_Type * p_reg, uint32_t shorts_mask);
+__STATIC_INLINE void nrf_radio_shorts_enable(uint32_t shorts_mask);
 
 /**
  * @brief Function for disabling specified RADIO shortcuts.
  *
- * @param[in] p_reg       Pointer to the structure of registers of the peripheral.
  * @param[in] shorts_mask Mask of shortcuts.
  */
-NRF_STATIC_INLINE void nrf_radio_shorts_disable(NRF_RADIO_Type * p_reg, uint32_t shorts_mask);
+__STATIC_INLINE void nrf_radio_shorts_disable(uint32_t shorts_mask);
 
 /**
  * @brief Function for setting the configuration of RADIO shortcuts.
  *
- * @param[in] p_reg       Pointer to the structure of registers of the peripheral.
  * @param[in] shorts_mask Shortcuts configuration to set.
  */
-NRF_STATIC_INLINE void nrf_radio_shorts_set(NRF_RADIO_Type * p_reg, uint32_t shorts_mask);
+__STATIC_INLINE void nrf_radio_shorts_set(uint32_t shorts_mask);
 
 /**
  * @brief Function for getting the configuration of RADIO shortcuts.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Mask of currently enabled shortcuts.
  */
-NRF_STATIC_INLINE uint32_t nrf_radio_shorts_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint32_t nrf_radio_shorts_get(void);
 
 /**
  * @brief Function for enabling specified RADIO interrupts.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- * @param[in] mask  Mask of interrupts to be enabled.
+ * @param[in] int_mask Mask of interrupts.
  */
-NRF_STATIC_INLINE void nrf_radio_int_enable(NRF_RADIO_Type * p_reg, uint32_t mask);
+__STATIC_INLINE void nrf_radio_int_enable(uint32_t int_mask);
 
 /**
  * @brief Function for disabling specified RADIO interrupts.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- * @param[in] mask  Mask of interrupts to be disabled.
+ * @param[in] int_mask Mask of interrupts.
  */
-NRF_STATIC_INLINE void nrf_radio_int_disable(NRF_RADIO_Type * p_reg, uint32_t mask);
+__STATIC_INLINE void nrf_radio_int_disable(uint32_t int_mask);
 
 /**
- * @brief Function for checking if the specified interrupts are enabled.
+ * @brief Function for getting the state of a specific interrupt.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- * @param[in] mask  Mask of interrupts to be checked.
+ * @param[in] int_mask Interrupt to be checked.
  *
- * @return Mask of enabled interrupts.
+ * @retval true  The interrupt is enabled.
+ * @retval false The interrupt is not enabled.
  */
-NRF_STATIC_INLINE uint32_t nrf_radio_int_enable_check(NRF_RADIO_Type const * p_reg, uint32_t mask);
+__STATIC_INLINE bool nrf_radio_int_enable_check(nrf_radio_int_mask_t int_mask);
 
 /**
  * @brief Function for getting CRC status of last received packet.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @retval true  The packet was received without CRC error.
  * @retval false The packet was received with CRC error.
  */
-NRF_STATIC_INLINE bool nrf_radio_crc_status_check(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE bool nrf_radio_crc_status_check(void);
 
 /**
  * @brief Function for getting the received address.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Received address.
  */
-NRF_STATIC_INLINE uint8_t nrf_radio_rxmatch_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint8_t nrf_radio_rxmatch_get(void);
 
 /**
  * @brief Function for getting CRC field of the last received packet.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return CRC field of previously received packet.
  */
-NRF_STATIC_INLINE uint32_t nrf_radio_rxcrc_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint32_t nrf_radio_rxcrc_get(void);
 
 /**
  * @brief Function for getting the device address match index.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Device adress match index.
  */
-NRF_STATIC_INLINE uint8_t nrf_radio_dai_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint8_t nrf_radio_dai_get(void);
 
 #if defined(RADIO_PDUSTAT_PDUSTAT_Msk) || defined(__NRFX_DOXYGEN__)
 /**
  * @brief Function for getting status on payload length.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @retval 0 The payload is lesser than PCNF1.MAXLEN.
  * @retval 1 The payload is greater than PCNF1.MAXLEN.
  */
-NRF_STATIC_INLINE uint8_t nrf_radio_pdustat_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint8_t nrf_radio_pdustat_get(void);
 
 /**
  * @brief Function for getting status on what rate packet is received with in Long Range.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @retval 0 The frame is received at 125kbps.
  * @retval 1 The frame is received at 500kbps.
  */
-NRF_STATIC_INLINE uint8_t nrf_radio_cistat_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint8_t nrf_radio_cistat_get(void);
 #endif // defined(RADIO_PDUSTAT_PDUSTAT_Msk) || defined(__NRFX_DOXYGEN__)
 
 /**
  * @brief Function for setting packet pointer to given location in memory.
  *
- * @param[in] p_reg    Pointer to the structure of registers of the peripheral.
  * @param[in] p_packet Packet pointer.
  */
-NRF_STATIC_INLINE void nrf_radio_packetptr_set(NRF_RADIO_Type * p_reg, void const * p_packet);
+__STATIC_INLINE void nrf_radio_packetptr_set(const void * p_packet);
 
 /**
  * @brief Function for getting packet pointer.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Pointer to tx or rx packet buffer.
  */
-NRF_STATIC_INLINE void * nrf_radio_packetptr_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE void * nrf_radio_packetptr_get(void);
 
 /**
  * @brief Function for setting the radio frequency.
  *
- * @param[in] p_reg           Pointer to the structure of registers of the peripheral.
  * @param[in] radio_frequency Frequency in MHz.
  */
-NRF_STATIC_INLINE void nrf_radio_frequency_set(NRF_RADIO_Type * p_reg, uint16_t radio_frequency);
+__STATIC_INLINE void nrf_radio_frequency_set(uint16_t radio_frequency);
 
 /**
  * @brief Function for getting the radio frequency.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Frequency in MHz.
  */
-NRF_STATIC_INLINE uint16_t nrf_radio_frequency_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint16_t nrf_radio_frequency_get(void);
 
 /**
  * @brief Function for setting the radio transmit power.
  *
- * @param[in] p_reg    Pointer to the structure of registers of the peripheral.
  * @param[in] tx_power Transmit power of the radio [dBm].
  */
-NRF_STATIC_INLINE void nrf_radio_txpower_set(NRF_RADIO_Type * p_reg, nrf_radio_txpower_t tx_power);
+__STATIC_INLINE void nrf_radio_txpower_set(nrf_radio_txpower_t tx_power);
 
 /**
  * @brief Function for getting the radio transmit power.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Transmit power of the radio.
  */
-NRF_STATIC_INLINE nrf_radio_txpower_t nrf_radio_txpower_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE nrf_radio_txpower_t nrf_radio_txpower_get(void);
 
 /**
  * @brief Function for setting the radio data rate and modulation settings.
  *
- * @param[in] p_reg      Pointer to the structure of registers of the peripheral.
  * @param[in] radio_mode Radio data rate and modulation.
  */
-NRF_STATIC_INLINE void nrf_radio_mode_set(NRF_RADIO_Type * p_reg, nrf_radio_mode_t radio_mode);
+__STATIC_INLINE void nrf_radio_mode_set(nrf_radio_mode_t radio_mode);
 
 /**
  * @brief Function for getting Radio data rate and modulation settings.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Radio data rate and modulation.
  */
-NRF_STATIC_INLINE nrf_radio_mode_t nrf_radio_mode_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE nrf_radio_mode_t nrf_radio_mode_get(void);
 
 /**
  * @brief Function for setting the packet configuration.
  *
- * @param[in] p_reg    Pointer to the structure of registers of the peripheral.
  * @param[in] p_config Pointer to the structure with packet configuration.
  */
-NRF_STATIC_INLINE void nrf_radio_packet_configure(NRF_RADIO_Type *                p_reg,
-                                                  nrf_radio_packet_conf_t const * p_config);
+__STATIC_INLINE void nrf_radio_packet_configure(const nrf_radio_packet_conf_t * p_config);
 
 /**
  * @brief Function for setting the base address 0.
  *
- * @param[in] p_reg   Pointer to the structure of registers of the peripheral.
- * @param[in] address Base address 0 value.
+ * @param address Base address 0 value.
  */
-NRF_STATIC_INLINE void nrf_radio_base0_set(NRF_RADIO_Type * p_reg, uint32_t address);
+__STATIC_INLINE void nrf_radio_base0_set(uint32_t address);
 
 /**
  * @brief Function for getting the base address 0.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Base address 0.
  */
-NRF_STATIC_INLINE uint32_t nrf_radio_base0_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint32_t nrf_radio_base0_get(void);
 
 /**
  * @brief Function for setting Base address 1.
  *
- * @param[in] p_reg   Pointer to the structure of registers of the peripheral.
- * @param[in] address Base address 1 value.
+ * @param address Base address 1 value.
  */
-NRF_STATIC_INLINE void nrf_radio_base1_set(NRF_RADIO_Type * p_reg, uint32_t address);
+__STATIC_INLINE void nrf_radio_base1_set(uint32_t address);
 
 /**
  * @brief Function for getting base address 1.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Base address 1.
  */
-NRF_STATIC_INLINE uint32_t nrf_radio_base1_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint32_t nrf_radio_base1_get(void);
 
 /**
  * @brief Function for setting prefixes bytes for logical addresses 0-3.
  *
- * @param[in] p_reg    Pointer to the structure of registers of the peripheral.
- * @param[in] prefixes Prefixes bytes for logical addresses 0-3.
+ * @param prefixes Prefixes bytes for logical addresses 0-3.
  */
-NRF_STATIC_INLINE void nrf_radio_prefix0_set(NRF_RADIO_Type * p_reg, uint32_t prefixes);
+__STATIC_INLINE void nrf_radio_prefix0_set(uint32_t prefixes);
 
 /**
  * @brief Function for getting prefixes bytes for logical addresses 0-3
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Prefixes bytes for logical addresses 0-3
  */
-NRF_STATIC_INLINE uint32_t nrf_radio_prefix0_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint32_t nrf_radio_prefix0_get(void);
 
 /**
  * @brief Function for setting prefixes bytes for logical addresses 4-7.
  *
- * @param[in] p_reg    Pointer to the structure of registers of the peripheral.
- * @param[in] prefixes Prefixes bytes for logical addresses 4-7.
+ * @param prefixes Prefixes bytes for logical addresses 4-7.
  */
-NRF_STATIC_INLINE void nrf_radio_prefix1_set(NRF_RADIO_Type * p_reg, uint32_t prefixes);
+__STATIC_INLINE void nrf_radio_prefix1_set(uint32_t prefixes);
 
 /**
  * @brief Function for getting prefixes bytes for logical addresses 4-7
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Prefixes bytes for logical addresses 4-7
  */
-NRF_STATIC_INLINE uint32_t nrf_radio_prefix1_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint32_t nrf_radio_prefix1_get(void);
 
 /**
  * @brief Function for setting the transmit address.
  *
- * @param[in] p_reg     Pointer to the structure of registers of the peripheral.
- * @param[in] txaddress Logical address to be used when transmitting a packet.
+ * @param txaddress Logical address to be used when transmitting a packet.
  */
-NRF_STATIC_INLINE void nrf_radio_txaddress_set(NRF_RADIO_Type * p_reg, uint8_t txaddress);
+__STATIC_INLINE void nrf_radio_txaddress_set(uint8_t txaddress);
 
 /**
  * @brief Function for getting the transmit address select.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Logical address to be used when transmitting a packet.
  */
-NRF_STATIC_INLINE uint8_t nrf_radio_txaddress_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint8_t nrf_radio_txaddress_get(void);
 
 /**
  * @brief Function for for selecting the receive addresses.
  *
- * @param[in] p_reg       Pointer to the structure of registers of the peripheral.
- * @param[in] rxaddresses Enable or disable reception on logical address i.
- *                        Read more in the Product Specification.
+ * @param rxaddresses Enable or disable reception on logical address i.
+ *                    Read more in the Product Specification.
  */
-NRF_STATIC_INLINE void nrf_radio_rxaddresses_set(NRF_RADIO_Type * p_reg, uint8_t rxaddresses);
+__STATIC_INLINE void nrf_radio_rxaddresses_set(uint8_t rxaddresses);
 
 /**
  * @brief Function for getting receive address select.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Receive address select.
  */
-NRF_STATIC_INLINE uint8_t nrf_radio_rxaddresses_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint8_t nrf_radio_rxaddresses_get(void);
 
 /**
  * @brief Function for configure CRC.
  *
- * @param[in] p_reg           Pointer to the structure of registers of the peripheral.
  * @param[in] crc_length      CRC length in number of bytes [0-3].
  * @param[in] crc_address     Include or exclude packet address field out of CRC.
  * @param[in] crc_polynominal CRC polynominal to set.
  */
-NRF_STATIC_INLINE void nrf_radio_crc_configure(NRF_RADIO_Type *     p_reg,
-                                               uint8_t              crc_length,
-                                               nrf_radio_crc_addr_t crc_address,
-                                               uint32_t             crc_polynominal);
+__STATIC_INLINE void nrf_radio_crc_configure(uint8_t              crc_length,
+                                             nrf_radio_crc_addr_t crc_address,
+                                             uint32_t             crc_polynominal);
 
 /**
  * @brief Function for setting CRC initial value.
  *
- * @param[in] p_reg          Pointer to the structure of registers of the peripheral.
- * @param[in] crc_init_value CRC initial value
+ * @param crc_init_value CRC initial value
  */
-NRF_STATIC_INLINE void nrf_radio_crcinit_set(NRF_RADIO_Type * p_reg, uint32_t crc_init_value);
+__STATIC_INLINE void nrf_radio_crcinit_set(uint32_t crc_init_value);
 
 /**
  * @brief Function for getting CRC initial value.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return CRC initial value.
  */
-NRF_STATIC_INLINE uint32_t nrf_radio_crcinit_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint32_t nrf_radio_crcinit_get(void);
 
 /**
  * @brief Function for setting Inter Frame Spacing interval.
  *
- * @param[in] p_reg     Pointer to the structure of registers of the peripheral.
  * @param[in] radio_ifs Inter frame spacing interval [us].
  */
-NRF_STATIC_INLINE void nrf_radio_ifs_set(NRF_RADIO_Type * p_reg, uint32_t radio_ifs);
+__STATIC_INLINE void nrf_radio_ifs_set(uint32_t radio_ifs);
 
 /**
  * @brief Function for getting Inter Frame Spacing interval.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Inter frame spacing interval [us].
  */
-NRF_STATIC_INLINE uint32_t nrf_radio_ifs_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint32_t nrf_radio_ifs_get(void);
 
 /**
  * @brief Function for getting RSSI sample result.
- *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
  *
  * @note The read value is a positive value while the actual received signal
  *       is a negative value. Actual received signal strength is therefore as follows:
@@ -780,373 +711,325 @@ NRF_STATIC_INLINE uint32_t nrf_radio_ifs_get(NRF_RADIO_Type const * p_reg);
  *
  * @return RSSI sample result.
  */
-NRF_STATIC_INLINE uint8_t nrf_radio_rssi_sample_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint8_t nrf_radio_rssi_sample_get(void);
 
 /**
  * @brief Function for getting the current state of the radio module.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Current radio state.
  */
-NRF_STATIC_INLINE nrf_radio_state_t nrf_radio_state_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE nrf_radio_state_t nrf_radio_state_get(void);
 
 /**
  * @brief Function for setting the data whitening initial value.
  *
- * @param[in] p_reg       Pointer to the structure of registers of the peripheral.
- * @param[in] datawhiteiv Data whitening initial value.
+ * @param datawhiteiv Data whitening initial value.
  */
-NRF_STATIC_INLINE void nrf_radio_datawhiteiv_set(NRF_RADIO_Type * p_reg, uint8_t datawhiteiv);
+__STATIC_INLINE void nrf_radio_datawhiteiv_set(uint8_t datawhiteiv);
 
 /**
  * @brief Function for getting the data whitening initial value.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Data whitening initial value.
  */
-NRF_STATIC_INLINE uint8_t nrf_radio_datawhiteiv_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint8_t nrf_radio_datawhiteiv_get(void);
 
 /**
  * @brief Function for setting Bit counter compare.
  *
- * @param[in] p_reg     Pointer to the structure of registers of the peripheral.
  * @param[in] radio_bcc Bit counter compare [bits].
  */
-NRF_STATIC_INLINE void nrf_radio_bcc_set(NRF_RADIO_Type * p_reg, uint32_t radio_bcc);
+__STATIC_INLINE void nrf_radio_bcc_set(uint32_t radio_bcc);
 
 /**
  * @brief Function for getting Bit counter compare.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Bit counter compare.
  */
-NRF_STATIC_INLINE uint32_t nrf_radio_bcc_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint32_t nrf_radio_bcc_get(void);
 
 /**
  * @brief Function for setting Device address base segment.
  *
- * @param[in] p_reg     Pointer to the structure of registers of the peripheral.
- * @param[in] dab_value Particular base segment value.
- * @param[in] segment   Index of the particular Device address base segment register.
+ * @param dab_value Particular base segment value.
+ * @param segment   Index of the particular Device address base segment register.
  */
-NRF_STATIC_INLINE void nrf_radio_dab_set(NRF_RADIO_Type * p_reg,
-                                         uint32_t         dab_value,
-                                         uint8_t          segment);
+__STATIC_INLINE void nrf_radio_dab_set(uint32_t dab_value, uint8_t segment);
 
 /**
  * @brief Function for getting Device address base segment.
  *
- * @param[in] p_reg   Pointer to the structure of registers of the peripheral.
- * @param[in] segment Number of the Device address base segment.
+ * @param segment Number of the Device address base segment.
  *
  * @return Particular segment of the Device address base.
  */
-NRF_STATIC_INLINE uint32_t nrf_radio_dab_get(NRF_RADIO_Type const * p_reg, uint8_t segment);
+__STATIC_INLINE uint32_t nrf_radio_dab_get(uint8_t segment);
 
 /**
  * @brief Function for setting device address prefix.
  *
- * @param[in] p_reg        Pointer to the structure of registers of the peripheral.
- * @param[in] dap_value    Particular device address prefix value.
- * @param[in] prefix_index Index of the particular device address prefix register.
+ * @param dap_value    Particular device address prefix value.
+ * @param prefix_index Index of the particular device address prefix register.
  */
-NRF_STATIC_INLINE void nrf_radio_dap_set(NRF_RADIO_Type * p_reg,
-                                         uint16_t         dap_value,
-                                         uint8_t          prefix_index);
+__STATIC_INLINE void nrf_radio_dap_set(uint16_t dap_value, uint8_t prefix_index);
 
 /**
  * @brief Function for getting Device address prefix.
  *
- * @param[in] p_reg        Pointer to the structure of registers of the peripheral.
- * @param[in] prefix_index Number of the Device address prefix segment.
+ * @param prefix_index Number of the Device address prefix segment.
  *
  * @return Particular segment of the Device address prefix.
  */
-NRF_STATIC_INLINE uint32_t nrf_radio_dap_get(NRF_RADIO_Type const * p_reg, uint8_t prefix_index);
+__STATIC_INLINE uint32_t nrf_radio_dap_get(uint8_t prefix_index);
 
 /**
  * @brief Function for setting device address match configuration.
  *
  * @note Read more about configuring device address match in the Product Specification.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- * @param[in] ena   Device address matching bitmask.
- * @param[in] txadd TxAdd bitmask.
+ * @param ena   Device address matching bitmask.
+ * @param txadd TxAdd bitmask.
  */
-NRF_STATIC_INLINE void nrf_radio_dacnf_set(NRF_RADIO_Type * p_reg, uint8_t ena, uint8_t txadd);
+__STATIC_INLINE void nrf_radio_dacnf_set(uint8_t ena, uint8_t txadd);
 
 /**
  * @brief Function for getting ENA field of the Device address match configuration register.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return ENA field of the Device address match configuration register.
  */
-NRF_STATIC_INLINE uint8_t nrf_radio_dacnf_ena_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint8_t nrf_radio_dacnf_ena_get(void);
 
 /**
  * @brief Function for getting TXADD field of the Device address match configuration register.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return TXADD field of the Device address match configuration register.
  */
-NRF_STATIC_INLINE uint8_t nrf_radio_dacnf_txadd_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint8_t nrf_radio_dacnf_txadd_get(void);
 
 #if defined(RADIO_INTENSET_MHRMATCH_Msk) || defined(__NRFX_DOXYGEN__)
 /**
  * @brief Function for setting MAC Header Match Unit search pattern configuration.
  *
- * @param[in] p_reg                     Pointer to the structure of registers of the peripheral.
  * @param[in] radio_mhmu_search_pattern Search Pattern Configuration.
  */
-NRF_STATIC_INLINE
-void nrf_radio_mhmu_search_pattern_set(NRF_RADIO_Type * p_reg,
-                                       uint32_t         radio_mhmu_search_pattern);
+__STATIC_INLINE void nrf_radio_mhmu_search_pattern_set(uint32_t radio_mhmu_search_pattern);
 
 /**
  * @brief Function for getting MAC Header Match Unit search pattern configuration.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Search Pattern Configuration.
  */
-NRF_STATIC_INLINE uint32_t nrf_radio_mhmu_search_pattern_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint32_t nrf_radio_mhmu_search_pattern_get(void);
 
 /**
  * @brief Function for setting MAC Header Match Unit pattern mask configuration.
  *
- * @param[in] p_reg                   Pointer to the structure of registers of the peripheral.
  * @param[in] radio_mhmu_pattern_mask Pattern mask.
  */
-NRF_STATIC_INLINE void nrf_radio_mhmu_pattern_mask_set(NRF_RADIO_Type * p_reg,
-                                                       uint32_t         radio_mhmu_pattern_mask);
+__STATIC_INLINE void nrf_radio_mhmu_pattern_mask_set(uint32_t radio_mhmu_pattern_mask);
 
 /**
  * @brief Function for getting MAC Header Match Unit pattern mask configuration.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Pattern mask.
  */
-NRF_STATIC_INLINE uint32_t nrf_radio_mhmu_pattern_mask_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint32_t nrf_radio_mhmu_pattern_mask_get(void);
 #endif // defined(RADIO_INTENSET_MHRMATCH_Msk) || defined(__NRFX_DOXYGEN__)
 
 #if defined(RADIO_MODECNF0_RU_Msk) || defined(__NRFX_DOXYGEN__)
 /**
  * @brief Function for setting Radio mode configuration register 0.
  *
- * @param[in] p_reg        Pointer to the structure of registers of the peripheral.
- * @param[in] fast_ramp_up Use fast radio ramp-up time
- * @param[in] default_tx   Default TX value during inactivity.
+ * @param fast_ramp_up Use fast radio ramp-up time
+ * @param default_tx   Default TX value during inactivity.
  */
-NRF_STATIC_INLINE void nrf_radio_modecnf0_set(NRF_RADIO_Type * p_reg,
-                                              bool             fast_ramp_up,
-                                              uint8_t          default_tx);
+__STATIC_INLINE void nrf_radio_modecnf0_set(bool fast_ramp_up, uint8_t default_tx);
 
 /**
  * @brief Function for getting ramp-up time configuration of the Radio mode configuration register 0.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @retval true  If the ramp-up time is set to fast.
  * @retval false If the ramp-up time is set to default.
  */
-NRF_STATIC_INLINE bool nrf_radio_modecnf0_ru_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE bool nrf_radio_modecnf0_ru_get(void);
 
 /**
  * @brief Function for getting default TX value of the Radio mode configuration register 0.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return Default TX value.
  */
-NRF_STATIC_INLINE uint8_t nrf_radio_modecnf0_dtx_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint8_t nrf_radio_modecnf0_dtx_get(void);
 #endif // defined(RADIO_MODECNF0_RU_Msk) || defined(__NRFX_DOXYGEN__)
 
 #if defined(RADIO_SFD_SFD_Msk) || defined(__NRFX_DOXYGEN__)
 /**
  * @brief Function for setting IEEE 802.15.4 start of frame delimiter.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- * @param[in] sfd   IEEE 802.15.4 start of frame delimiter.
+ * @param sfd IEEE 802.15.4 start of frame delimiter.
  */
-NRF_STATIC_INLINE void nrf_radio_sfd_set(NRF_RADIO_Type * p_reg, uint8_t sfd);
+__STATIC_INLINE void nrf_radio_sfd_set(uint8_t sfd);
 
 /**
  * @brief Function for getting IEEE 802.15.4 start of frame delimiter.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return IEEE 802.15.4 start of frame delimiter.
  */
-NRF_STATIC_INLINE uint8_t nrf_radio_sfd_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint8_t nrf_radio_sfd_get(void);
 #endif // defined(RADIO_SFD_SFD_Msk) || defined(__NRFX_DOXYGEN__)
 
 #if defined(RADIO_EDCNT_EDCNT_Msk) || defined(__NRFX_DOXYGEN__)
 /**
  * @brief Function for setting number of iterations to perform ED scan.
  *
- * @param[in] p_reg         Pointer to the structure of registers of the peripheral.
  * @param[in] ed_loop_count Number of iterations during ED procedure.
  */
-NRF_STATIC_INLINE void nrf_radio_ed_loop_count_set(NRF_RADIO_Type * p_reg, uint32_t ed_loop_count);
+__STATIC_INLINE void nrf_radio_ed_loop_count_set(uint32_t ed_loop_count);
 #endif // defined(RADIO_EDCNT_EDCNT_Msk) || defined(__NRFX_DOXYGEN__)
 
 #if defined(RADIO_EDSAMPLE_EDLVL_Msk) || defined(__NRFX_DOXYGEN__)
 /**
  * @brief Function for getting Energy Detection level.
  *
- * @param[in] p_reg Pointer to the structure of registers of the peripheral.
- *
  * @return IEEE 802.15.4 energy detect level.
  */
-NRF_STATIC_INLINE uint8_t nrf_radio_ed_sample_get(NRF_RADIO_Type const * p_reg);
+__STATIC_INLINE uint8_t nrf_radio_ed_sample_get(void);
 #endif // defined(RADIO_EDSAMPLE_EDLVL_Msk) || defined(__NRFX_DOXYGEN__)
 
 #if defined(RADIO_CCACTRL_CCAMODE_Msk) || defined(__NRFX_DOXYGEN__)
 /**
  * @brief Function for configuring the IEEE 802.15.4 clear channel assessment.
  *
- * @param[in] p_reg              Pointer to the structure of registers of the peripheral.
- * @param[in] cca_mode           Mode of CCA.
- * @param[in] cca_ed_threshold   Energy Detection threshold value.
- * @param[in] cca_corr_threshold Correlator Busy Threshold.
- * @param[in] cca_corr_cnt       Limit of occurances above Correlator Threshold.
- *                               When not equal to zero the correlator based
- *                               signal detect is enabled.
+ * @param cca_mode           Mode of CCA.
+ * @param cca_ed_threshold   Energy Detection threshold value.
+ * @param cca_corr_threshold Correlator Busy Threshold.
+ * @param cca_corr_cnt       Limit of occurances above Correlator Threshold.
+ *                           When not equal to zero the correlator based
+ *                           signal detect is enabled.
  */
-NRF_STATIC_INLINE void nrf_radio_cca_configure(NRF_RADIO_Type *     p_reg,
-                                               nrf_radio_cca_mode_t cca_mode,
-                                               uint8_t              cca_ed_threshold,
-                                               uint8_t              cca_corr_threshold,
-                                               uint8_t              cca_corr_cnt);
+__STATIC_INLINE void nrf_radio_cca_configure(nrf_radio_cca_mode_t cca_mode,
+                                             uint8_t              cca_ed_threshold,
+                                             uint8_t              cca_corr_threshold,
+                                             uint8_t              cca_corr_cnt);
 #endif // defined(RADIO_CCACTRL_CCAMODE_Msk) || defined(__NRFX_DOXYGEN__)
 
 /**
  * @brief Function for setting power mode of the radio peripheral.
  *
- * @param[in] p_reg       Pointer to the structure of registers of the peripheral.
  * @param[in] radio_power If radio should be powered on.
  */
-NRF_STATIC_INLINE void nrf_radio_power_set(NRF_RADIO_Type * p_reg, bool radio_power);
+__STATIC_INLINE void nrf_radio_power_set(bool radio_power);
 
 
-#ifndef NRF_DECLARE_ONLY
+#ifndef SUPPRESS_INLINE_IMPLEMENTATION
 
-NRF_STATIC_INLINE void nrf_radio_task_trigger(NRF_RADIO_Type * p_reg, nrf_radio_task_t task)
+__STATIC_INLINE void nrf_radio_task_trigger(nrf_radio_task_t task)
 {
-    *((volatile uint32_t *)((uint8_t *)p_reg + (uint32_t)task)) = 0x1UL;
+    *((volatile uint32_t *)((uint8_t *)NRF_RADIO + (uint32_t)task)) = 0x1UL;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_radio_task_address_get(NRF_RADIO_Type const * p_reg,
-                                                      nrf_radio_task_t       task)
+__STATIC_INLINE uint32_t nrf_radio_task_address_get(nrf_radio_task_t task)
 {
-    return ((uint32_t)p_reg + (uint32_t)task);
+    return ((uint32_t)NRF_RADIO + (uint32_t)task);
 }
 
-NRF_STATIC_INLINE void nrf_radio_event_clear(NRF_RADIO_Type * p_reg, nrf_radio_event_t event)
+__STATIC_INLINE void nrf_radio_event_clear(nrf_radio_event_t event)
 {
-    *((volatile uint32_t *)((uint8_t *)p_reg + (uint32_t)event)) = 0x0UL;
+    *((volatile uint32_t *)((uint8_t *)NRF_RADIO + (uint32_t)event)) = 0x0UL;
 #if __CORTEX_M == 0x04
-    volatile uint32_t dummy = *((volatile uint32_t *)((uint8_t *)p_reg + (uint32_t)event));
+    volatile uint32_t dummy = *((volatile uint32_t *)((uint8_t *)NRF_RADIO + (uint32_t)event));
     (void)dummy;
 #endif
 }
 
-NRF_STATIC_INLINE bool nrf_radio_event_check(NRF_RADIO_Type const * p_reg, nrf_radio_event_t event)
+__STATIC_INLINE bool nrf_radio_event_check(nrf_radio_event_t event)
 {
-    return (bool) *((volatile uint32_t *)((uint8_t *)p_reg + (uint32_t)event));
+    return (bool) *((volatile uint32_t *)((uint8_t *)NRF_RADIO + (uint32_t)event));
 }
 
-NRF_STATIC_INLINE uint32_t nrf_radio_event_address_get(NRF_RADIO_Type const * p_reg,
-                                                       nrf_radio_event_t      event)
+__STATIC_INLINE uint32_t nrf_radio_event_address_get(nrf_radio_event_t event)
 {
-    return ((uint32_t)p_reg + (uint32_t)event);
+    return ((uint32_t)NRF_RADIO + (uint32_t)event);
 }
 
-NRF_STATIC_INLINE void nrf_radio_shorts_enable(NRF_RADIO_Type * p_reg, uint32_t shorts_mask)
+__STATIC_INLINE void nrf_radio_shorts_enable(uint32_t shorts_mask)
 {
-    p_reg->SHORTS |= shorts_mask;
+    NRF_RADIO->SHORTS |= shorts_mask;
 }
 
-NRF_STATIC_INLINE void nrf_radio_shorts_disable(NRF_RADIO_Type * p_reg, uint32_t shorts_mask)
+__STATIC_INLINE void nrf_radio_shorts_disable(uint32_t shorts_mask)
 {
-    p_reg->SHORTS &= ~shorts_mask;
+    NRF_RADIO->SHORTS &= ~shorts_mask;
 }
 
-NRF_STATIC_INLINE void nrf_radio_shorts_set(NRF_RADIO_Type * p_reg, uint32_t shorts_mask)
+__STATIC_INLINE void nrf_radio_shorts_set(uint32_t shorts_mask)
 {
-    p_reg->SHORTS = shorts_mask;
+    NRF_RADIO->SHORTS = shorts_mask;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_radio_shorts_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint32_t nrf_radio_shorts_get(void)
 {
-    return p_reg->SHORTS;
+    return NRF_RADIO->SHORTS;
 }
 
-NRF_STATIC_INLINE void nrf_radio_int_enable(NRF_RADIO_Type * p_reg, uint32_t mask)
+__STATIC_INLINE void nrf_radio_int_enable(uint32_t int_mask)
 {
-    p_reg->INTENSET = mask;
+    NRF_RADIO->INTENSET = int_mask;
 }
 
-NRF_STATIC_INLINE void nrf_radio_int_disable(NRF_RADIO_Type * p_reg, uint32_t mask)
+__STATIC_INLINE void nrf_radio_int_disable(uint32_t int_mask)
 {
-    p_reg->INTENCLR = mask;
+    NRF_RADIO->INTENCLR = int_mask;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_radio_int_enable_check(NRF_RADIO_Type const * p_reg, uint32_t mask)
+__STATIC_INLINE bool nrf_radio_int_enable_check(nrf_radio_int_mask_t int_mask)
 {
-    return p_reg->INTENSET & mask;
+    return (bool)(NRF_RADIO->INTENSET & int_mask);
 }
 
-NRF_STATIC_INLINE bool nrf_radio_crc_status_check(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE bool nrf_radio_crc_status_check(void)
 {
-    return ((p_reg->CRCSTATUS & RADIO_CRCSTATUS_CRCSTATUS_Msk) >> RADIO_CRCSTATUS_CRCSTATUS_Pos)
+    return ((NRF_RADIO->CRCSTATUS & RADIO_CRCSTATUS_CRCSTATUS_Msk) >> RADIO_CRCSTATUS_CRCSTATUS_Pos)
              == RADIO_CRCSTATUS_CRCSTATUS_CRCOk ;
 }
 
-NRF_STATIC_INLINE uint8_t nrf_radio_rxmatch_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint8_t nrf_radio_rxmatch_get(void)
 {
-    return (uint8_t)p_reg->RXMATCH;
+    return (uint8_t)NRF_RADIO->RXMATCH;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_radio_rxcrc_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint32_t nrf_radio_rxcrc_get(void)
 {
-    return p_reg->RXCRC;
+    return NRF_RADIO->RXCRC;
 }
 
-NRF_STATIC_INLINE uint8_t nrf_radio_dai_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint8_t nrf_radio_dai_get(void)
 {
-    return (uint8_t)p_reg->DAI;
+    return (uint8_t)NRF_RADIO->DAI;
 }
 
 #if defined(RADIO_PDUSTAT_PDUSTAT_Msk)
-NRF_STATIC_INLINE uint8_t nrf_radio_pdustat_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint8_t nrf_radio_pdustat_get(void)
 {
-    return (uint8_t)(p_reg->PDUSTAT & RADIO_PDUSTAT_PDUSTAT_Msk);
+    return (uint8_t)(NRF_RADIO->PDUSTAT & RADIO_PDUSTAT_PDUSTAT_Msk);
 }
 
-NRF_STATIC_INLINE uint8_t nrf_radio_cistat_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint8_t nrf_radio_cistat_get(void)
 {
-    return (uint8_t)((p_reg->PDUSTAT & RADIO_PDUSTAT_CISTAT_Msk) >> RADIO_PDUSTAT_CISTAT_Pos);
+    return (uint8_t)((NRF_RADIO->PDUSTAT & RADIO_PDUSTAT_CISTAT_Msk) >> RADIO_PDUSTAT_CISTAT_Pos);
 }
 #endif // defined(RADIO_PDUSTAT_PDUSTAT_Msk)
 
-NRF_STATIC_INLINE void nrf_radio_packetptr_set(NRF_RADIO_Type * p_reg, void const * p_packet)
+__STATIC_INLINE void nrf_radio_packetptr_set(const void * p_packet)
 {
-    p_reg->PACKETPTR = (uint32_t)p_packet;
+    NRF_RADIO->PACKETPTR = (uint32_t)p_packet;
 }
 
-NRF_STATIC_INLINE void * nrf_radio_packetptr_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE void * nrf_radio_packetptr_get(void)
 {
-    return (void *)p_reg->PACKETPTR;
+    return (void *)NRF_RADIO->PACKETPTR;
 }
 
-NRF_STATIC_INLINE void nrf_radio_frequency_set(NRF_RADIO_Type * p_reg, uint16_t radio_frequency)
+__STATIC_INLINE void nrf_radio_frequency_set(uint16_t radio_frequency)
 {
     NRFX_ASSERT(radio_frequency <= 2500);
 
@@ -1165,19 +1048,19 @@ NRF_STATIC_INLINE void nrf_radio_frequency_set(NRF_RADIO_Type * p_reg, uint16_t 
                 (RADIO_FREQUENCY_MAP_Default << RADIO_FREQUENCY_MAP_Pos);
     }
 
-    p_reg->FREQUENCY = delta;
+    NRF_RADIO->FREQUENCY = delta;
 #else
     NRFX_ASSERT(radio_frequency >= 2400);
-    p_reg->FREQUENCY = (uint32_t)(radio_frequency - 2400);
+    NRF_RADIO->FREQUENCY = (uint32_t)(radio_frequency - 2400);
 #endif //defined(RADIO_FREQUENCY_MAP_Msk)
 }
 
-NRF_STATIC_INLINE uint16_t nrf_radio_frequency_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint16_t nrf_radio_frequency_get(void)
 {
     uint32_t freq;
 
 #if defined(RADIO_FREQUENCY_MAP_Msk)
-    if (((p_reg->FREQUENCY & RADIO_FREQUENCY_MAP_Msk) >> RADIO_FREQUENCY_MAP_Pos) ==
+    if (((NRF_RADIO->FREQUENCY & RADIO_FREQUENCY_MAP_Msk) >> RADIO_FREQUENCY_MAP_Pos) ==
         RADIO_FREQUENCY_MAP_Low)
     {
         freq = 2360;
@@ -1187,341 +1070,330 @@ NRF_STATIC_INLINE uint16_t nrf_radio_frequency_get(NRF_RADIO_Type const * p_reg)
     {
         freq = 2400;
     }
-    freq += p_reg->FREQUENCY & RADIO_FREQUENCY_FREQUENCY_Msk;
+    freq += NRF_RADIO->FREQUENCY & RADIO_FREQUENCY_FREQUENCY_Msk;
 
     return freq;
 }
 
-NRF_STATIC_INLINE void nrf_radio_txpower_set(NRF_RADIO_Type * p_reg, nrf_radio_txpower_t tx_power)
+__STATIC_INLINE void nrf_radio_txpower_set(nrf_radio_txpower_t tx_power)
 {
-    p_reg->TXPOWER = (((uint32_t)tx_power) << RADIO_TXPOWER_TXPOWER_Pos);
+    NRF_RADIO->TXPOWER = (((uint32_t)tx_power) << RADIO_TXPOWER_TXPOWER_Pos);
 }
 
-NRF_STATIC_INLINE nrf_radio_txpower_t nrf_radio_txpower_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE nrf_radio_txpower_t nrf_radio_txpower_get(void)
 {
-    return (nrf_radio_txpower_t)(p_reg->TXPOWER >> RADIO_TXPOWER_TXPOWER_Pos);
+    return (nrf_radio_txpower_t)(NRF_RADIO->TXPOWER >> RADIO_TXPOWER_TXPOWER_Pos);
 }
 
-NRF_STATIC_INLINE void nrf_radio_mode_set(NRF_RADIO_Type * p_reg, nrf_radio_mode_t radio_mode)
+__STATIC_INLINE void nrf_radio_mode_set(nrf_radio_mode_t radio_mode)
 {
-    p_reg->MODE = ((uint32_t) radio_mode << RADIO_MODE_MODE_Pos);
+    NRF_RADIO->MODE = ((uint32_t) radio_mode << RADIO_MODE_MODE_Pos);
 }
 
-NRF_STATIC_INLINE nrf_radio_mode_t nrf_radio_mode_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE nrf_radio_mode_t nrf_radio_mode_get(void)
 {
-    return (nrf_radio_mode_t)((p_reg->MODE & RADIO_MODE_MODE_Msk) >> RADIO_MODE_MODE_Pos);
+    return (nrf_radio_mode_t)((NRF_RADIO->MODE & RADIO_MODE_MODE_Msk) >> RADIO_MODE_MODE_Pos);
 }
 
-NRF_STATIC_INLINE void nrf_radio_packet_configure(NRF_RADIO_Type *                p_reg,
-                                                  nrf_radio_packet_conf_t const * p_config)
+__STATIC_INLINE void nrf_radio_packet_configure(const nrf_radio_packet_conf_t * p_config)
 {
-    p_reg->PCNF0 = (((uint32_t)p_config->lflen << RADIO_PCNF0_LFLEN_Pos) |
-                    ((uint32_t)p_config->s0len << RADIO_PCNF0_S0LEN_Pos) |
-                    ((uint32_t)p_config->s1len << RADIO_PCNF0_S1LEN_Pos) |
+    NRF_RADIO->PCNF0 = (((uint32_t)p_config->lflen << RADIO_PCNF0_LFLEN_Pos) |
+                        ((uint32_t)p_config->s0len << RADIO_PCNF0_S0LEN_Pos) |
+                        ((uint32_t)p_config->s1len << RADIO_PCNF0_S1LEN_Pos) |
 #if defined(RADIO_PCNF0_S1INCL_Msk)
-                    (p_config->s1incl ?
-                        (RADIO_PCNF0_S1INCL_Include   << RADIO_PCNF0_S1INCL_Pos) :
-                        (RADIO_PCNF0_S1INCL_Automatic << RADIO_PCNF0_S1INCL_Pos) ) |
+                        (p_config->s1incl ?
+                             (RADIO_PCNF0_S1INCL_Include   << RADIO_PCNF0_S1INCL_Pos) :
+                             (RADIO_PCNF0_S1INCL_Automatic << RADIO_PCNF0_S1INCL_Pos) ) |
 #endif
 #if defined(RADIO_PCNF0_CILEN_Msk)
-                    ((uint32_t)p_config->cilen << RADIO_PCNF0_CILEN_Pos) |
+                        ((uint32_t)p_config->cilen << RADIO_PCNF0_CILEN_Pos) |
 #endif
 #if defined(RADIO_PCNF0_PLEN_Msk)
-                    ((uint32_t)p_config->plen << RADIO_PCNF0_PLEN_Pos) |
+                        ((uint32_t)p_config->plen << RADIO_PCNF0_PLEN_Pos) |
 #endif
 #if defined(RADIO_PCNF0_CRCINC_Msk)
-                    (p_config->crcinc ?
-                        (RADIO_PCNF0_CRCINC_Include << RADIO_PCNF0_CRCINC_Pos) :
-                        (RADIO_PCNF0_CRCINC_Exclude << RADIO_PCNF0_CRCINC_Pos) ) |
+                        (p_config->crcinc ?
+                             (RADIO_PCNF0_CRCINC_Include << RADIO_PCNF0_CRCINC_Pos) :
+                             (RADIO_PCNF0_CRCINC_Exclude << RADIO_PCNF0_CRCINC_Pos) ) |
 #endif
 #if defined(RADIO_PCNF0_TERMLEN_Msk)
-                    ((uint32_t)p_config->termlen << RADIO_PCNF0_TERMLEN_Pos) |
+                        ((uint32_t)p_config->termlen << RADIO_PCNF0_TERMLEN_Pos) |
 #endif
-                    0);
+                        0);
 
-    p_reg->PCNF1 = (((uint32_t)p_config->maxlen  << RADIO_PCNF1_MAXLEN_Pos) |
-                    ((uint32_t)p_config->statlen << RADIO_PCNF1_STATLEN_Pos) |
-                    ((uint32_t)p_config->balen   << RADIO_PCNF1_BALEN_Pos) |
-                    (p_config->big_endian ?
-                         (RADIO_PCNF1_ENDIAN_Big    << RADIO_PCNF1_ENDIAN_Pos) :
-                         (RADIO_PCNF1_ENDIAN_Little << RADIO_PCNF1_ENDIAN_Pos) ) |
-                    (p_config->whiteen ?
-                         (RADIO_PCNF1_WHITEEN_Enabled  << RADIO_PCNF1_WHITEEN_Pos) :
-                         (RADIO_PCNF1_WHITEEN_Disabled << RADIO_PCNF1_WHITEEN_Pos) ));
+    NRF_RADIO->PCNF1 = (((uint32_t)p_config->maxlen  << RADIO_PCNF1_MAXLEN_Pos) |
+                        ((uint32_t)p_config->statlen << RADIO_PCNF1_STATLEN_Pos) |
+                        ((uint32_t)p_config->balen   << RADIO_PCNF1_BALEN_Pos) |
+                        (p_config->big_endian ?
+                             (RADIO_PCNF1_ENDIAN_Big    << RADIO_PCNF1_ENDIAN_Pos) :
+                             (RADIO_PCNF1_ENDIAN_Little << RADIO_PCNF1_ENDIAN_Pos) ) |
+                        (p_config->whiteen ?
+                             (RADIO_PCNF1_WHITEEN_Enabled  << RADIO_PCNF1_WHITEEN_Pos) :
+                             (RADIO_PCNF1_WHITEEN_Disabled << RADIO_PCNF1_WHITEEN_Pos) ));
 }
 
-NRF_STATIC_INLINE void nrf_radio_base0_set(NRF_RADIO_Type * p_reg, uint32_t address)
+__STATIC_INLINE void nrf_radio_base0_set(uint32_t address)
 {
-    p_reg->BASE0 = address;
+    NRF_RADIO->BASE0 = address;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_radio_base0_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint32_t nrf_radio_base0_get(void)
 {
-    return p_reg->BASE0;
+    return NRF_RADIO->BASE0;
 }
 
-NRF_STATIC_INLINE void nrf_radio_base1_set(NRF_RADIO_Type * p_reg, uint32_t address)
+__STATIC_INLINE void nrf_radio_base1_set(uint32_t address)
 {
-    p_reg->BASE1 = address;
+    NRF_RADIO->BASE1 = address;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_radio_base1_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint32_t nrf_radio_base1_get(void)
 {
-    return p_reg->BASE1;
+    return NRF_RADIO->BASE1;
 }
 
-NRF_STATIC_INLINE void nrf_radio_prefix0_set(NRF_RADIO_Type * p_reg, uint32_t prefixes)
+__STATIC_INLINE void nrf_radio_prefix0_set(uint32_t prefix0_value)
 {
-    p_reg->PREFIX0 = prefixes;
+    NRF_RADIO->PREFIX0 = prefix0_value;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_radio_prefix0_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint32_t nrf_radio_prefix0_get(void)
 {
-    return p_reg->PREFIX0;
+    return NRF_RADIO->PREFIX0;
 }
 
-NRF_STATIC_INLINE void nrf_radio_prefix1_set(NRF_RADIO_Type * p_reg, uint32_t prefixes)
+__STATIC_INLINE void nrf_radio_prefix1_set(uint32_t prefix1_value)
 {
-    p_reg->PREFIX1 = prefixes;
+    NRF_RADIO->PREFIX1 = prefix1_value;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_radio_prefix1_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint32_t nrf_radio_prefix1_get(void)
 {
-    return p_reg->PREFIX1;
+    return NRF_RADIO->PREFIX1;
 }
 
-NRF_STATIC_INLINE void nrf_radio_txaddress_set(NRF_RADIO_Type * p_reg, uint8_t txaddress)
+__STATIC_INLINE void nrf_radio_txaddress_set(uint8_t txaddress)
 {
-    p_reg->TXADDRESS = ((uint32_t)txaddress) << RADIO_TXADDRESS_TXADDRESS_Pos;
+    NRF_RADIO->TXADDRESS = ((uint32_t)txaddress) << RADIO_TXADDRESS_TXADDRESS_Pos;
 }
 
-NRF_STATIC_INLINE uint8_t nrf_radio_txaddress_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint8_t nrf_radio_txaddress_get(void)
 {
-    return (uint8_t)((p_reg->TXADDRESS & RADIO_TXADDRESS_TXADDRESS_Msk) >>
+    return (uint8_t)((NRF_RADIO->TXADDRESS & RADIO_TXADDRESS_TXADDRESS_Msk) >>
                      RADIO_TXADDRESS_TXADDRESS_Pos);
 }
 
-NRF_STATIC_INLINE void nrf_radio_rxaddresses_set(NRF_RADIO_Type * p_reg, uint8_t rxaddresses)
+__STATIC_INLINE void nrf_radio_rxaddresses_set(uint8_t rxaddresses)
 {
-    p_reg->RXADDRESSES = (uint32_t)(rxaddresses);
+    NRF_RADIO->RXADDRESSES = (uint32_t)(rxaddresses);
 }
 
-NRF_STATIC_INLINE uint8_t nrf_radio_rxaddresses_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint8_t nrf_radio_rxaddresses_get(void)
 {
-    return (uint8_t)(p_reg->RXADDRESSES);
+    return (uint8_t)(NRF_RADIO->RXADDRESSES);
 }
 
-NRF_STATIC_INLINE void nrf_radio_crc_configure(NRF_RADIO_Type *     p_reg,
-                                               uint8_t              crc_length,
-                                               nrf_radio_crc_addr_t crc_address,
-                                               uint32_t             crc_polynominal)
+__STATIC_INLINE void nrf_radio_crc_configure(uint8_t              crc_length,
+                                             nrf_radio_crc_addr_t crc_address,
+                                             uint32_t             crc_polynominal)
 {
-    p_reg->CRCCNF = ((uint32_t)crc_length  << RADIO_CRCCNF_LEN_Pos) |
-                    ((uint32_t)crc_address << RADIO_CRCCNF_SKIPADDR_Pos);
-    p_reg->CRCPOLY = (crc_polynominal << RADIO_CRCPOLY_CRCPOLY_Pos);
+    NRF_RADIO->CRCCNF = ((uint32_t)crc_length  << RADIO_CRCCNF_LEN_Pos) |
+                        ((uint32_t)crc_address << RADIO_CRCCNF_SKIPADDR_Pos);
+    NRF_RADIO->CRCPOLY = (crc_polynominal << RADIO_CRCPOLY_CRCPOLY_Pos);
 }
 
-NRF_STATIC_INLINE void nrf_radio_crcinit_set(NRF_RADIO_Type * p_reg, uint32_t crc_init_value)
+__STATIC_INLINE void nrf_radio_crcinit_set(uint32_t crc_init_value)
 {
-    p_reg->CRCINIT = crc_init_value;
+    NRF_RADIO->CRCINIT = crc_init_value;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_radio_crcinit_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint32_t nrf_radio_crcinit_get(void)
 {
-    return p_reg->CRCINIT;
+    return NRF_RADIO->CRCINIT;
 }
 
-NRF_STATIC_INLINE void nrf_radio_ifs_set(NRF_RADIO_Type * p_reg, uint32_t radio_ifs)
+__STATIC_INLINE void nrf_radio_ifs_set(uint32_t radio_ifs)
 {
-    p_reg->TIFS = radio_ifs;
+    NRF_RADIO->TIFS = radio_ifs;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_radio_ifs_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint32_t nrf_radio_ifs_get(void)
 {
-    return p_reg->TIFS;
+    return NRF_RADIO->TIFS;
 }
 
-NRF_STATIC_INLINE uint8_t nrf_radio_rssi_sample_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint8_t nrf_radio_rssi_sample_get(void)
 {
-    return (uint8_t)((p_reg->RSSISAMPLE & RADIO_RSSISAMPLE_RSSISAMPLE_Msk) >>
+    return (uint8_t)((NRF_RADIO->RSSISAMPLE & RADIO_RSSISAMPLE_RSSISAMPLE_Msk) >>
                      RADIO_RSSISAMPLE_RSSISAMPLE_Pos);
 }
 
-NRF_STATIC_INLINE nrf_radio_state_t nrf_radio_state_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE nrf_radio_state_t nrf_radio_state_get(void)
 {
-    return (nrf_radio_state_t) p_reg->STATE;
+    return (nrf_radio_state_t) NRF_RADIO->STATE;
 }
 
-NRF_STATIC_INLINE void nrf_radio_datawhiteiv_set(NRF_RADIO_Type * p_reg, uint8_t datawhiteiv)
+__STATIC_INLINE void nrf_radio_datawhiteiv_set(uint8_t datawhiteiv)
 {
-    p_reg->DATAWHITEIV = (((uint32_t)datawhiteiv) & RADIO_DATAWHITEIV_DATAWHITEIV_Msk);
+    NRF_RADIO->DATAWHITEIV = (((uint32_t)datawhiteiv) & RADIO_DATAWHITEIV_DATAWHITEIV_Msk);
 }
 
-NRF_STATIC_INLINE uint8_t nrf_radio_datawhiteiv_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint8_t nrf_radio_datawhiteiv_get(void)
 {
-    return (uint8_t)(p_reg->DATAWHITEIV & RADIO_DATAWHITEIV_DATAWHITEIV_Msk);
+    return (uint8_t)(NRF_RADIO->DATAWHITEIV & RADIO_DATAWHITEIV_DATAWHITEIV_Msk);
 }
 
-NRF_STATIC_INLINE void nrf_radio_bcc_set(NRF_RADIO_Type * p_reg, uint32_t radio_bcc)
+__STATIC_INLINE void nrf_radio_bcc_set(uint32_t radio_bcc)
 {
-    p_reg->BCC = radio_bcc;
+    NRF_RADIO->BCC = radio_bcc;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_radio_bcc_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint32_t nrf_radio_bcc_get(void)
 {
-    return p_reg->BCC;
+    return NRF_RADIO->BCC;
 }
 
-NRF_STATIC_INLINE void nrf_radio_dab_set(NRF_RADIO_Type * p_reg,
-                                         uint32_t         dab_value,
-                                         uint8_t          segment)
+__STATIC_INLINE void nrf_radio_dab_set(uint32_t dab_value, uint8_t segment)
 {
     NRFX_ASSERT(segment < 8);
-    p_reg->DAB[segment] = dab_value;
+    NRF_RADIO->DAB[segment] = dab_value;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_radio_dab_get(NRF_RADIO_Type const * p_reg, uint8_t segment)
+__STATIC_INLINE uint32_t nrf_radio_dab_get(uint8_t segment)
 {
     NRFX_ASSERT(segment < 8);
-    return p_reg->DAB[segment];
+    return NRF_RADIO->DAB[segment];
 }
 
-NRF_STATIC_INLINE void nrf_radio_dap_set(NRF_RADIO_Type * p_reg,
-                                         uint16_t         dap_value,
-                                         uint8_t          prefix_index)
+__STATIC_INLINE void nrf_radio_dap_set(uint16_t dap_value, uint8_t prefix_index)
 {
     NRFX_ASSERT(prefix_index < 8);
-    p_reg->DAP[prefix_index] = (uint32_t)dap_value;
+    NRF_RADIO->DAP[prefix_index] = (uint32_t)dap_value;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_radio_dap_get(NRF_RADIO_Type const * p_reg, uint8_t prefix_index)
+__STATIC_INLINE uint32_t nrf_radio_dap_get(uint8_t prefix_index)
 {
     NRFX_ASSERT(prefix_index < 8);
-    return p_reg->DAP[prefix_index];
+    return NRF_RADIO->DAP[prefix_index];
 }
 
-NRF_STATIC_INLINE void nrf_radio_dacnf_set(NRF_RADIO_Type * p_reg, uint8_t ena, uint8_t txadd)
+__STATIC_INLINE void nrf_radio_dacnf_set(uint8_t ena, uint8_t txadd)
 {
-    p_reg->DACNF = (((uint32_t)ena   << RADIO_DACNF_ENA0_Pos) |
-                    ((uint32_t)txadd << RADIO_DACNF_TXADD0_Pos));
+    NRF_RADIO->DACNF = (((uint32_t)ena   << RADIO_DACNF_ENA0_Pos) |
+                        ((uint32_t)txadd << RADIO_DACNF_TXADD0_Pos));
 }
 
-NRF_STATIC_INLINE uint8_t nrf_radio_dacnf_ena_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint8_t nrf_radio_dacnf_ena_get(void)
 {
-    return (p_reg->DACNF & (RADIO_DACNF_ENA0_Msk |
-                            RADIO_DACNF_ENA1_Msk |
-                            RADIO_DACNF_ENA2_Msk |
-                            RADIO_DACNF_ENA3_Msk |
-                            RADIO_DACNF_ENA4_Msk |
-                            RADIO_DACNF_ENA5_Msk |
-                            RADIO_DACNF_ENA6_Msk |
-                            RADIO_DACNF_ENA7_Msk)) >> RADIO_DACNF_ENA0_Pos;
+    return (NRF_RADIO->DACNF & (RADIO_DACNF_ENA0_Msk |
+                                RADIO_DACNF_ENA1_Msk |
+                                RADIO_DACNF_ENA2_Msk |
+                                RADIO_DACNF_ENA3_Msk |
+                                RADIO_DACNF_ENA4_Msk |
+                                RADIO_DACNF_ENA5_Msk |
+                                RADIO_DACNF_ENA6_Msk |
+                                RADIO_DACNF_ENA7_Msk)) >> RADIO_DACNF_ENA0_Pos;
 }
 
-NRF_STATIC_INLINE uint8_t nrf_radio_dacnf_txadd_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint8_t nrf_radio_dacnf_txadd_get(void)
 {
-    return (p_reg->DACNF & (RADIO_DACNF_TXADD0_Msk |
-                            RADIO_DACNF_TXADD1_Msk |
-                            RADIO_DACNF_TXADD2_Msk |
-                            RADIO_DACNF_TXADD3_Msk |
-                            RADIO_DACNF_TXADD4_Msk |
-                            RADIO_DACNF_TXADD5_Msk |
-                            RADIO_DACNF_TXADD6_Msk |
-                            RADIO_DACNF_TXADD7_Msk)) >> RADIO_DACNF_TXADD0_Pos;
+    return (NRF_RADIO->DACNF & (RADIO_DACNF_TXADD0_Msk |
+                                RADIO_DACNF_TXADD1_Msk |
+                                RADIO_DACNF_TXADD2_Msk |
+                                RADIO_DACNF_TXADD3_Msk |
+                                RADIO_DACNF_TXADD4_Msk |
+                                RADIO_DACNF_TXADD5_Msk |
+                                RADIO_DACNF_TXADD6_Msk |
+                                RADIO_DACNF_TXADD7_Msk)) >> RADIO_DACNF_TXADD0_Pos;
 }
 
 #if defined(RADIO_INTENSET_MHRMATCH_Msk)
-void nrf_radio_mhmu_search_pattern_set(NRF_RADIO_Type * p_reg,
-                                       uint32_t         radio_mhmu_search_pattern)
+__STATIC_INLINE void nrf_radio_mhmu_search_pattern_set(uint32_t radio_mhmu_search_pattern)
 {
-    p_reg->MHRMATCHCONF = radio_mhmu_search_pattern;
+    NRF_RADIO->MHRMATCHCONF = radio_mhmu_search_pattern;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_radio_mhmu_search_pattern_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint32_t nrf_radio_mhmu_search_pattern_get(void)
 {
-    return p_reg->MHRMATCHCONF;
+    return NRF_RADIO->MHRMATCHCONF;
 }
 
-NRF_STATIC_INLINE void nrf_radio_mhmu_pattern_mask_set(NRF_RADIO_Type * p_reg,
-                                                       uint32_t         radio_mhmu_pattern_mask)
+__STATIC_INLINE void nrf_radio_mhmu_pattern_mask_set(uint32_t radio_mhmu_pattern_mask)
 {
-    p_reg->MHRMATCHMAS = radio_mhmu_pattern_mask;
+    NRF_RADIO->MHRMATCHMAS = radio_mhmu_pattern_mask;
 }
 
-NRF_STATIC_INLINE uint32_t nrf_radio_mhmu_pattern_mask_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint32_t nrf_radio_mhmu_pattern_mask_get(void)
 {
-    return p_reg->MHRMATCHMAS;
+    return NRF_RADIO->MHRMATCHMAS;
 }
 #endif // defined(RADIO_INTENSET_MHRMATCH_Msk)
 
 #if defined(RADIO_MODECNF0_RU_Msk)
-NRF_STATIC_INLINE void nrf_radio_modecnf0_set(NRF_RADIO_Type * p_reg,
-                                              bool             fast_ramp_up,
-                                              uint8_t          default_tx)
+__STATIC_INLINE void nrf_radio_modecnf0_set(bool fast_ramp_up, uint8_t default_tx)
 {
-    p_reg->MODECNF0 = (fast_ramp_up ? (RADIO_MODECNF0_RU_Fast    << RADIO_MODECNF0_RU_Pos) :
-                                      (RADIO_MODECNF0_RU_Default << RADIO_MODECNF0_RU_Pos) ) |
-                      (((uint32_t)default_tx) << RADIO_MODECNF0_DTX_Pos);
+    NRF_RADIO->MODECNF0 = (fast_ramp_up ? (RADIO_MODECNF0_RU_Fast    << RADIO_MODECNF0_RU_Pos) :
+                                          (RADIO_MODECNF0_RU_Default << RADIO_MODECNF0_RU_Pos) ) |
+                          (((uint32_t)default_tx) << RADIO_MODECNF0_DTX_Pos);
 }
 
-NRF_STATIC_INLINE bool nrf_radio_modecnf0_ru_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE bool nrf_radio_modecnf0_ru_get(void)
 {
-    return ((p_reg->MODECNF0 & RADIO_MODECNF0_RU_Msk) >> RADIO_MODECNF0_RU_Pos) ==
+    return ((NRF_RADIO->MODECNF0 & RADIO_MODECNF0_RU_Msk) >> RADIO_MODECNF0_RU_Pos) ==
             RADIO_MODECNF0_RU_Fast;
 }
 
-NRF_STATIC_INLINE uint8_t nrf_radio_modecnf0_dtx_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint8_t nrf_radio_modecnf0_dtx_get(void)
 {
-    return (uint8_t)((p_reg->MODECNF0 & RADIO_MODECNF0_DTX_Msk) >> RADIO_MODECNF0_DTX_Pos);
+    return (uint8_t)((NRF_RADIO->MODECNF0 & RADIO_MODECNF0_DTX_Msk) >> RADIO_MODECNF0_DTX_Pos);
 }
 #endif // defined(RADIO_MODECNF0_RU_Msk)
 
 #if defined(RADIO_SFD_SFD_Msk)
-NRF_STATIC_INLINE void nrf_radio_sfd_set(NRF_RADIO_Type * p_reg, uint8_t sfd)
+__STATIC_INLINE void nrf_radio_sfd_set(uint8_t sfd)
 {
-    p_reg->SFD = ((uint32_t)sfd) << RADIO_SFD_SFD_Pos;
+    NRF_RADIO->SFD = ((uint32_t)sfd) << RADIO_SFD_SFD_Pos;
 }
 
-NRF_STATIC_INLINE uint8_t nrf_radio_sfd_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint8_t nrf_radio_sfd_get(void)
 {
-    return (uint8_t)((p_reg->SFD & RADIO_SFD_SFD_Msk) >> RADIO_SFD_SFD_Pos);
+    return (uint8_t)((NRF_RADIO->SFD & RADIO_SFD_SFD_Msk) >> RADIO_SFD_SFD_Pos);
 }
 #endif // defined(RADIO_SFD_SFD_Msk)
 
 #if defined(RADIO_EDCNT_EDCNT_Msk)
-NRF_STATIC_INLINE void nrf_radio_ed_loop_count_set(NRF_RADIO_Type * p_reg, uint32_t ed_loop_count)
+__STATIC_INLINE void nrf_radio_ed_loop_count_set(uint32_t ed_loop_count)
 {
-    p_reg->EDCNT = (ed_loop_count & RADIO_EDCNT_EDCNT_Msk);
+    NRF_RADIO->EDCNT = (ed_loop_count & RADIO_EDCNT_EDCNT_Msk);
 }
 #endif
 
 #if defined(RADIO_EDSAMPLE_EDLVL_Msk)
-NRF_STATIC_INLINE uint8_t nrf_radio_ed_sample_get(NRF_RADIO_Type const * p_reg)
+__STATIC_INLINE uint8_t nrf_radio_ed_sample_get(void)
 {
-    return (uint8_t) p_reg->EDSAMPLE;
+    return (uint8_t) NRF_RADIO->EDSAMPLE;
 }
 #endif
 
 #if defined(RADIO_CCACTRL_CCAMODE_Msk)
-NRF_STATIC_INLINE void nrf_radio_cca_configure(NRF_RADIO_Type *     p_reg,
-                                               nrf_radio_cca_mode_t cca_mode,
-                                               uint8_t              cca_ed_threshold,
-                                               uint8_t              cca_corr_threshold,
-                                               uint8_t              cca_corr_cnt)
+
+__STATIC_INLINE void nrf_radio_cca_configure(nrf_radio_cca_mode_t cca_mode,
+                                             uint8_t              cca_ed_threshold,
+                                             uint8_t              cca_corr_threshold,
+                                             uint8_t              cca_corr_cnt)
 {
-    p_reg->CCACTRL = (((uint32_t)cca_mode           << RADIO_CCACTRL_CCAMODE_Pos) |
-                      ((uint32_t)cca_ed_threshold   << RADIO_CCACTRL_CCAEDTHRES_Pos) |
-                      ((uint32_t)cca_corr_threshold << RADIO_CCACTRL_CCACORRTHRES_Pos) |
-                      ((uint32_t)cca_corr_cnt       << RADIO_CCACTRL_CCACORRCNT_Pos));
+    NRF_RADIO->CCACTRL = (((uint32_t)cca_mode           << RADIO_CCACTRL_CCAMODE_Pos) |
+                          ((uint32_t)cca_ed_threshold   << RADIO_CCACTRL_CCAEDTHRES_Pos) |
+                          ((uint32_t)cca_corr_threshold << RADIO_CCACTRL_CCACORRTHRES_Pos) |
+                          ((uint32_t)cca_corr_cnt       << RADIO_CCACTRL_CCACORRCNT_Pos));
 }
 #endif
 
-NRF_STATIC_INLINE void nrf_radio_power_set(NRF_RADIO_Type * p_reg, bool radio_power)
+__STATIC_INLINE void nrf_radio_power_set(bool radio_power)
 {
-    p_reg->POWER = (uint32_t) radio_power;
+    NRF_RADIO->POWER = (uint32_t) radio_power;
 }
-
-#endif // NRF_DECLARE_ONLY
+#endif
 
 /** @} */
 

@@ -1,32 +1,41 @@
-/*
- * Copyright (c) 2016 - 2020, Nordic Semiconductor ASA
+/**
+ * Copyright (c) 2016 - 2021, Nordic Semiconductor ASA
+ *
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice, this
  *    list of conditions and the following disclaimer.
  *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * 2. Redistributions in binary form, except as embedded into a Nordic
+ *    Semiconductor ASA integrated circuit in a product or a software update for
+ *    such product, must reproduce the above copyright notice, this list of
+ *    conditions and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
  *
- * 3. Neither the name of the copyright holder nor the names of its
+ * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
  *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * 4. This software, with or without modification, must only be used with a
+ *    Nordic Semiconductor ASA integrated circuit.
+ *
+ * 5. Any software provided in binary form under this license must not be reverse
+ *    engineered, decompiled, modified and/or disassembled.
+ *
+ * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
  * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
  */
 
 #include <nrfx.h>
@@ -34,6 +43,7 @@
 #if NRFX_CHECK(NRFX_QSPI_ENABLED)
 
 #include <nrfx_qspi.h>
+#include <hal/nrf_gpio.h>
 
 /** @brief Command byte used to read status register. */
 #define QSPI_STD_CMD_RDSR 0x05
@@ -46,6 +56,18 @@
 
 /** @brief Default number of tries in timeout function. */
 #define QSPI_DEF_WAIT_ATTEMPTS 100
+
+/**
+ * @brief Macro for initializing a QSPI pin.
+ *
+ * QSPI peripheral expects high drive pin strength.
+ */
+#define QSPI_PIN_INIT(_pin) nrf_gpio_cfg((_pin),                        \
+                                         NRF_GPIO_PIN_DIR_INPUT,        \
+                                         NRF_GPIO_PIN_INPUT_DISCONNECT, \
+                                         NRF_GPIO_PIN_NOPULL,           \
+                                         NRF_GPIO_PIN_H0H1,             \
+                                         NRF_GPIO_PIN_NOSENSE)
 
 /** @brief Control block - driver instance local data. */
 typedef struct
@@ -95,9 +117,41 @@ static bool qspi_pins_configure(nrf_qspi_pins_t const * p_config)
         return false;
     }
 
+    QSPI_PIN_INIT(p_config->sck_pin);
+    QSPI_PIN_INIT(p_config->csn_pin);
+    QSPI_PIN_INIT(p_config->io0_pin);
+    QSPI_PIN_INIT(p_config->io1_pin);
+    if (p_config->io2_pin != NRF_QSPI_PIN_NOT_CONNECTED)
+    {
+        QSPI_PIN_INIT(p_config->io2_pin);
+    }
+    if (p_config->io3_pin != NRF_QSPI_PIN_NOT_CONNECTED)
+    {
+        QSPI_PIN_INIT(p_config->io3_pin);
+    }
+
     nrf_qspi_pins_set(NRF_QSPI, p_config);
 
     return true;
+}
+
+static void qspi_pins_deconfigure(void)
+{
+    nrf_qspi_pins_t pins;
+    nrf_qspi_pins_get(NRF_QSPI, &pins);
+
+    nrf_gpio_cfg_default(pins.sck_pin);
+    nrf_gpio_cfg_default(pins.csn_pin);
+    nrf_gpio_cfg_default(pins.io0_pin);
+    nrf_gpio_cfg_default(pins.io1_pin);
+    if (pins.io2_pin != NRF_QSPI_PIN_NOT_CONNECTED)
+    {
+        nrf_gpio_cfg_default(pins.io2_pin);
+    }
+    if (pins.io3_pin != NRF_QSPI_PIN_NOT_CONNECTED)
+    {
+        nrf_gpio_cfg_default(pins.io3_pin);
+    }
 }
 
 static nrfx_err_t qspi_ready_wait(void)
@@ -330,15 +384,17 @@ void nrfx_qspi_uninit(void)
         nrf_qspi_cinstr_long_transfer_continue(NRF_QSPI, NRF_QSPI_CINSTR_LEN_1B, true);
     }
 
+    NRFX_IRQ_DISABLE(QSPI_IRQn);
+
     nrf_qspi_int_disable(NRF_QSPI, NRF_QSPI_INT_READY_MASK);
 
     nrf_qspi_task_trigger(NRF_QSPI, NRF_QSPI_TASK_DEACTIVATE);
 
     nrf_qspi_disable(NRF_QSPI);
 
-    NRFX_IRQ_DISABLE(QSPI_IRQn);
-
     nrf_qspi_event_clear(NRF_QSPI, NRF_QSPI_EVENT_READY);
+
+    qspi_pins_deconfigure();
 
     m_cb.state = NRFX_DRV_STATE_UNINITIALIZED;
 }
@@ -393,50 +449,6 @@ nrfx_err_t nrfx_qspi_chip_erase(void)
 {
     return nrfx_qspi_erase(NRF_QSPI_ERASE_LEN_ALL, 0);
 }
-
-#if NRF_QSPI_HAS_XIP_ENC
-nrfx_err_t nrfx_qspi_xip_encrypt(nrf_qspi_encryption_t const * p_config)
-{
-    if (m_cb.is_busy)
-    {
-        return NRFX_ERROR_BUSY;
-    }
-
-    if (p_config)
-    {
-        nrf_qspi_xip_encryption_configure(NRF_QSPI, p_config);
-        nrf_qspi_xip_encryption_set(NRF_QSPI, true);
-    }
-    else
-    {
-        nrf_qspi_xip_encryption_set(NRF_QSPI, false);
-    }
-
-    return NRFX_SUCCESS;
-}
-#endif
-
-#if NRF_QSPI_HAS_DMA_ENC
-nrfx_err_t nrfx_qspi_dma_encrypt(nrf_qspi_encryption_t const * p_config)
-{
-    if (m_cb.is_busy)
-    {
-        return NRFX_ERROR_BUSY;
-    }
-
-    if (p_config)
-    {
-        nrf_qspi_dma_encryption_configure(NRF_QSPI, p_config);
-        nrf_qspi_dma_encryption_set(NRF_QSPI, true);
-    }
-    else
-    {
-        nrf_qspi_dma_encryption_set(NRF_QSPI, false);
-    }
-
-    return NRFX_SUCCESS;
-}
-#endif
 
 void nrfx_qspi_irq_handler(void)
 {

@@ -425,18 +425,26 @@ add_custom_target(FLASH_SOFTDEVICE
         COMMAND ${OPENOCD_BIN_PATH} -c "tcl_port disabled" -c "gdb_port 3333" -c "telnet_port 4444" -f interface/stlink.cfg -c 'transport select hla_swd' -f target/nrf52.cfg -c "program \"${CMAKE_SOURCE_DIR}/src/libs/nRF52/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex\"" -c reset -c shutdown
         COMMENT "## Flashing SoftDevice s112_nrf52_6.1.1_softdevice.hex"
         )
-
+# 2.7.31 = 207031
+# 0.1.0  =001000
 add_custom_target(MAKE_BOOT
         DEPENDS ${EXECUTABLE_APP_NAME}
-        COMMAND ${NRFUTIL} settings generate --family NRF52 --application ${EXECUTABLE_APP_NAME}.hex --app-boot-validation VALIDATE_GENERATED_CRC --application-version 0x00 --bootloader-version 0x01 --bl-settings-version 2 --softdevice ${CMAKE_SOURCE_DIR}/src/libs/nRF52/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex dfu_settings.hex
+        COMMAND ${NRFUTIL} settings generate --family NRF52 --application ${EXECUTABLE_APP_NAME}.hex --app-boot-validation VALIDATE_GENERATED_CRC --application-version 0x001000 --bootloader-version 0x01 --bl-settings-version 2 --softdevice ${CMAKE_SOURCE_DIR}/src/libs/nRF52/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex dfu_settings.hex
         COMMAND hexmerge.py --overlap=replace ${CMAKE_SOURCE_DIR}/src/libs/nRF52/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex ${CMAKE_SOURCE_DIR}/bootloader/bootloader.hex ${EXECUTABLE_APP_NAME}.hex dfu_settings.hex -o ${EXECUTABLE_APP_NAME}.boot.hex
         COMMENT "## Build Bootloader and App for flashing"
         )
 
 add_custom_target(MAKE_PKG
         DEPENDS ${EXECUTABLE_APP_NAME}
-        COMMAND ${NRFUTIL} pkg generate --key-file /mnt/d/Work/PineTime/nordic_pem_keys/pinetime.pem --app-boot-validation VALIDATE_GENERATED_CRC --hw-version 52 --sd-req 0x0103 --application-version-string "0.1.0" --application ${EXECUTABLE_APP_NAME}.hex ${EXECUTABLE_APP_NAME}.dfu.zip
+        COMMAND ${NRFUTIL} pkg generate --key-file /mnt/d/Work/PineTime/nordic_pem_keys/pinetime.pem --app-boot-validation VALIDATE_GENERATED_CRC --hw-version 52 --sd-req 0xB8 --application-version 0x01 --application ${EXECUTABLE_APP_NAME}.hex ${EXECUTABLE_APP_NAME}.dfu.zip
         COMMENT "## Build .zip for DFU"
+        )
+
+add_custom_target(MAKE_BOOT_PKG
+        COMMAND ${NRFUTIL} settings generate --family NRF52 --application ${EXECUTABLE_APP_NAME}.hex --app-boot-validation VALIDATE_GENERATED_CRC --application-version 0x001000 --bootloader-version 0x01 --bl-settings-version 2 --softdevice ${CMAKE_SOURCE_DIR}/src/libs/nRF52/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex boot_settings.hex
+        COMMAND hexmerge.py --overlap=replace ${CMAKE_SOURCE_DIR}/bootloader/bootloader.hex boot_settings.hex -o ${EXECUTABLE_APP_NAME}.boot.hex
+        COMMAND ${NRFUTIL} pkg generate --key-file /mnt/d/Work/PineTime/nordic_pem_keys/pinetime.pem --hw-version 52 --sd-req 0xB8 --bootloader-version 0x01 --bootloader ${EXECUTABLE_APP_NAME}.boot.hex ${EXECUTABLE_APP_NAME}.bootloader.dfu.zip
+        COMMENT "## Build bootloader .zip for DFU"
         )
 
 add_custom_target(FLASH_ALL
@@ -447,7 +455,7 @@ add_custom_target(FLASH_ALL
 
 add_custom_target(FLASH_APP
         DEPENDS ${EXECUTABLE_APP_NAME}
-        COMMAND ${NRFUTIL} settings generate --family NRF52 --application ${EXECUTABLE_APP_NAME}.hex --app-boot-validation VALIDATE_GENERATED_CRC --application-version 0x00 --bootloader-version 0x01 --bl-settings-version 2 --softdevice ${CMAKE_SOURCE_DIR}/src/libs/nRF52/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex dfu_settings.hex
+        COMMAND ${NRFUTIL} settings generate --family NRF52 --application ${EXECUTABLE_APP_NAME}.hex --app-boot-validation VALIDATE_GENERATED_CRC --application-version 0x001000 --bootloader-version 0x01 --bl-settings-version 2 --softdevice ${CMAKE_SOURCE_DIR}/src/libs/nRF52/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex dfu_settings.hex
         COMMAND hexmerge.py --overlap=replace ${EXECUTABLE_APP_NAME}.hex dfu_settings.hex -o ${EXECUTABLE_APP_NAME}.app.hex
         COMMAND ${OPENOCD_BIN_PATH} -c "tcl_port disabled" -c "gdb_port 3333" -c "telnet_port 4444" -f interface/stlink.cfg -c 'transport select hla_swd' -f target/nrf52.cfg -c "program \"${EXECUTABLE_APP_NAME}.app.hex\"" -c reset -c shutdown        
         COMMENT "## Flashing ${EXECUTABLE_APP_NAME}.hex"
