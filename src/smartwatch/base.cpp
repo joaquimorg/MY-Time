@@ -124,6 +124,19 @@ void ble_send_steps(void) {
     send_data_ble(data, i);
 }
 
+void ble_send_hr(void) {
+
+    uint8_t data[3] = {};
+
+    uint8_t i = 0;
+    data[i++] = 0x00;
+    data[i++] = COMMAND_PT_HEARTRATE;
+
+    data[i++] = smartwatch->heartRate.getLastHR();
+    
+    send_data_ble(data, i);
+}
+
 // callback invoked when central connects
 void connect_callback(uint16_t conn_handle) {
 
@@ -480,6 +493,7 @@ void send_ble_data() {
 
     ble_send_battery();
     ble_send_steps();
+    ble_send_hr();
 }
 
 void loop(void) {

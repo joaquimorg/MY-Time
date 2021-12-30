@@ -22,7 +22,7 @@ class Steps : public Application
             lv_label_set_text_fmt(lv_steps, "%li", smartwatch->stepCount.getStepCounterOutput());
             lv_obj_set_style_text_color(lv_steps, lv_color_hex(0xffffff), 0);
             lv_obj_set_style_text_align(lv_steps, LV_TEXT_ALIGN_CENTER, 0);
-            lv_obj_align(lv_steps, LV_ALIGN_CENTER, 0, -25);
+            lv_obj_align(lv_steps, LV_ALIGN_CENTER, 0, -30);
             lv_obj_set_style_text_font(lv_steps, &lv_font_clock_76, 0);
 
             smartwatch->stepCount.getAcceleration(&ax, &ay, &az);

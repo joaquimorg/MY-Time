@@ -8,6 +8,8 @@ class HeartRate : public Application
     public:
         HeartRate( Smartwatch * smartwatch ) : Application(smartwatch->get_main_screen()), smartwatch{smartwatch} {
 
+            smartwatch->heartRate.beginHR();
+            
             lv_obj_set_style_bg_opa(this->screen, LV_OPA_COVER, 0);
             lv_obj_set_style_bg_color(this->screen, lv_color_hex(0x000055), 0);
             lv_obj_set_style_radius(this->screen, 15, 0);
@@ -16,20 +18,65 @@ class HeartRate : public Application
             lv_label_set_text(lv_info, "\xEE\xA4\x81 Heart Rate");
             lv_obj_set_style_text_color(lv_info, lv_color_hex(0xffffff), 0);
             lv_obj_set_style_text_align(lv_info, LV_TEXT_ALIGN_CENTER, 0);
-            lv_obj_align(lv_info, LV_ALIGN_CENTER, 0, 0);
+            lv_obj_align(lv_info, LV_ALIGN_CENTER, 0, 20);
 
-            set_update_interval(5000);
-            update();
+            lv_status = lv_label_create( this->screen );
+            lv_label_set_text(lv_status, "");
+            lv_obj_set_style_text_color(lv_status, lv_color_hex(0xffff00), 0);
+            lv_obj_set_style_text_align(lv_status, LV_TEXT_ALIGN_CENTER, 0);
+            lv_obj_align(lv_status, LV_ALIGN_BOTTOM_MID, 0, -10);
+
+            lv_hr = lv_label_create( this->screen );
+            byte hr = smartwatch->heartRate.getLastHR();
+            if ( hr == 0 )
+                lv_label_set_text_static(lv_hr, "--");
+            else
+                lv_label_set_text_fmt(lv_hr, "%i", smartwatch->heartRate.getLastHR());
+            lv_obj_set_style_text_color(lv_hr, lv_color_hex(0x4f4f4f), 0);
+            lv_obj_set_style_text_align(lv_hr, LV_TEXT_ALIGN_CENTER, 0);
+            lv_obj_align(lv_hr, LV_ALIGN_CENTER, 0, -40);
+            lv_obj_set_style_text_font(lv_hr, &lv_font_clock_76, 0);
             
+            set_update_interval(500);
+            update();
+            smartwatch->dont_sleep(true);
         };
 
         void update(void) {
-           
+            smartwatch->heartRate.getHRms();
+
+            byte hr = smartwatch->heartRate.getHR();
+
+            switch (hr) {
+                case 0:
+                case 255:
+                    //lv_label_set_text_fmt(lv_status, "Reading...");
+                    break;
+                case 254:
+                    lv_label_set_text_fmt(lv_status, "No Touch");
+                    break;
+                case 253:
+                    lv_label_set_text_fmt(lv_status, "Please Wait");
+                    break;
+                default:
+                    lv_label_set_text(lv_status, "");
+                    lv_label_set_text_fmt(lv_hr, "%i", hr);
+                    lv_obj_set_style_text_color(lv_hr, lv_color_hex(0xffffff), 0);
+                    smartwatch->heartRate.endHR();
+                    break;
+            }            
+        };
+
+        ~HeartRate() {
+            smartwatch->heartRate.endHR();
+            smartwatch->dont_sleep(false);
         };
 
         bool gestures(Touch::Gestures gesture) {
             switch (gesture) {
                 case Touch::Gestures::SlideRight:
+                    smartwatch->heartRate.endHR();
+                    smartwatch->dont_sleep(false);
                     smartwatch->load_application(Applications::Clock, Smartwatch::RefreshDirections::Right);
                     return true;
                 default:
@@ -41,6 +88,8 @@ class HeartRate : public Application
     protected:
         Smartwatch * smartwatch;
         lv_obj_t * lv_info;
+        lv_obj_t * lv_hr;
+        lv_obj_t * lv_status;
 
 };
 

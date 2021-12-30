@@ -2,10 +2,15 @@
 #include "nrf52.h"
 #include "pinetime_board.h"
 
-#define LOOP_STACK_SZ       (256*2)
+#define LOOP_STACK_SZ       (256*1)
 #define CALLBACK_STACK_SZ   (256*1)
 
 static TaskHandle_t  _loopHandle;
+
+void HardFault_Handler(void) {
+    // reset on hardfault
+    NVIC_SystemReset();
+}
 
 static void loop_task(void* arg) {
 
@@ -34,36 +39,43 @@ void configure_ram_retention(void) {
     NRF_POWER->RAM[4].POWER = NRF52_ONRAM1_OFFRAM0;
     NRF_POWER->RAM[5].POWER = NRF52_ONRAM1_OFFRAM0;
     NRF_POWER->RAM[6].POWER = NRF52_ONRAM1_OFFRAM0;*/
-    NRF_POWER->RAM[7].POWER = NRF52_ONRAM1_OFFRAM0;
+    
+    //NRF_POWER->RAM[7].POWER = NRF52_ONRAM1_OFFRAM0;
 }
 
 void clean_i2c(void) {
 
-    NRF_UARTE0->ENABLE = 0; //disable UART
-    NRF_TWIS0 ->ENABLE = 0; //disable TWI Slave
-    NRF_TWIS1 ->ENABLE = 0; //disable TWI Slave
-    NRF_NFCT->TASKS_DISABLE = 1; //disable NFC, confirm this is the right way
+    //NRF_UARTE0->ENABLE = 0; //disable UART
+    //NRF_TWIS0 ->ENABLE = 0; //disable TWI Slave
+    //NRF_TWIS1 ->ENABLE = 0; //disable TWI Slave
+    //NRF_NFCT->TASKS_DISABLE = 1; //disable NFC, confirm this is the right way
     
     //*(volatile uint32_t *)0x40000EE4 = (*(volatile uint32_t *)0x10000258 & 0x0000004F);
 
-    //NRF_TWIM0->ENABLE = 0;
+    NRF_TWIM0->ENABLE = 0;
     /**(volatile uint32_t *)0x40003FFC = 0;
     *(volatile uint32_t *)0x40003FFC;
     *(volatile uint32_t *)0x40003FFC = 1;*/
 
-    //NRF_TWIM1->ENABLE = 0;
+    NRF_TWIM1->ENABLE = 0;
     /**(volatile uint32_t *)0x40004FFC = 0;
     *(volatile uint32_t *)0x40004FFC;
     *(volatile uint32_t *)0x40004FFC = 1;*/
 
-    pinMode(TWI_SCL, OUTPUT);
-    digitalWrite(TWI_SCL, HIGH);
-    for(uint8_t i = 0; i < 16; i++) {
-        digitalToggle(TWI_SCL);
-        delay_ns(5);
+   pinMode(TWI_SCL, INPUT);
+   pinMode(TWI_SDA, INPUT);
+   if(digitalRead(TWI_SCL) == HIGH && digitalRead(TWI_SDA) == LOW) {
+        //Serial.println("reset i2c bus");
+        pinMode(TWI_SCL, OUTPUT);  // connect parallel to SCL
+        digitalWrite(TWI_SCL, LOW);
+        delay(200); 
+        pinMode(TWI_SCL, INPUT);
+        delay(50);
+        NVIC_SystemReset();
     }
 
 }
+
 
 int main(void) {
 

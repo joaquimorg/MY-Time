@@ -15,16 +15,15 @@ void Touch::init(void) {
     pinMode(TP_RST, OUTPUT);
 
     digitalWrite(TP_RST, HIGH);
-    delay_ns(50);
+    delay_ns(5);
     digitalWrite(TP_RST, LOW);
     delay_ns(5);
     digitalWrite(TP_RST, HIGH);
-    delay_ns(50);
-
-    uint8_t dummy;
-    user_i2c_read(TP_TWI_ADDR, 0x15, &dummy, 1);
     delay_ns(5);
-    user_i2c_read(TP_TWI_ADDR, 0xA7, &dummy, 1);
+
+    user_i2c_read(TP_TWI_ADDR, 0x15, &version15, 1);
+    delay_ns(5);
+    user_i2c_read(TP_TWI_ADDR, 0xA7, versionInfo, 3);
     delay_ns(5);
 
     /*
@@ -42,9 +41,12 @@ void Touch::init(void) {
     [4] When EnMotion detects a gesture, it sends out a low pulse.
     [0] OnceWLP Long press gesture only sends out a low pulse signal.
     */
-    const uint8_t irqCtl = 0b01110000;
+    const uint8_t irqCtl = 0b00110001;
     user_i2c_write(TP_TWI_ADDR, 0xFA, &irqCtl, 1);
     delay_ns(15);
+
+    //user_i2c_read(TP_TWI_ADDR, 0xEC, &version15, 1);
+    //delay_ns(5);
 }
 
 
@@ -66,7 +68,7 @@ void Touch::read(void) {
 
 void Touch::get(void) {
 
-    user_i2c_read(TP_TWI_ADDR, 0x01, data_raw, 10);
+    user_i2c_read(TP_TWI_ADDR, 0x01, data_raw, 6);
 
     if (data_raw[0] == 0xe0) {
         gesture = Touch::Gestures::None;

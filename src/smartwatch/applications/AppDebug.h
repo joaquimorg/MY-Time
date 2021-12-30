@@ -16,19 +16,18 @@ class AppDebug : public Application
             lv_obj_set_style_text_align(lv_info, LV_TEXT_ALIGN_CENTER, 0);
             lv_obj_align(lv_info, LV_ALIGN_CENTER, 0, 0);
 
-            set_update_interval(5000);
+            set_update_interval(1000);
             update();
         };
 
         void update(void) {
-            lv_label_set_text_fmt(lv_info, "%1i.%02i volts %d%%\n%s\nver: %s\nHfree: %i\nSfree: %i\n%li", 
+            lv_label_set_text_fmt(lv_info, "%1i.%02i volts %d%%\n%s\nver: %s\ntouch: 0x%02x\n%li", 
                 smartwatch->battery.get_voltage() / 1000,
                 smartwatch->battery.get_voltage() % 1000 / 10,
                 smartwatch->battery.get_percent_remaining(),
                 smartwatch->get_reset_reason(),
                 getBootloaderVersion(),
-                dbgHeapFree(),
-                (dbgStackTotal() - dbgStackUsed()),
+                smartwatch->touch.getVersion(),
                 NoInit_BackUpTime
                 );
         };

@@ -16,7 +16,7 @@
 #include "HeartRate.h"
 
 
-#define SW_STACK_SZ       (256*8)
+#define SW_STACK_SZ       (256*6)
 #define LVGL_STACK_SZ     (256*2)
 
 /**
@@ -47,13 +47,15 @@ void Smartwatch::init(void) {
 
     // Initialize the modules
     rtc_time.init();    
-    
+
+    touch.init();        
+    heartRate.init();
     display.init();
-    touch.init();
     lvglmodule.init();
     backlight.init();
     backlight.set_level(2);
     vibration.init();
+    
     stepCount.initialize();
 
     set_charging(false);
@@ -81,7 +83,7 @@ void Smartwatch::init(void) {
     // Create a task for lvgl
     xTaskCreate(Smartwatch::lvgl_task, "lvgl", LVGL_STACK_SZ, this, TASK_PRIO_NORMAL, &_lvglHandle);
         
-    hardwareTimer.start();
+    hardwareTimer.start();    
 
 }
 
@@ -93,7 +95,7 @@ void Smartwatch::update_application(void) {
 
 void Smartwatch::task(void *instance) {
     auto *sw = static_cast<Smartwatch *>(instance);
-    xTaskNotifyGive(xTaskGetCurrentTaskHandle());    
+    xTaskNotifyGive(xTaskGetCurrentTaskHandle());
     while (1) {
         sw->run();
     }
@@ -173,6 +175,8 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
     set_refresh_direction(dir);
     appUpdateTimer.stop();
     currentApplication.reset(nullptr);
+    dont_sleep(false);
+    heartRate.endHR();
     switch (app) {
         case Applications::Clock:
             currentApplication = std::make_unique<Clock>(this);
@@ -213,8 +217,7 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
     }
     appUpdateTimer.setPeriod(pdMS_TO_TICKS(currentApplication->get_update_interval()));
     appUpdateTimer.start();
-    stopLvgl = false;
-    dont_sleep(false);
+    stopLvgl = false;    
 }
 
 void Smartwatch::run(void) {
@@ -240,6 +243,7 @@ void Smartwatch::run(void) {
                 break;
 
             case Messages::OnChargingEvent:
+                if(doNotGoToSleep) return;
                 if (currentApp == Applications::ShowMessage) break;
                 if (is_charging()) {
                     set_notification("\xEE\xA4\xA1 Power", "Charging...", Smartwatch::MessageType::Info);

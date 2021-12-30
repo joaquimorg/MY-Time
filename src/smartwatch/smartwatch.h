@@ -12,6 +12,7 @@
 #include "battery.h"
 #include "vibration.h"
 #include "step_count.h"
+#include "hr.h"
 #include "lvglmodule.h"
 #include "notification.h"
 
@@ -39,6 +40,7 @@ class Smartwatch
         Display display;
         Touch touch;
         StepCount stepCount;
+        HR heartRate;
         LvglModule lvglmodule{display, touch};
 
         Notification notification;

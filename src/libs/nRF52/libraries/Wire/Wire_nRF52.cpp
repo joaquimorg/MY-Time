@@ -420,7 +420,7 @@ extern "C"
   }
 }
 #endif
-
+/*
 #if WIRE_INTERFACES_COUNT > 1
 TwoWire Wire1(NRF_TWIM1, NRF_TWIS1, SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQn, TWI_SDA, TWI_SCL);
 
@@ -440,5 +440,5 @@ extern "C"
   }
 }
 #endif
-
+*/
 #endif // NRF52_SERIES

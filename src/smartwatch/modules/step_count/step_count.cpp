@@ -108,6 +108,7 @@ void StepCount::initialize() {
     //bma421_step_counter_set_watermark(1, &bma);
 
     bma4_set_advance_power_save(BMA4_ENABLE, &bma);
+    initialized = true;
 }
 
 

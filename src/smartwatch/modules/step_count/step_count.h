@@ -42,10 +42,14 @@ class StepCount {
 
     uint32_t getStepCounterOutput(void);
 
+    bool isInitialized(void) { return initialized; }
+
   private:
 
     struct bma4_dev bma;
     struct bma4_accel_config accel_conf;
+
+    bool initialized = false;
 
 };
 
