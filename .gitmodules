@@ -1,3 +1,6 @@
 [submodule "src/libs/lvgl"]
 	path = src/libs/lvgl
 	url = https://github.com/joaquimorg/lvgl.git
+[submodule "src/libs/hrs3300"]
+	path = src/libs/hrs3300
+	url = https://github.com/joaquimorg/HRS3300-Arduino-Library.git
