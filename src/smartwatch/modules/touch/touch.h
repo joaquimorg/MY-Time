@@ -31,6 +31,7 @@ class Touch
     uint16_t getLastX(void) { return last_xpos; }
     uint16_t getLastY(void) { return last_ypos; }
     Gestures getGesture(void) { return gesture; }
+    Gestures readGesture(void);
     uint8_t getEvent(void) { return event; }
     uint8_t getVersion(void) { return version15; }
 

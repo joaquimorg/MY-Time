@@ -24,6 +24,9 @@ class LvglModule
             this->touch_ypos = y;
         };
 
+        Touch::Gestures get_touch_gesture(void) { return this->touch_gesture; };
+        void set_touch_gesture(Touch::Gestures gesture) { this->touch_gesture = gesture; };
+
         refreshDirections get_direction(void) { return this->scrollDirection; };
 
     protected:

@@ -299,9 +299,9 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  *E.g. #define LV_FONT_CUSTOM_DECLARE   LV_FONT_DECLARE(my_font_1) LV_FONT_DECLARE(my_font_2)*/
 #define LV_FONT_CUSTOM_DECLARE \
 LV_FONT_DECLARE(lv_font_24) \
+LV_FONT_DECLARE(lv_font_38) \
 LV_FONT_DECLARE(lv_font_sys_48) \
 LV_FONT_DECLARE(lv_font_clock_42) \
-LV_FONT_DECLARE(lv_font_clock_76) \
 LV_FONT_DECLARE(lv_font_clock_90) \
 
 

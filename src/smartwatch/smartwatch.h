@@ -11,8 +11,8 @@
 #include "touch.h"
 #include "battery.h"
 #include "vibration.h"
-#include "step_count.h"
-#include "hr.h"
+//#include "step_count.h"
+//#include "hr.h"
 #include "lvglmodule.h"
 #include "notification.h"
 
@@ -23,6 +23,7 @@ enum class Applications
     Passkey,
     ShowMessage,
     QMenu,
+    Backlight,
     Clock,
     Notifications,
     Steps,
@@ -39,8 +40,8 @@ class Smartwatch
         Backlight backlight;
         Display display;
         Touch touch;
-        StepCount stepCount;
-        HR heartRate;
+        //StepCount stepCount;
+        //HR heartRate;
         LvglModule lvglmodule{display, touch};
 
         Notification notification;
@@ -134,6 +135,7 @@ class Smartwatch
 
         bool doNotGoToSleep = false;
         bool stopLvgl = false;
+        bool runLvgl = true;
         bool isCharging = false;
         bool isBluetoothConnected = false;
         bool dontDisturbMode = false;

@@ -13,7 +13,7 @@ set(OPENOCD_BIN_PATH "openocd.exe")
 
 set(NRFUTIL "/usr/share/nrfutil/nrfutil")
 
-# Setup toolchain
+# Setup .toolchain
 include(${CMAKE_SOURCE_DIR}/cmake-nRF5x/arm-gcc-toolchain.cmake)
 
 if (NOT DEFINED ARM_GCC_TOOLCHAIN)
@@ -50,7 +50,7 @@ set(NRFX_SOURCE_FILES
     libs/nRF52/libraries/InternalFileSytem/src/InternalFileSystem.cpp
     libs/nRF52/libraries/SPI/SPI.cpp
     libs/nRF52/libraries/SPI/SPI_nrf52832.cpp
-    libs/nRF52/libraries/Wire/Wire_nRF52.cpp
+    #libs/nRF52/libraries/Wire/Wire_nRF52.cpp
     libs/nRF52/cores/nRF5/freertos/portable/CMSIS/nrf52/port_cmsis.c
     libs/nRF52/cores/nRF5/freertos/portable/CMSIS/nrf52/port_cmsis_systick.c
     libs/nRF52/cores/nRF5/freertos/portable/GCC/nrf52/port.c
@@ -253,7 +253,7 @@ include_directories(
     libs/nRF52/libraries/InternalFileSytem/src
     libs/nRF52/libraries/InternalFileSytem/src/flash
     libs/nRF52/libraries/SPI
-    libs/nRF52/libraries/Wire
+    #libs/nRF52/libraries/Wire
     libs/nRF52/cmsis/include
 
     libs/lvgl/src
@@ -304,8 +304,8 @@ include_directories(
     smartwatch/modules/touch
     smartwatch/modules/vibration
     smartwatch/modules/watchdog
-    smartwatch/modules/step_count
-    smartwatch/modules/hr
+    #smartwatch/modules/step_count
+    #smartwatch/modules/hr
     smartwatch/services/
     smartwatch/services/notification
     smartwatch/services/weather
@@ -327,16 +327,17 @@ list(APPEND SOURCE_FILES
     smartwatch/modules/battery/battery.cpp
     smartwatch/modules/vibration/vibration.cpp
     smartwatch/modules/rtc_time/rtc_time.cpp
-    smartwatch/modules/step_count/bma4.c
-    smartwatch/modules/step_count/bma421.c
-    smartwatch/modules/step_count/step_count.cpp
+    #smartwatch/modules/step_count/bma4.c
+    #smartwatch/modules/step_count/bma421.c
+    #smartwatch/modules/step_count/step_count.cpp
 
-    smartwatch/modules/hr/hr.cpp
+    #smartwatch/modules/hr/hr.cpp
 
     smartwatch/modules/lvgl/theme/lv_font_24.c
+    smartwatch/modules/lvgl/theme/lv_font_38.c
     smartwatch/modules/lvgl/theme/lv_font_sys_48.c
     smartwatch/modules/lvgl/theme/lv_font_clock_42.c
-    smartwatch/modules/lvgl/theme/lv_font_clock_76.c
+    #smartwatch/modules/lvgl/theme/lv_font_clock_76.c
     smartwatch/modules/lvgl/theme/lv_font_clock_90.c
     smartwatch/modules/lvgl/theme/lv_theme_pinetime.c
     smartwatch/modules/lvgl/lvglmodule.cpp
@@ -437,14 +438,14 @@ add_custom_target(FLASH_SOFTDEVICE
 
 add_custom_target(MAKE_BOOT
         DEPENDS ${EXECUTABLE_APP_NAME}
-        COMMAND ${NRFUTIL} settings generate --family NRF52 --application ${EXECUTABLE_APP_NAME}.hex --app-boot-validation VALIDATE_GENERATED_CRC --application-version 0x001000 --bootloader-version 0x01 --bl-settings-version 2 --softdevice ${CMAKE_SOURCE_DIR}/src/libs/nRF52/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex dfu_settings.hex
+        COMMAND ${NRFUTIL} settings generate --family NRF52 --application ${EXECUTABLE_APP_NAME}.hex --app-boot-validation VALIDATE_GENERATED_CRC --application-version 0x02 --bootloader-version 0x02 --bl-settings-version 2 --softdevice ${CMAKE_SOURCE_DIR}/src/libs/nRF52/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex dfu_settings.hex
         COMMAND hexmerge.py --overlap=replace ${CMAKE_SOURCE_DIR}/src/libs/nRF52/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex ${CMAKE_SOURCE_DIR}/bootloader/bootloader.hex ${EXECUTABLE_APP_NAME}.hex dfu_settings.hex -o ${EXECUTABLE_APP_NAME}.boot.hex
         COMMENT "## Build Bootloader and App for flashing"
         )
 
 add_custom_target(MAKE_PKG
         DEPENDS ${EXECUTABLE_APP_NAME}
-        COMMAND ${NRFUTIL} pkg generate --key-file /mnt/d/Work/PineTime/nordic_pem_keys/pinetime.pem --app-boot-validation VALIDATE_GENERATED_CRC --hw-version 52 --sd-req 0xB8 --application-version 0x01 --application ${EXECUTABLE_APP_NAME}.hex ${EXECUTABLE_APP_NAME}.dfu.zip
+        COMMAND ${NRFUTIL} pkg generate --key-file /mnt/d/Work/PineTime/nordic_pem_keys/pinetime.pem --app-boot-validation VALIDATE_GENERATED_CRC --hw-version 52 --sd-req 0xB8 --application-version 0x02 --application ${EXECUTABLE_APP_NAME}.hex ${EXECUTABLE_APP_NAME}.dfu.zip
         COMMENT "## Build .zip for DFU"
         )
 
@@ -455,9 +456,9 @@ add_custom_target(MAKE_PKG_OLD
         )
 
 add_custom_target(MAKE_BOOT_PKG
-        COMMAND ${NRFUTIL} settings generate --family NRF52 --application ${EXECUTABLE_APP_NAME}.hex --app-boot-validation VALIDATE_GENERATED_CRC --application-version 0x001000 --bootloader-version 0x01 --bl-settings-version 2 --softdevice ${CMAKE_SOURCE_DIR}/src/libs/nRF52/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex boot_settings.hex
+        COMMAND ${NRFUTIL} settings generate --family NRF52 --application ${EXECUTABLE_APP_NAME}.hex --app-boot-validation VALIDATE_GENERATED_CRC --application-version 0x02 --bootloader-version 0x03 --bl-settings-version 2 --softdevice ${CMAKE_SOURCE_DIR}/src/libs/nRF52/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex boot_settings.hex
         COMMAND hexmerge.py --overlap=replace ${CMAKE_SOURCE_DIR}/bootloader/bootloader.hex boot_settings.hex -o ${EXECUTABLE_APP_NAME}.boot.hex
-        COMMAND ${NRFUTIL} pkg generate --key-file /mnt/d/Work/PineTime/nordic_pem_keys/pinetime.pem --hw-version 52 --sd-req 0xB8 --bootloader-version 0x01 --bootloader ${EXECUTABLE_APP_NAME}.boot.hex ${EXECUTABLE_APP_NAME}.bootloader.dfu.zip
+        COMMAND ${NRFUTIL} pkg generate --key-file /mnt/d/Work/PineTime/nordic_pem_keys/pinetime.pem --hw-version 52 --sd-req 0xB8 --bootloader-version 0x03 --bootloader ${EXECUTABLE_APP_NAME}.boot.hex ${EXECUTABLE_APP_NAME}.bootloader.dfu.zip
         COMMENT "## Build bootloader .zip for DFU"
         )
 

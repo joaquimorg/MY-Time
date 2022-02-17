@@ -24,21 +24,23 @@ void stop_timer_callback(TimerHandle_t xTimer) {
 void button_callback(void) {
     if (digitalRead(KEY_ACTION) == HIGH) {
         if (xTimerIsTimerActive(buttonTimer) == pdFALSE) {
+            smartwatch->push_message(Smartwatch::Messages::OnButtonEvent);
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
             xTimerStartFromISR(buttonTimer, & xHigherPriorityTaskWoken);
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-            smartwatch->push_message(Smartwatch::Messages::OnButtonEvent);
         }
     }
 }
 
 void tp_callback(void) {
     if (digitalRead(TP_IRQ) == LOW) {
+        smartwatch->touch.get();
+        smartwatch->lvglmodule.set_touch_data(smartwatch->touch.getGesture(), smartwatch->touch.getEvent(), smartwatch->touch.getX(), smartwatch->touch.getY());
         if (xTimerIsTimerActive(tpTimer) == pdFALSE) {
+            smartwatch->push_message(Smartwatch::Messages::OnTouchEvent);
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
             xTimerStartFromISR(tpTimer, & xHigherPriorityTaskWoken);
             portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-            smartwatch->push_message(Smartwatch::Messages::OnTouchEvent);
         }
     }
 }
@@ -119,7 +121,7 @@ void ble_send_steps(void) {
     data[i++] = 0x00;
     data[i++] = COMMAND_PT_STEPS;
 
-    i += packInt(& data[i], smartwatch->stepCount.getStepCounterOutput());
+    i += packInt(& data[i], 0);//smartwatch->stepCount.getStepCounterOutput());
     
     send_data_ble(data, i);
 }
@@ -132,7 +134,7 @@ void ble_send_hr(void) {
     data[i++] = 0x00;
     data[i++] = COMMAND_PT_HEARTRATE;
 
-    data[i++] = smartwatch->heartRate.getLastHR();
+    data[i++] = 0;//smartwatch->heartRate.getLastHR();
     
     send_data_ble(data, i);
 }

@@ -46,20 +46,23 @@ class Notifications : public Application
             lv_obj_align(lv_count, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
 
             lv_obj_t * lv_subject = lv_label_create(this->screen);
+            lv_obj_set_style_text_font(lv_subject, &lv_font_38, 0);
             lv_label_set_text_static(lv_subject, smartwatch->notification.get_notification_subject(notification_count));
-            lv_obj_set_style_text_align(lv_subject, LV_TEXT_ALIGN_CENTER, 0);
+            //lv_obj_set_style_text_align(lv_subject, LV_TEXT_ALIGN_CENTER, 0);
             lv_label_set_long_mode(lv_subject, LV_LABEL_LONG_SCROLL_CIRCULAR);
             lv_obj_set_style_text_color(lv_subject, lv_color_hex(0x909090), 0);
             lv_obj_set_width(lv_subject, 235);
-            lv_obj_align(lv_subject, LV_ALIGN_TOP_MID, 0, 40);
+            lv_obj_align(lv_subject, LV_ALIGN_TOP_MID, 0, 50);
 
             lv_obj_t * lv_message = lv_label_create(this->screen);
+            lv_obj_set_style_text_font(lv_message, &lv_font_38, 0);
             lv_label_set_text_static(lv_message, smartwatch->notification.get_notification_message(notification_count));
-            lv_obj_set_style_text_align(lv_message, LV_TEXT_ALIGN_CENTER, 0);
-            lv_label_set_long_mode(lv_message, LV_LABEL_LONG_WRAP);
+            //lv_obj_set_style_text_align(lv_message, LV_TEXT_ALIGN_CENTER, 0);
+            //lv_label_set_long_mode(lv_message, LV_LABEL_LONG_WRAP);
+            lv_label_set_long_mode(lv_message, LV_LABEL_LONG_SCROLL_CIRCULAR);
             lv_obj_set_style_text_color(lv_message, lv_color_hex(0xf0f000), 0);
-            lv_obj_set_width(lv_message, 239);
-            lv_obj_align(lv_message, LV_ALIGN_CENTER, 0, 10);
+            lv_obj_set_width(lv_message, 235);
+            lv_obj_align(lv_message, LV_ALIGN_CENTER, 0, 20);
 
             lv_obj_t * lv_time = lv_label_create(this->screen);
             uint8_t time_past = smartwatch->rtc_time.diff_minutes(smartwatch->notification.get_notification_timestamp(notification_count));
@@ -74,10 +77,13 @@ class Notifications : public Application
             lv_obj_align(lv_time, LV_ALIGN_BOTTOM_LEFT, 10, -10);
         }
 
+        void update(void) {
+        }
+
         static void close_app(lv_timer_t * timer) {
-            auto user_data = static_cast<Notifications *>(timer->user_data);
+            /*auto user_data = static_cast<Notifications *>(timer->user_data);
             user_data->close_application();
-            lv_timer_del(timer);
+            lv_timer_del(timer);*/
         }
 
         void close_application(void) {
@@ -114,7 +120,7 @@ class Notifications : public Application
 
     protected:
         Smartwatch * smartwatch;
-        lv_timer_t * closeApp;
+        //lv_timer_t * closeApp;
 
 };
 

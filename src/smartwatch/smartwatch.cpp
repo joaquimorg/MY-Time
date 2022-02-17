@@ -11,19 +11,20 @@
 #include "Passkey.h"
 #include "ShowMessage.h"
 #include "QMenu.h"
+#include "AppBacklight.h"
 #include "Notifications.h"
-#include "Steps.h"
-#include "HeartRate.h"
+//#include "Steps.h"
+//#include "HeartRate.h"
 
 
-#define SW_STACK_SZ       (256*6)
+#define SW_STACK_SZ       (256*4)
 #define LVGL_STACK_SZ     (256*2)
 
 /**
  * Constructor
  */
 Smartwatch::Smartwatch(void) {
-    displayTimeout = 15000;
+    displayTimeout = 20000;
 }
 
 void Smartwatch::idle_callback(TimerHandle_t xTimer) {
@@ -49,14 +50,14 @@ void Smartwatch::init(void) {
     rtc_time.init();    
 
     touch.init();        
-    heartRate.init();
+    //heartRate.init();
     display.init();
     lvglmodule.init();
     backlight.init();
     backlight.set_level(2);
     vibration.init();
     
-    stepCount.initialize();
+    //stepCount.initialize();
 
     set_charging(false);
 
@@ -104,7 +105,11 @@ void Smartwatch::task(void *instance) {
 void Smartwatch::lvgl_task(void *instance) {
     auto *sw = static_cast<Smartwatch *>(instance);    
     while (1) {
-        sw->run_lvgl();
+        if ( sw->runLvgl ) {
+            sw->run_lvgl();
+        } else {
+            vTaskDelay(pdMS_TO_TICKS(500));
+        }
     }
 }
 
@@ -112,12 +117,12 @@ void Smartwatch::run_lvgl(void) {
 
     if ( !stopLvgl ) {
         lv_timer_handler();
-        lv_tick_inc(15);
+        lv_tick_inc(10);
         vTaskDelay(1);
     } else {
-        vTaskDelay(pdMS_TO_TICKS(100));
+        //vTaskDelay(pdMS_TO_TICKS(500));
+        vTaskDelay(1);
     }
-
 }
 
 void Smartwatch::hardware_update(void) {
@@ -176,7 +181,7 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
     appUpdateTimer.stop();
     currentApplication.reset(nullptr);
     dont_sleep(false);
-    heartRate.endHR();
+    //heartRate.endHR();
     switch (app) {
         case Applications::Clock:
             currentApplication = std::make_unique<Clock>(this);
@@ -186,14 +191,14 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
             currentApplication = std::make_unique<Notifications>(this);
             return_app(Applications::Clock, Touch::Gestures::SlideDown, RefreshDirections::Down);
             break;
-        case Applications::Steps:
+        /*case Applications::Steps:
             currentApplication = std::make_unique<Steps>(this);
             return_app(Applications::Clock, Touch::Gestures::SlideLeft, RefreshDirections::Left);
             break;
         case Applications::HeartRate:
             currentApplication = std::make_unique<HeartRate>(this);
             return_app(Applications::Clock, Touch::Gestures::SlideRight, RefreshDirections::Right);
-            break;
+            break;*/
         case Applications::Passkey:
             dont_sleep(true);
             currentApplication = std::make_unique<Passkey>(this);
@@ -206,6 +211,10 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
         case Applications::QMenu:
             currentApplication = std::make_unique<QMenu>(this);
             return_app(Applications::Clock, Touch::Gestures::SlideUp, RefreshDirections::Up);
+            break;
+        case Applications::Backlight:
+            currentApplication = std::make_unique<AppBacklight>(this);
+            return_app(Applications::QMenu, Touch::Gestures::SlideUp, RefreshDirections::Up);
             break;
         case Applications::Debug:
             currentApplication = std::make_unique<AppDebug>(this);
@@ -270,16 +279,22 @@ void Smartwatch::run(void) {
                 push_message(Messages::BleData);
                 set_bluetooth_connected(false);
 
-                set_notification("\xEE\xA4\x83 Bluetooth", "\nBluetooth disconnected !", Smartwatch::MessageType::Info);
+                set_notification("\n\xEE\xA4\x83 Bluetooth", "\n\nBluetooth disconnected !", Smartwatch::MessageType::Info);
                 push_message(Messages::WakeUp);
                 load_application(Applications::ShowMessage, RefreshDirections::Up);
                 break;
 
             case Messages::OnTouchEvent:
                
-                touch.get();
+                //touch.get();
+                //gesture = touch.readGesture();
                 gesture = touch.getGesture();
-                
+                //lvglmodule.set_touch_data(gesture, touch.getEvent(), touch.getX(), touch.getY());
+                //touch.cleanGesture();        
+                //gesture = lvglmodule.get_touch_gesture();  
+                //lvglmodule.set_touch_gesture(Touch::Gestures::None);      
+                //if ( gesture == Touch::Gestures::None ) break;
+
                 if (state == States::Idle) {
                     if ( gesture == Touch::Gestures::DoubleTap ) {
                         push_message(Messages::WakeUp);
@@ -295,10 +310,9 @@ void Smartwatch::run(void) {
                         push_message(Messages::GoToSleep);
                         break;
                     }
-                }
-                
+                }                
+
                 if ( gesture == Touch::Gestures::None ) break;
-                lvglmodule.set_touch_data(gesture, touch.getEvent(), touch.getX(), touch.getY());
                 
                 if ( !currentApplication->gestures(gesture) ) {
                     /*if ( gesture == returnGesture ) {
@@ -307,7 +321,6 @@ void Smartwatch::run(void) {
                         //lvglmodule.set_touch_data(gesture, touch.getEvent(), touch.getX(), touch.getY());
                     }*/
                 }
-                touch.cleanGesture();
                 break;
 
             case Messages::BleData:
@@ -422,7 +435,7 @@ void Smartwatch::sleep() {
     while (backlight.get_level() > 0) {
         vTaskDelay(500);
     }
-    stopLvgl = true;
+    runLvgl = false;
     display.sleep();
 
     //touch.sleep(true);
@@ -443,7 +456,7 @@ void Smartwatch::wakeup() {
     //touch.sleep(false);
     idleTimer.start();
     hardwareTimer.setPeriod(pdMS_TO_TICKS(5000));
-    stopLvgl = false;
+    runLvgl = true;
     //appUpdateTimer.start();
     backlight.set_level(backlight.get_saved_level());
 }

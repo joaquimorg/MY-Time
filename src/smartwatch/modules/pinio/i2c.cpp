@@ -2,9 +2,10 @@
 #include "pinetime_board.h"
 #include "i2c.h"
 
-#include "Wire.h"
+//#include "Wire.h"
 
-/*
+static constexpr uint32_t HwFreezedDelay {161000};
+
 volatile bool i2cReading = false;
 
 void set_i2c_reading(bool state) {
@@ -24,6 +25,16 @@ RingBuffer rxBuffer;
 RingBuffer txBuffer;
 uint8_t txAddress;
 
+/* Sometimes, the TWIM device just freeze and never set the event EVENTS_LASTTX.
+ * This method disable and re-enable the peripheral so that it works again.
+ * This is just a workaround, and it would be better if we could find a way to prevent
+ * this issue from happening.
+ * */
+void FixHwFreezed() {
+  uint32_t twi_state = NRF_TWIM0->ENABLE;
+  NRF_TWIM0->ENABLE = (TWIM_ENABLE_ENABLE_Disabled << TWIM_ENABLE_ENABLE_Pos);
+  NRF_TWIM0->ENABLE = twi_state;
+}
 
 
 void wire_begin(void) {
@@ -113,7 +124,17 @@ uint8_t wire_end_transmission(bool stopBit) {
     NRF_TWIM0->EVENTS_TXSTARTED = 0x0UL;
 
     if (txBuffer.available()) {
-        while (!NRF_TWIM0->EVENTS_LASTTX && !NRF_TWIM0->EVENTS_ERROR);
+
+        uint32_t txStartedCycleCount = DWT->CYCCNT;
+        uint32_t currentCycleCount;
+
+        while (!NRF_TWIM0->EVENTS_LASTTX && !NRF_TWIM0->EVENTS_ERROR) {
+            currentCycleCount = DWT->CYCCNT;
+            if ((currentCycleCount - txStartedCycleCount) > HwFreezedDelay) {
+                FixHwFreezed();
+                return 4;
+            }
+        }
     }
     NRF_TWIM0->EVENTS_LASTTX = 0x0UL;
 
@@ -243,10 +264,10 @@ uint8_t user_i2c_write(uint8_t addr, uint8_t reg_addr, const uint8_t* reg_data, 
 
     return 0;
 }
-*/
 
 
 
+/*
 
 
 void init_i2c() {
@@ -279,3 +300,5 @@ uint8_t user_i2c_write(uint8_t addr, uint8_t reg_addr, const uint8_t* reg_data, 
     Wire.endTransmission(true);
     return 0;
 }
+
+*/

@@ -41,7 +41,7 @@ void Touch::init(void) {
     [4] When EnMotion detects a gesture, it sends out a low pulse.
     [0] OnceWLP Long press gesture only sends out a low pulse signal.
     */
-    const uint8_t irqCtl = 0b00110001;
+    const uint8_t irqCtl = 0b01110000;
     user_i2c_write(TP_TWI_ADDR, 0xFA, &irqCtl, 1);
     delay_ns(15);
 
@@ -62,30 +62,32 @@ void Touch::sleep(bool state) {
 }
 
 void Touch::read(void) {
-    user_i2c_read(TP_TWI_ADDR, 0x01, data_raw, 6);
+    user_i2c_read(TP_TWI_ADDR, 0x02, data_raw, 6);
 }
 
 
 void Touch::get(void) {
 
-    user_i2c_read(TP_TWI_ADDR, 0x01, data_raw, 6);
+    byte raw[7];
 
-    if (data_raw[0] == 0xe0) {
-        gesture = Touch::Gestures::None;
-        return;
-    }
+    user_i2c_read(TP_TWI_ADDR, 0x01, raw, 6);
 
-    gesture = static_cast<Gestures>(data_raw[0]);
-    touchpoints = data_raw[1];
-    event = data_raw[2] >> 6;
-    xpos = data_raw[3];
-    ypos = data_raw[5];
-    /*if (xpos == 255 && ypos == 255) {
-        xpos = last_xpos;
-        ypos = last_ypos;
-    }
-    else {
-        last_xpos = xpos;
-        last_ypos = ypos;
-    }*/
+    gesture = static_cast<Gestures>(raw[0]);
+
+    touchpoints = raw[1];
+
+    event = raw[2] >> 6;
+    xpos = raw[3];
+    ypos = raw[5];
+
+}
+
+
+Touch::Gestures Touch::readGesture(void) {
+    
+    byte raw[1];
+
+    user_i2c_read(TP_TWI_ADDR, 0x01, raw, 1);
+    gesture = static_cast<Gestures>(raw[0]);
+    return gesture;
 }

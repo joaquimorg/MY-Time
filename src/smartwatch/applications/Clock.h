@@ -21,29 +21,29 @@ class Clock : public Application
             lv_label_set_text_fmt(lv_timeh, "%02i", smartwatch->rtc_time.hours());
             lv_obj_set_style_text_align(lv_timeh, LV_TEXT_ALIGN_CENTER, 0);
             lv_obj_set_style_text_color(lv_timeh, lv_color_hex(0xffffff), 0);
-            lv_obj_align(lv_timeh, LV_ALIGN_CENTER, -55, -40);
+            lv_obj_align(lv_timeh, LV_ALIGN_CENTER, -55, -55);
 
             lv_timem = lv_label_create(this->screen);    
             lv_obj_set_style_text_font(lv_timem, &lv_font_clock_90, 0);
             lv_label_set_text_fmt(lv_timem, "%02i", smartwatch->rtc_time.minutes());
             lv_obj_set_style_text_align(lv_timem, LV_TEXT_ALIGN_CENTER, 0);
             lv_obj_set_style_text_color(lv_timem, lv_color_hex(0x00ff00), 0);
-            lv_obj_align(lv_timem, LV_ALIGN_CENTER, 55, -40);
+            lv_obj_align(lv_timem, LV_ALIGN_CENTER, 55, -55);
 
             lv_times = lv_label_create(this->screen);    
             lv_obj_set_style_text_font(lv_times, &lv_font_clock_90, 0);
             lv_label_set_text_static(lv_times, ":");
             lv_obj_set_style_text_align(lv_times, LV_TEXT_ALIGN_CENTER, 0);
             lv_obj_set_style_text_color(lv_times, lv_color_hex(0xffff00), 0);
-            lv_obj_align(lv_times, LV_ALIGN_CENTER, 0, -40);
+            lv_obj_align(lv_times, LV_ALIGN_CENTER, 0, -55);
 
             lv_date = lv_label_create(this->screen);    
-            //lv_obj_set_style_text_font(lv_date, &lv_font_clock_42, 0);
+            lv_obj_set_style_text_font(lv_date, &lv_font_38, 0);
             lv_label_set_recolor(lv_date, true);
-            lv_label_set_text_fmt(lv_date, "#00ff00 %s# %02i %s", smartwatch->rtc_time.get_days(), smartwatch->rtc_time.day(), smartwatch->rtc_time.get_months());
+            lv_label_set_text_fmt(lv_date, "#ffff00 %s#\n%02i %s", smartwatch->rtc_time.get_days(), smartwatch->rtc_time.day(), smartwatch->rtc_time.get_months());
             lv_obj_set_style_text_align(lv_date, LV_TEXT_ALIGN_CENTER, 0);
             lv_obj_set_style_text_color(lv_date, lv_color_make(0xff, 0xff, 0xff), 0);
-            lv_obj_align(lv_date, LV_ALIGN_CENTER, 0, 20);
+            lv_obj_align(lv_date, LV_ALIGN_CENTER, 0, 40);
             
 
             lv_not_info = lv_label_create(this->screen);
@@ -51,9 +51,9 @@ class Clock : public Application
         
             lv_label_set_recolor(lv_not_info, true);
             lv_obj_set_style_text_color(lv_not_info, lv_color_hex(0xffff00), 0);
-            lv_obj_align(lv_not_info, LV_ALIGN_BOTTOM_LEFT, 10, -10);
+            lv_obj_align(lv_not_info, LV_ALIGN_BOTTOM_LEFT, 5, -5);
 
-            lv_info = lv_label_create( this->screen );
+            /*lv_info = lv_label_create( this->screen );
             lv_label_set_recolor(lv_info, true);
             if (smartwatch->weather.hasData) {
                 lv_label_set_text_fmt(lv_info, "%s - %s, #ffffff %i°C# - Today #ff9090 %i°C# / #9090ff %i°C#", 
@@ -70,7 +70,7 @@ class Clock : public Application
             lv_obj_set_style_text_color(lv_info, lv_color_hex(0x00ffff), 0);
             lv_obj_set_width(lv_info, 230);
             lv_label_set_long_mode(lv_info, LV_LABEL_LONG_SCROLL_CIRCULAR);
-            lv_obj_align(lv_info, LV_ALIGN_BOTTOM_LEFT, 5, -45);
+            lv_obj_align(lv_info, LV_ALIGN_BOTTOM_LEFT, 5, -45);*/
 
             save_old_time();
             update();
@@ -93,7 +93,7 @@ class Clock : public Application
             }
 
             if (smartwatch->rtc_time.day() != to_day) {
-                lv_label_set_text_fmt(lv_date, "#00ff00 %s# %02i %s", smartwatch->rtc_time.get_days(), smartwatch->rtc_time.day(), smartwatch->rtc_time.get_months());
+                lv_label_set_text_fmt(lv_date, "#ffff00 %s#\n%02i %s", smartwatch->rtc_time.get_days(), smartwatch->rtc_time.day(), smartwatch->rtc_time.get_months());
             }
 
             if (smartwatch->notification.get_notification_count() > 0) {
@@ -103,7 +103,7 @@ class Clock : public Application
             }
 
             
-            if (smartwatch->weather.newData) {
+            /*if (smartwatch->weather.newData) {
                 lv_label_set_text_fmt(lv_info, "%s - %s, #ffffff %i°C# - Today #ff9090 %i°C# / #9090ff %i°C#", 
                     smartwatch->weather.location, 
                     smartwatch->weather.currentCondition, 
@@ -112,7 +112,7 @@ class Clock : public Application
                     smartwatch->weather.todayMinTemp
                 );
                 smartwatch->weather.newData = false;
-            }
+            }*/
             
             save_old_time();
         };
@@ -126,12 +126,12 @@ class Clock : public Application
                 case Touch::Gestures::SlideUp:
                     smartwatch->load_application(Applications::Notifications, Smartwatch::RefreshDirections::Up);
                     return true;
-                case Touch::Gestures::SlideRight:
+                /*case Touch::Gestures::SlideRight:
                     smartwatch->load_application(Applications::Steps, Smartwatch::RefreshDirections::Right);
                     return true;
                 case Touch::Gestures::SlideLeft:
                     smartwatch->load_application(Applications::HeartRate, Smartwatch::RefreshDirections::Left);
-                    return true;
+                    return true;*/
                 default:
                     return false;
             }

@@ -55,7 +55,7 @@ class QMenu : public Application
 
             lbl_backlight = lv_label_create(btn_backlight);
             lv_obj_set_style_text_font(lbl_backlight, &lv_font_sys_48, 0);
-            lv_label_set_text_static(lbl_backlight, smartwatch->backlight.get_icon(smartwatch->backlight.get_level()));
+            lv_label_set_text_static(lbl_backlight, smartwatch->backlight.get_icon(3));
             lv_obj_center(lbl_backlight);
 
             btn_settings = lv_btn_create(this->screen);
@@ -68,7 +68,7 @@ class QMenu : public Application
             lv_obj_center(btn_label);
 
 
-            set_update_interval(1000);
+            set_update_interval(500);
             update();
         };
 
@@ -107,7 +107,9 @@ class QMenu : public Application
                 if ( level > 3 ) {
                     level = 1;
                 }
-                 smartwatch->backlight.set_level(level);
+                smartwatch->backlight.set_level(level);
+                lv_label_set_text_static(lbl_backlight, smartwatch->backlight.get_icon(level));
+                //smartwatch->load_application(Applications::Backlight, Smartwatch::RefreshDirections::Down);
             } else if ( bt == btn_settings ) {
                 //smartwatch->settings.show();
                 smartwatch->load_application(Applications::Debug, Smartwatch::RefreshDirections::Down);
