@@ -42,6 +42,36 @@ void Smartwatch::hardware_callback(TimerHandle_t xTimer) {
     sw->hardware_update();
 }
 
+void Smartwatch::gesture_event_cb(lv_event_t * e) {
+    auto sw = static_cast<Smartwatch *>(lv_event_get_user_data(e));
+
+    lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_get_act());
+
+    switch (dir) {
+        case LV_DIR_LEFT:
+            sw->gesture(Touch::Gestures::SlideLeft);    
+            break;
+        case LV_DIR_RIGHT:
+            sw->gesture(Touch::Gestures::SlideRight);
+            break;
+        case LV_DIR_TOP:
+            sw->gesture(Touch::Gestures::SlideUp);
+            break;
+        case LV_DIR_BOTTOM:
+            sw->gesture(Touch::Gestures::SlideDown);
+            break;
+        default:
+            break;
+    }
+
+}
+
+void Smartwatch::gesture( Touch::Gestures gesture ) {
+    /*if ( !currentApplication->gestures(gesture) ) {
+
+    }*/
+}
+
 void Smartwatch::init(void) {
 
     resetReason = actual_reset_reason();
@@ -54,7 +84,7 @@ void Smartwatch::init(void) {
     display.init();
     lvglmodule.init();
     backlight.init();
-    backlight.set_level(2);
+    backlight.set_value(44);
     vibration.init();
     
     //stepCount.initialize();
@@ -72,6 +102,7 @@ void Smartwatch::init(void) {
     appUpdateTimer.begin(ms2tick(1000), Smartwatch::lv_update_app, this, pdTRUE);
 
     main_scr = lv_scr_act();
+    //lv_obj_add_event_cb(main_scr, gesture_event_cb, LV_EVENT_GESTURE, this);
 
     load_application(Applications::Clock, RefreshDirections::None);
 
@@ -244,11 +275,12 @@ void Smartwatch::run(void) {
                 break;
 
             case Messages::GoToSleep:
+                sleep();
                 if (currentApp != Applications::Clock) {
                     load_application(Applications::Clock, RefreshDirections::None);
-                }
-                sleep();
+                }                
                 state = States::Idle;
+                runLvgl = false;
                 break;
 
             case Messages::OnChargingEvent:
@@ -272,6 +304,9 @@ void Smartwatch::run(void) {
             case Messages::BleConnected:
                 push_message(Messages::BleData);
                 set_bluetooth_connected(true);
+                set_notification("\n\xEE\xA4\x83 Bluetooth", "\n\nPhone connected !", Smartwatch::MessageType::Info);
+                push_message(Messages::WakeUp);
+                load_application(Applications::ShowMessage, RefreshDirections::Up);
                 ble_send_version();
                 break;
 
@@ -279,16 +314,20 @@ void Smartwatch::run(void) {
                 push_message(Messages::BleData);
                 set_bluetooth_connected(false);
 
-                set_notification("\n\xEE\xA4\x83 Bluetooth", "\n\nBluetooth disconnected !", Smartwatch::MessageType::Info);
+                set_notification("\n\xEE\xA4\x83 Bluetooth", "\n\nPhone disconnected !", Smartwatch::MessageType::Info);
                 push_message(Messages::WakeUp);
                 load_application(Applications::ShowMessage, RefreshDirections::Up);
                 break;
 
             case Messages::OnTouchEvent:
+                if (state != States::Idle) {
+                    push_message(Messages::ReloadIdleTimer);
+                }
                
+                /*
                 //touch.get();
                 //gesture = touch.readGesture();
-                gesture = touch.getGesture();
+                //gesture = touch.getGesture();
                 //lvglmodule.set_touch_data(gesture, touch.getEvent(), touch.getX(), touch.getY());
                 //touch.cleanGesture();        
                 //gesture = lvglmodule.get_touch_gesture();  
@@ -311,7 +350,8 @@ void Smartwatch::run(void) {
                         break;
                     }
                 }                
-
+                */
+                gesture = touch.readGesture();
                 if ( gesture == Touch::Gestures::None ) break;
                 
                 if ( !currentApplication->gestures(gesture) ) {
@@ -321,6 +361,8 @@ void Smartwatch::run(void) {
                         //lvglmodule.set_touch_data(gesture, touch.getEvent(), touch.getX(), touch.getY());
                     }*/
                 }
+                
+                
                 break;
 
             case Messages::BleData:
@@ -334,15 +376,13 @@ void Smartwatch::run(void) {
                     break;
                 }
                 if (state == States::Running) {
-                    push_message(Messages::ReloadIdleTimer);
-
-                    if (currentApp == Applications::Clock) {
-                        if (backlight.is_dimmed()) {
-                            backlight.restore_dim();
-                        }
+                    //push_message(Messages::ReloadIdleTimer);
+                    idleTimer.reset();
+                    if (currentApp == Applications::Clock) {                        
                         push_message(Messages::GoToSleep);
                         break;
                     }
+                    push_message(Messages::ReloadIdleTimer);
                     load_application(returnToApp, returnDirection);
                     break;
                 }
@@ -352,7 +392,7 @@ void Smartwatch::run(void) {
             case Messages::ReloadIdleTimer:
                 idleTimer.reset();
                 if (backlight.is_dimmed()) {
-                    backlight.set_level(backlight.get_saved_level());
+                    backlight.set_value(backlight.get_save_value());
                 }
                 break;
                         
@@ -385,8 +425,7 @@ void Smartwatch::run(void) {
 
 void Smartwatch::on_idle() {
     if(doNotGoToSleep) return;
-    if (backlight.is_dimmed()) {
-        backlight.restore_dim();
+    if (backlight.is_dimmed()) {        
         push_message(Messages::GoToSleep);
     } else {
         backlight.dim();
@@ -430,12 +469,12 @@ void Smartwatch::resume_task( TaskHandle_t xTaskToResume ) {
 }
 
 void Smartwatch::sleep() {    
-    backlight.save_level();
-    backlight.set_level(0);
-    while (backlight.get_level() > 0) {
+    backlight.save_value();
+    backlight.set_value(0);
+    while (backlight.get_value() > 0) {
         vTaskDelay(500);
     }
-    runLvgl = false;
+    
     display.sleep();
 
     //touch.sleep(true);
@@ -447,8 +486,7 @@ void Smartwatch::sleep() {
 }
 
 void Smartwatch::wakeup() {    
-    //resume_task( _lvglHandle );
-    display.wake_up();    
+    //resume_task( _lvglHandle );        
     //update_application();
     //lv_timer_handler();
     //lv_tick_inc(1);
@@ -457,6 +495,7 @@ void Smartwatch::wakeup() {
     idleTimer.start();
     hardwareTimer.setPeriod(pdMS_TO_TICKS(5000));
     runLvgl = true;
+    display.wake_up();
     //appUpdateTimer.start();
-    backlight.set_level(backlight.get_saved_level());
+    backlight.set_value(backlight.get_save_value());
 }

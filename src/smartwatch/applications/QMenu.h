@@ -39,10 +39,10 @@ class QMenu : public Application
 
             btn_dont_disturb = lv_btn_create(this->screen);
             lv_obj_add_event_cb(btn_dont_disturb, QMenu::button_event_handler, LV_EVENT_CLICKED, this);
+            lv_obj_set_style_bg_color(btn_dont_disturb, lv_color_hex(0x006600), LV_STATE_CHECKED);
             lv_obj_add_flag(btn_dont_disturb, LV_OBJ_FLAG_CHECKABLE);
             lv_obj_add_state(btn_dont_disturb, smartwatch->get_disturb_mode() ? LV_STATE_DEFAULT : LV_STATE_CHECKED);
-            lv_obj_align(btn_dont_disturb, LV_ALIGN_CENTER, -55, -20);
-            lv_obj_set_style_bg_color(btn_dont_disturb, lv_color_hex(0x006600), LV_STATE_CHECKED);
+            lv_obj_align(btn_dont_disturb, LV_ALIGN_CENTER, -55, -20);            
 
             lbl_dont_disturb = lv_label_create(btn_dont_disturb);
             lv_obj_set_style_text_font(lbl_dont_disturb, &lv_font_sys_48, 0);
@@ -55,7 +55,7 @@ class QMenu : public Application
 
             lbl_backlight = lv_label_create(btn_backlight);
             lv_obj_set_style_text_font(lbl_backlight, &lv_font_sys_48, 0);
-            lv_label_set_text_static(lbl_backlight, smartwatch->backlight.get_icon(3));
+            lv_label_set_text_static(lbl_backlight, "\xEE\xA4\x84");
             lv_obj_center(lbl_backlight);
 
             btn_settings = lv_btn_create(this->screen);
@@ -88,7 +88,7 @@ class QMenu : public Application
                 lv_obj_set_style_text_color(lv_ble, lv_color_hex(0x606060), 0);
             }
 
-            lv_label_set_text_static(lbl_backlight, smartwatch->backlight.get_icon(smartwatch->backlight.get_level()));
+            //lv_label_set_text_static(lbl_backlight, smartwatch->backlight.get_icon(smartwatch->backlight.get_level()));
 
             lv_label_set_text_static(lbl_dont_disturb, smartwatch->get_disturb_mode() ? "\xEE\xA4\x8B" : "\xEE\xA4\x8C");
         };
@@ -103,15 +103,14 @@ class QMenu : public Application
             if ( bt == btn_dont_disturb ) {
                 smartwatch->set_disturb_mode(!lv_obj_has_state(bt, LV_STATE_CHECKED));
             } else if ( bt == btn_backlight ) {
-                uint8_t level = smartwatch->backlight.get_level() + 1;
+                /*uint8_t level = smartwatch->backlight.get_level() + 1;
                 if ( level > 3 ) {
                     level = 1;
                 }
                 smartwatch->backlight.set_level(level);
-                lv_label_set_text_static(lbl_backlight, smartwatch->backlight.get_icon(level));
-                //smartwatch->load_application(Applications::Backlight, Smartwatch::RefreshDirections::Down);
+                lv_label_set_text_static(lbl_backlight, smartwatch->backlight.get_icon(level));*/
+                smartwatch->load_application(Applications::Backlight, Smartwatch::RefreshDirections::Down);
             } else if ( bt == btn_settings ) {
-                //smartwatch->settings.show();
                 smartwatch->load_application(Applications::Debug, Smartwatch::RefreshDirections::Down);
             }
 

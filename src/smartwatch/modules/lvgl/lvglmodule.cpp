@@ -67,23 +67,23 @@ void LvglModule::init(void) {
 void LvglModule::touchpad(lv_indev_data_t* data) {
 
     // Get the touchpad's position    
-    //touch.get();
+    touch.get();
 
     //data->point.x = touch.getX();
     //data->point.y = touch.getY();
 
+    //touch_event = touch.getEvent();
+
     //touch_gesture = touch.getGesture();
 
-    //set_touch_data(touch.getGesture(), touch.getEvent(), touch.getX(), touch.getY());
+    set_touch_data(touch.getGesture(), touch.getEvent(), touch.getX(), touch.getY());
 
     data->point.x = touch_xpos;
     data->point.y = touch_ypos;
 
-    if (touch_gesture == Touch::Gestures::SingleTap) {
-        data->state = LV_INDEV_STATE_PR;
-        //data->point.x = touch_xpos;
-        //data->point.y = touch_ypos;
-        touch_gesture = Touch::Gestures::None;
+    if (touch_event == 2) {
+        data->state = LV_INDEV_STATE_PR;        
+        //touch_gesture = Touch::Gestures::None;
     } else {
         data->state = LV_INDEV_STATE_REL;
         //data->point.x = 0;

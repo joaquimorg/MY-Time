@@ -175,6 +175,9 @@ class Smartwatch
 
         static void hardware_callback(TimerHandle_t xTimer);
 
+        static void gesture_event_cb(lv_event_t * e);
+        void gesture( Touch::Gestures gesture );
+
         void sleep();
         void wakeup();
 

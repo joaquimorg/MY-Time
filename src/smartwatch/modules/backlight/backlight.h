@@ -7,10 +7,8 @@
 class Backlight
 {
   protected:
-    uint8_t backlightLevel = 0;
-    uint8_t backlightSaveLevel = 0;
-    uint8_t backlightNewLevel = 0;
     SoftwareTimer lightTimer;
+    uint16_t backlightSaveValue = 0;
     uint16_t backlightNewValue = 0;
     uint16_t backlightValue = 0;
     bool isDimmed = false;
@@ -20,24 +18,22 @@ class Backlight
 
   public:
     Backlight(void);
-    void init(void);
+    void init(void);    
 
-    void set_level(uint8_t level);
-    void save_level(void) { backlightSaveLevel = backlightLevel; }
-    uint8_t get_saved_level(void) { return backlightSaveLevel; }
-    uint8_t get_level(void);
-    const char * get_icon(uint8_t level);
+    void set_value(uint16_t value);
+    uint16_t get_value(void) { return backlightValue; }  
+    uint16_t get_save_value(void) { return backlightSaveValue; }
+    void save_value(void) { if(!isDimmed) { backlightSaveValue = backlightValue;} }
 
     void dim(void) {
-      save_level();
-      set_level(9);
+      backlightSaveValue = backlightValue;
+      if (backlightValue > 5) {
+        set_value(5);
+      }
+      isDimmed = true;
     };
 
     bool is_dimmed(void) { return isDimmed; };
-
-    void restore_dim(void) {
-      backlightLevel = backlightSaveLevel;
-    };
 
 };
 

@@ -27,12 +27,12 @@ void Backlight::init(void){
 
    HwPWM0.addPin( LCD_LIGHT_3 );
    HwPWM0.begin();
-   HwPWM0.setMaxValue(256);
+   HwPWM0.setMaxValue(128);
    HwPWM0.setClockDiv(PWM_PRESCALER_PRESCALER_DIV_16); // freq = 1Mhz
 
    HwPWM0.writePin(LCD_LIGHT_3, backlightValue, true);
 
-   lightTimer.begin(ms2tick(2), Backlight::timer_callback, this, pdTRUE);
+   lightTimer.begin(ms2tick(6), Backlight::timer_callback, this, pdTRUE);
    
 }
 
@@ -47,76 +47,16 @@ void Backlight::backlight_timer(void) {
 
    if ( backlightNewValue == backlightValue ) {
       lightTimer.stop();
-      backlightLevel = backlightNewLevel;
-      if ( backlightLevel == 0 ) {
+      if ( backlightValue == 0 ) {
          HwPWM0.writePin(LCD_LIGHT_3, 0, true);
          digitalWrite(LCD_LIGHT_3, HIGH);
       }
    }
 }
 
-void Backlight::set_level(uint8_t level) {
-      
-   if ( level == backlightLevel ) return;
+void Backlight::set_value(uint16_t value) {
+   backlightNewValue = value;
+   //HwPWM0.writePin(LCD_LIGHT_3, backlightValue, true);
+   lightTimer.start();
    isDimmed = false;
-   switch (level) {
-      case 0:
-         backlightNewLevel = 0;
-         backlightNewValue = 0;
-         
-         lightTimer.start();
-         break;
-      case 1:
-         backlightNewLevel = 1;
-         backlightNewValue = 64;
-         
-         lightTimer.start();
-         break;
-      case 2:       
-         backlightNewLevel = 2;
-         backlightNewValue = 128;
-         
-         lightTimer.start();
-         break;
-      case 3:
-         backlightNewLevel = 3;
-         backlightNewValue = 256;
-         
-         lightTimer.start();
-         break;
-
-      case 9:
-         isDimmed = true;
-         backlightNewLevel = 9;
-         backlightNewValue = 16;
-         
-         lightTimer.start();
-         break;
-
-      default:
-         break;
-   }
-   
-}
-
-uint8_t Backlight::get_level(void){
-   return backlightLevel;
-}
-
-const char * Backlight::get_icon(uint8_t level) {
-   if ( level == 9 ) level = backlightSaveLevel;
-   switch (level) {
-      case 1:
-         return "\xEE\xA4\x85";
-      break;
-      case 2:
-         return "\xEE\xA4\x86";
-      break;
-      case 3:
-         return "\xEE\xA4\x84";
-      break;
-      default:
-         return "\xEE\xA4\x85";
-      break;
-   }
 }

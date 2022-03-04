@@ -34,8 +34,8 @@ void button_callback(void) {
 
 void tp_callback(void) {
     if (digitalRead(TP_IRQ) == LOW) {
-        smartwatch->touch.get();
-        smartwatch->lvglmodule.set_touch_data(smartwatch->touch.getGesture(), smartwatch->touch.getEvent(), smartwatch->touch.getX(), smartwatch->touch.getY());
+        //smartwatch->touch.get();
+        //smartwatch->lvglmodule.set_touch_data(smartwatch->touch.getGesture(), smartwatch->touch.getEvent(), smartwatch->touch.getX(), smartwatch->touch.getY());
         if (xTimerIsTimerActive(tpTimer) == pdFALSE) {
             smartwatch->push_message(Smartwatch::Messages::OnTouchEvent);
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;

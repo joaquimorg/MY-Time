@@ -76,6 +76,7 @@ class Clock : public Application
             update();
 
             set_update_interval(500);
+            
         };
 
         void update(void) {
