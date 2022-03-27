@@ -13,7 +13,7 @@
 #include "QMenu.h"
 #include "AppBacklight.h"
 #include "Notifications.h"
-//#include "Steps.h"
+#include "Steps.h"
 //#include "HeartRate.h"
 
 
@@ -222,11 +222,11 @@ void Smartwatch::load_application(Applications app, RefreshDirections dir) {
             currentApplication = std::make_unique<Notifications>(this);
             return_app(Applications::Clock, Touch::Gestures::SlideDown, RefreshDirections::Down);
             break;
-        /*case Applications::Steps:
+        case Applications::Steps:
             currentApplication = std::make_unique<Steps>(this);
             return_app(Applications::Clock, Touch::Gestures::SlideLeft, RefreshDirections::Left);
             break;
-        case Applications::HeartRate:
+        /*case Applications::HeartRate:
             currentApplication = std::make_unique<HeartRate>(this);
             return_app(Applications::Clock, Touch::Gestures::SlideRight, RefreshDirections::Right);
             break;*/

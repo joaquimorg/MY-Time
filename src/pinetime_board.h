@@ -8,6 +8,7 @@
 #define SPI_SCK         2
 #define SPI_MOSI        3
 #define SPI_MISO        4
+#define PIN_LRCK        29
 
 #define FLASH_CSN       5
 

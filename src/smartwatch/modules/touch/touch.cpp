@@ -1,4 +1,4 @@
-#include "Touch.h"
+#include "touch.h"
 #include "pinetime_board.h"
 #include "nrf52.h"
 #include "i2c.h"

@@ -10,6 +10,7 @@ build
 *.map
 *.out
 !bootloader/*.hex
+!src/libs/nRF52/softdevice/s112/hex/*.hex
 
 # Linux
 **/.directory

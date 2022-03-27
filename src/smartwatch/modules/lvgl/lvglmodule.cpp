@@ -3,7 +3,7 @@
 #include "lvgl.h"
 #include "lv_theme_pinetime.h"
 #include "fast_spi.h"
-
+#include "I2S.h"
 
 /**
  * Constructor
@@ -27,6 +27,7 @@ void LvglModule::touchpad_read(lv_indev_drv_t* indev_drv, lv_indev_data_t* data)
 }
 
 void LvglModule::init(void) {
+
 
     writeOffset = 0;
     scrollOffset = 0;
@@ -92,8 +93,13 @@ void LvglModule::touchpad(lv_indev_data_t* data) {
     //touch_gesture = Touch::Gestures::None;
 }
 
+uint16_t convertColor(uint8_t r, uint8_t g, uint8_t b) {
+    return ((r >> 3) << 11 | (g >> 2) << 5 | (b >> 3));
+}
+
 void LvglModule::flush_display(const lv_area_t* area, lv_color_t* color_p) {
 
+    
     uint16_t y1, y2, width, height = 0;    
 
     display.start_write_display();
@@ -128,8 +134,9 @@ void LvglModule::flush_display(const lv_area_t* area, lv_color_t* color_p) {
             else {
                 toScroll -= scrollOffset;
                 scrollOffset = (totalNbLines)-toScroll;
-            }
-            display.vertical_scroll_definition(0, totalNbLines, 0, scrollOffset);
+            }            
+            display.vertical_scroll_definition(0, totalNbLines, 0, scrollOffset);            
+
         }
     }
     else if (this->scrollDirection == refreshDirections::Up) {
@@ -143,7 +150,7 @@ void LvglModule::flush_display(const lv_area_t* area, lv_color_t* color_p) {
             else {
                 scrollOffset += height;
             }
-            scrollOffset = scrollOffset % totalNbLines;
+            scrollOffset = scrollOffset % totalNbLines;            
             display.vertical_scroll_definition(0, totalNbLines, 0, scrollOffset);
         }
     }
@@ -160,28 +167,35 @@ void LvglModule::flush_display(const lv_area_t* area, lv_color_t* color_p) {
         }
     }
 
+    display.end_write_display();
+
     if (y2 < y1) {
         height = totalNbLines - y1;
 
         if (height > 0) {
-            display.set_addr_display(area->x1, y1, width, height);
-            write_fast_spi(reinterpret_cast<const uint8_t*>(color_p), (width * height * 2));
+            //display.set_addr_display(area->x1, y1, width, height);            
+            //write_fast_spi(reinterpret_cast<const uint8_t*>(color_p), (width * height * 2));
+            display.drawBitmap_I2S_wh(area->x1, y1, width, height, reinterpret_cast<uint8_t*>(color_p));
+
         }
 
         uint16_t pixOffset = width * height;
 
-        height = y2 + 1;
-
-        display.set_addr_display(area->x1, 0, width, height);
-        write_fast_spi(reinterpret_cast<const uint8_t*>(color_p + pixOffset), (width * height * 2));
+        height = y2 + 1;        
+        //display.set_addr_display(area->x1, 0, width, height);
+        //write_fast_spi(reinterpret_cast<const uint8_t*>(color_p + pixOffset), (width * height * 2));
+        display.drawBitmap_I2S_wh(area->x1, 0, width, height, reinterpret_cast<uint8_t*>(color_p + pixOffset));
 
     }
-    else {
-        display.set_addr_display(area->x1, y1, width, height);
-        write_fast_spi(reinterpret_cast<const uint8_t*>(color_p), (width * height * 2));
-    }
-
-    display.end_write_display();
+    else {        
+        //display.set_addr_display(area->x1, y1, width, height);
+        //write_fast_spi(reinterpret_cast<const uint8_t*>(color_p), (width * height * 2));
+        display.drawBitmap_I2S_wh(area->x1, y1, width, height, reinterpret_cast<uint8_t*>(color_p));
+    }    
+    
+    
+    
+    //display.drawBitmap_I2S(area->x1, area->y1, area->x2, area->y2, reinterpret_cast<uint8_t*>(color_p));
 
     lv_disp_flush_ready(&disp_drv);
 }

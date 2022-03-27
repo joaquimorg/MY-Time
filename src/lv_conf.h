@@ -304,7 +304,6 @@ LV_FONT_DECLARE(lv_font_sys_48) \
 LV_FONT_DECLARE(lv_font_clock_42) \
 LV_FONT_DECLARE(lv_font_clock_90) \
 
-
 /*Always set a default font*/
 #define LV_FONT_DEFAULT &lv_font_24
 

@@ -59,7 +59,17 @@ $ cmake -S . -B "build" -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DARM_NONE_EABI_TO
 
 $ cmake --build build
 
-$ cmake --build build --target FLASH
+$ cmake --build build --target #COMMANDS#
+
+#COMMANDS#
+- FLASH_ERASE
+- FLASH_SOFTDEVICE
+- MAKE_BOOT
+- MAKE_PKG
+- MAKE_PKG_OLD
+- MAKE_BOOT_PKG
+- FLASH_ALL
+- FLASH_APP
 
 
 WSL Windows build fix

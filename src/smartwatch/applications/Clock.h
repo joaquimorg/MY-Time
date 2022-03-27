@@ -127,10 +127,10 @@ class Clock : public Application
                 case Touch::Gestures::SlideUp:
                     smartwatch->load_application(Applications::Notifications, Smartwatch::RefreshDirections::Up);
                     return true;
-                /*case Touch::Gestures::SlideRight:
+                case Touch::Gestures::SlideRight:
                     smartwatch->load_application(Applications::Steps, Smartwatch::RefreshDirections::Right);
                     return true;
-                case Touch::Gestures::SlideLeft:
+                /*case Touch::Gestures::SlideLeft:
                     smartwatch->load_application(Applications::HeartRate, Smartwatch::RefreshDirections::Left);
                     return true;*/
                 default:
