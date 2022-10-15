@@ -51,6 +51,7 @@ $ wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc
 $ sudo tar xjf gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2 -C /usr/share
 $ sudo apt install ninja-build
 $ sudo apt install cmake
+$ pip install nrfutil
 
 $ git clone --recurse-submodules https://github.com/joaquimorg/MY-Time.git
 $ cd MY-Time

@@ -11,7 +11,7 @@ endif ()
 
 set(OPENOCD_BIN_PATH "openocd.exe")
 
-set(NRFUTIL "/usr/share/nrfutil/nrfutil")
+set(NRFUTIL "nrfutil")
 
 # Setup .toolchain
 include(${CMAKE_SOURCE_DIR}/cmake-nRF5x/arm-gcc-toolchain.cmake)
